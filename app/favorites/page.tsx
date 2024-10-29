@@ -4,7 +4,7 @@ import {
   Container,
 } from "@chakra-ui/react";
 
-function Dashboard() {
+function Page() {
 
   return (
     <Container maxW="container.lg" p={3}>
@@ -13,4 +13,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Page;

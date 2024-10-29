@@ -15,11 +15,11 @@ const masonryStyles = css`
   .my-masonry-grid {
     display: flex;
     width: auto;
-    margin-left: -15px; /* 调整间距 */
+    margin-left: -15px; 
   }
 
   .my-masonry-grid_column {
-    padding-left: 15px; /* 调整间距 */
+    padding-left: 15px; 
     background-clip: padding-box;
   }
 `;
@@ -41,7 +41,7 @@ const Waterfall: React.FC = () => {
   };
 
   const fetchData = useCallback(async () => {
-    if (!hasMore || loading) return;
+    if (loading || !hasMore) return; // 避免重复请求
     setLoading(true);
 
     try {
@@ -68,22 +68,29 @@ const Waterfall: React.FC = () => {
     }
   }, [hasMore, loading, page]);
 
+  const hasFetchedOnce = useRef(false);
+
   useEffect(() => {
-    fetchData();
+    if (!hasFetchedOnce.current) {
+      fetchData(); // 只在第一次进入页面时请求
+      hasFetchedOnce.current = true; // 设置为 true，表示已经请求过
+    }
   }, [fetchData]);
+  
 
   const lastImageRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
+      if (loading || !hasMore) return; // 如果正在加载或没有更多数据，避免触发
+
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            fetchData();
+          if (entries[0].isIntersecting) {
+            fetchData(); // 当最后一张图片进入视口时加载更多
           }
         },
-        { rootMargin: "200px", threshold: 0.1 }
+        { rootMargin: "100px", threshold: 0.2 }
       );
 
       if (node) observer.current.observe(node);
@@ -104,7 +111,6 @@ const Waterfall: React.FC = () => {
 
   return (
     <>
-      {/* 全局应用样式 */}
       <Global styles={masonryStyles} />
       <Box>
         <Masonry
@@ -114,7 +120,7 @@ const Waterfall: React.FC = () => {
         >
           {imageList.map((item, index) => (
             <Suspense fallback={<div>Loading...</div>} key={item.ID}>
-              <Box  key={item.ID}>
+              <Box>
                 <ImageOverlay
                   src={item.image_url}
                   openModal={() => openModal(item.image_url)}
