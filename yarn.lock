@@ -183,10 +183,10 @@
     "@babel/helper-string-parser" "^7.25.9"
     "@babel/helper-validator-identifier" "^7.25.9"
 
-"@chakra-ui/cli@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.npmmirror.com/@chakra-ui/cli/-/cli-3.0.1.tgz#763dcde86d583a34eceb67aab37ca7440027f64b"
-  integrity sha512-bN3aQVPnUHth2vK6krEpHsyfNcWUx0kw79qxG6tIjLvkBfhDksImqPajZjIzXOqm+k3Bn29NFVG4Q70KsYU14A==
+"@chakra-ui/cli@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.npmmirror.com/@chakra-ui/cli/-/cli-3.0.2.tgz#72114027f25cb5c57f635c66fdf19b57631ff21b"
+  integrity sha512-BwFqYVou0QZd4lQb9sEUPasV8vkPnBcDJg7HQFuGM1H2VQG3EhZ7LJIDKzDsHk/o4ufbQxKzC18evD0RXbUHeQ==
   dependencies:
     "@clack/prompts" "0.7.0"
     "@pandacss/is-valid-prop" "0.41.0"

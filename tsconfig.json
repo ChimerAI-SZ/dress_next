@@ -21,10 +21,14 @@
     "types": ["node", "prop-types"],
     "customConditions": ["source"],
     "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
     "paths": {
-      "@chakra-ui/react": ["../../packages/react/src"]
+      "@chakra-ui/react": ["../../packages/react/src"],
+      "@img/*": ["./public/assets/images/*"],
+      "@definitions/*": ["./definitions/*"],
+      "@/*": ["./src/*"]
     }
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts","declarations.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "declarations.d.ts"]
 }
