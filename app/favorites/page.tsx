@@ -1,12 +1,12 @@
 import { Container } from '@chakra-ui/react'
 import Header from './components/Header'
-import { Field } from '@components/ui/field'
+import FavouritesList from './components/FavouritesList'
 
 function Page() {
   return (
     <Container maxW="container.lg">
       <Header name="Like" addBtnvisible />
-      <Field />
+      <FavouritesList />
     </Container>
   )
 }
