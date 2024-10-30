@@ -26,7 +26,8 @@
       "@chakra-ui/react": ["../../packages/react/src"],
       "@img/*": ["./public/assets/images/*"],
       "@definitions/*": ["./definitions/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./components/*"]
     }
   },
   "exclude": ["node_modules"],
