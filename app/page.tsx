@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 
-import Waterfall from "../components/Waterfall";
+import Waterfall from "./components/Waterfall";
 // import ImageGuideModal from "../components/Common/ImageGuideModal";
 
 function Dashboard() {

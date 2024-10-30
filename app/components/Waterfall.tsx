@@ -1,5 +1,6 @@
+"use client";
 import React, { useState, useRef, useEffect, Suspense, useCallback } from "react";
-import axios from "axios";
+import axios from "../../lib/axios";
 import Masonry from "react-masonry-css";
 import { Box, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import ImageOverlay from "./ImageOverlay";
@@ -46,15 +47,13 @@ const Waterfall: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://create.aimoda.tech:3000/api/image/list",
+        "/api/image/list",
         {
           limit: 10,
           offset: page * 10,
           library: "top_sales",
         },
-        {
-          headers: { "Content-Type": "text/plain" },
-        }
+
       );
       const newImages = response.data.data;
 
@@ -62,7 +61,7 @@ const Waterfall: React.FC = () => {
       setHasMore(newImages.length > 0);
       setPage((prev) => prev + 1);
     } catch (err) {
-      setError(axios.isAxiosError(err) ? err.message : "An unexpected error occurred");
+      console.log(err);
     } finally {
       setLoading(false);
     }
