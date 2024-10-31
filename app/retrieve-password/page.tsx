@@ -16,7 +16,7 @@ import Lock from "@img/login/lock.svg";
 import { useRouter } from "next/navigation";
 interface FormValues {
   email: string;
-  password: string;
+  userName: string;
 }
 
 // 模拟检查邮箱是否已注册的函数
@@ -63,10 +63,10 @@ const Page = () => {
           pt="10rem"
           textAlign="center"
         >
-          Login
+          Trouble logging in?
         </Text>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack pt="2rem" pb="4rem" w="100%">
+          <VStack pt="4rem" pb="4rem" w="100%">
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
                 <Field
@@ -91,17 +91,12 @@ const Page = () => {
                           value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
                           message: "Invalid email format",
                         },
-                        validate: async (value) => {
-                          const isRegistered =
-                            await checkEmailRegistered(value);
-                          return isRegistered ? "true" : "Unregistered email";
-                        },
                       })}
                       maxW="md"
                       name="email"
                       type="email"
                       variant="flushed"
-                      placeholder="Type your email"
+                      placeholder="Email, Phone"
                       borderBlockEnd="1px solid #A2A2A2"
                       _focusVisible={{
                         borderColor: "#A2A2A2",
@@ -115,63 +110,22 @@ const Page = () => {
                     </Text>
                   )}
                 </Field>
-                <Field
-                  label="Password"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.password}
-                >
-                  <InputGroup
-                    w="100%"
-                    startElement={
-                      <Image src={Lock.src} alt="Lock" boxSize="0.75rem" />
-                    }
-                    bg={!!errors.password ? "#ffe0e0" : ""}
-                  >
-                    <Input
-                      {...register("password", {
-                        required: "Password is required",
-                        minLength: {
-                          value: 6,
-                          message: "Password must be at least 6 characters",
-                        },
-                      })}
-                      flex="1"
-                      name="password"
-                      type="password"
-                      variant="flushed"
-                      placeholder="Type your password"
-                      borderBlockEnd="1px solid #A2A2A2"
-                      _focusVisible={{
-                        borderColor: "#A2A2A2",
-                        boxShadow: "none",
-                      }}
-                    />
-                  </InputGroup>
-                  {errors.password && (
-                    <Text color="red.500" fontSize="0.75rem">
-                      {errors.password.message}
-                    </Text>
-                  )}
-                </Field>
               </Fieldset.Content>
-              <Text
-                fontFamily="Arial"
-                fontSize="0.625rem"
-                fontWeight="400"
-                color="#A2A2A2"
-                textAlign="right"
-                cursor="pointer"
-                onClick={navPassword}
-              >
-                Forgot password
-              </Text>
             </Fieldset.Root>
           </VStack>
           <VStack pb="4rem" w="100%">
+            <Text
+              fontFamily="Arial"
+              fontSize="0.75rem"
+              fontWeight="400"
+              color="#A2A2A2"
+              textAlign="center"
+            >
+              Enter you email, phone, or username and we’ll send you a link to
+              get back into your account.
+            </Text>
             <Button w="100%" type="submit" py="1.75rem">
-              LOGIN
+              Send login link
             </Button>
             <Text
               fontFamily="Arial"
@@ -180,7 +134,7 @@ const Page = () => {
               color="#A2A2A2"
               textAlign="center"
             >
-              Don't have an account?
+              Create new account
             </Text>
             <Text
               fontFamily="Arial"
@@ -191,7 +145,7 @@ const Page = () => {
               cursor="pointer"
               onClick={naviRegister}
             >
-              SIGN UP
+              LOGIN
             </Text>
           </VStack>
         </form>

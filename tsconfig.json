@@ -27,7 +27,8 @@
       "@img/*": ["./public/assets/images/*"],
       "@definitions/*": ["./definitions/*"],
       "@/*": ["./src/*"],
-      "@components/*": ["./components/*"]
+      "@components/*": ["./components/*"],
+      "@lib/*": ["./lib/*"]
     }
   },
   "exclude": ["node_modules"],
