@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { Button, Text, HStack } from "@chakra-ui/react";
 
-interface CountdownTimerProps {
+interface CountdownTimerProps<T> {
   initialCountdown?: number;
-  onResend: () => void;
-  isActive?: boolean; // 新增，用于控制倒计时是否立即激活
+  onResend: (params: T) => Promise<void>; // onResend 接收一个参数
+  isActive?: boolean;
+  resendParams: T; // 新增，提供给 onResend 的参数
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({
+const CountdownTimer = <T,>({
   initialCountdown = 40,
   onResend,
   isActive = false,
-}) => {
+  resendParams, // 需要传递的参数
+}: CountdownTimerProps<T>) => {
   const [countdown, setCountdown] = useState<number>(0);
 
   useEffect(() => {
@@ -27,9 +29,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     }
   }, [countdown]);
 
-  const handleResend = () => {
+  // 处理异步的重发逻辑
+  const handleResend = async () => {
     setCountdown(initialCountdown); // 重置倒计时
-    onResend(); // 触发发送验证码的回调
+    await onResend(resendParams); // 将参数传递给 onResend
   };
 
   return (

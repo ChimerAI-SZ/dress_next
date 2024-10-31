@@ -44,10 +44,12 @@ const Page = () => {
     handleSubmit,
     formState: { errors },
     setError,
+    watch,
   } = useForm<FormValues>();
 
   const [pageState, setPageState] = useState<PageState>(PageState.INITIAL);
-
+  // 使用 watch 获取当前表单中的 email 值
+  const email = watch("email");
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
     const emailRegistered = await checkEmailRegistered(data.email);
@@ -196,6 +198,12 @@ const Page = () => {
                           initialCountdown={40}
                           onResend={handleSendCode}
                           isActive={pageState === PageState.CODE_SENT}
+                          resendParams={{
+                            email: email,
+                            userName: "",
+                            code: "",
+                            password: "",
+                          }}
                         />
                       }
                       bg={!!errors.code ? "#ffe0e0" : ""}
