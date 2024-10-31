@@ -9,9 +9,8 @@ export type FavouriteItem = {
 
 // 收藏页 header 的 props 类型
 export interface FavouritesHeaderProps {
-  name: string
+  name: string | null
   addBtnvisible: boolean
-  handleBack: React.MouseEventHandler<HTMLDivElement>
   handleAddFavourites: React.MouseEventHandler<HTMLDivElement>
 }
 
