@@ -23,11 +23,10 @@ export default async function CustomersTable() {
           {(item: FavouriteItem, index: number) => (
             <StyledLink
               href={{
-                pathname: '/favorites/item',
-                query: { name: item.name } as NextRouter['query']
+                pathname: `/favorites/${item.id}`,
+                query: { name: encodeURIComponent(item.name) } as NextRouter['query']
               }}
               key={item.id + index}
-              onClick={() => {}}
             >
               <Favourites favouriteData={item} />
             </StyledLink>

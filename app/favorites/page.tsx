@@ -8,13 +8,14 @@ import FavouritesList from './components/FavouritesList'
 
 function Page() {
   // 新增收藏夹点击事件
-  const handleAddFavourites = () => {
+  const handleIconClick = (type: string): void => {
+    console.log(type, 'type')
     // setAddModalVisible(true)
   }
 
   return (
     <Container>
-      <Header name="Like" addBtnvisible={true} handleAddFavourites={handleAddFavourites} />
+      <Header name="Like" addBtnvisible={true} handleIconClick={handleIconClick} />
       <FavouritesList />
     </Container>
   )

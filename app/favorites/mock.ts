@@ -1,4 +1,4 @@
-import { FavouriteItem } from '@definitions/favourites'
+import { FavouriteItem, FavouriteImage } from '@definitions/favourites'
 
 export function featchFavouritesList(): Promise<FavouriteItem[]> {
   return new Promise(resolve =>
@@ -50,6 +50,44 @@ export function featchFavouritesList(): Promise<FavouriteItem[]> {
             imgNumber: 11
           }
         ]),
+      1000
+    )
+  )
+}
+
+export function featchFavouritesData(id: string): Promise<FavouriteImage> {
+  console.log(id)
+
+  return new Promise(resolve =>
+    setTimeout(
+      () =>
+        resolve({
+          data: [
+            {
+              id: 1,
+              collection_id: 1,
+              image_url: 'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_77.svg',
+              is_deleted: false,
+              added_at: '2024-10-31T15:25:41.156702734+08:00'
+            },
+            {
+              id: 2,
+              collection_id: 1,
+              image_url: 'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_76.svg',
+              is_deleted: false,
+              added_at: '2024-10-31T15:25:41.156702734+08:00'
+            },
+            {
+              id: 3,
+              collection_id: 1,
+              image_url: 'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_76.svg',
+              is_deleted: false,
+              added_at: '2024-10-31T15:25:41.156702734+08:00'
+            }
+          ],
+          message: '',
+          success: true
+        }),
       1000
     )
   )
