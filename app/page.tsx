@@ -11,16 +11,15 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-
 import Waterfall from "./components/Waterfall";
+import { useRouter } from "next/navigation";
 // import ImageGuideModal from "../components/Common/ImageGuideModal";
 
 function Dashboard() {
-  const { onOpen, onClose } = useDisclosure();
-
+  // const { onOpen, onClose } = useDisclosure();
+  const router = useRouter();
   return (
-    
-    <Container maxW="container.lg" p={3}>
+    <Container p={3}>
       {/* Header Section */}
       <Flex
         as="header"
@@ -45,13 +44,28 @@ function Dashboard() {
 
         <Flex gap="0.8rem">
           <Link href="/history">
-            <Image src="/assets/images/history.svg" alt="History" boxSize="2.1rem" cursor="pointer" />
+            <Image
+              src="/assets/images/history.svg"
+              alt="History"
+              boxSize="2.1rem"
+              cursor="pointer"
+            />
           </Link>
           <Link href="/favorites">
-            <Image src="/assets/images/like.svg" alt="Favorites" boxSize="2.1rem" cursor="pointer" />
+            <Image
+              src="/assets/images/like.svg"
+              alt="Favorites"
+              boxSize="2.1rem"
+              cursor="pointer"
+            />
           </Link>
           <Link href="/profile">
-            <Image src="/assets/images/people.svg" alt="Profile" boxSize="2.1rem" cursor="pointer" />
+            <Image
+              src="/assets/images/people.svg"
+              alt="Profile"
+              boxSize="2.1rem"
+              cursor="pointer"
+            />
           </Link>
         </Flex>
       </Flex>
@@ -65,7 +79,9 @@ function Dashboard() {
         py="1.75rem"
         fontSize="1rem"
         letterSpacing="0.02rem"
-        onClick={onOpen}
+        onClick={() => {
+          router.push("/upload");
+        }}
         mt={1}
         mb={4}
         borderRadius="4px"
