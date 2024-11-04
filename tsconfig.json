@@ -28,8 +28,10 @@
       "@definitions/*": ["./definitions/*"],
       "@/*": ["./src/*"],
       "@components/*": ["./components/*"],
-      "@lib/*": ["./lib/*"]
-    }
+      "@lib/*": ["./lib/*"],
+      "@hooks/*": ["./hooks/*"]
+    },
+    
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "declarations.d.ts"]
