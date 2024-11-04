@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from '@emotion/styled'
-import { Container, Box, For, Grid, GridItem, Image, Icon, Show } from '@chakra-ui/react'
 import dayjs from 'dayjs'
+import { Container, Box, For, Grid, GridItem, Image, Icon, Show } from '@chakra-ui/react'
 import { useSearchParams } from 'next/navigation'
 
 import fullSelectionIcon from '@img/favourites/fullSelection.svg'
@@ -12,19 +12,17 @@ import Header from '../components/Header'
 
 import { featchFavouritesData } from '../mock'
 
-const itemList = new Array(20).fill(null).map((_, index) => ({
-  id: index,
-  collection_id: 1,
-  image_url: `https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_7${(index % 3) + 5}.svg`,
-  date: `2024-11-0${(index % 3) + 1}T15:25:41.156702734+08:00`
-}))
+type GroupList = {
+  [key: string]: string[]
+}
 
 export default function FavouriteItem({ params }: { params: { item: string } }) {
   const searchParams = useSearchParams()
   const favouriteName = searchParams.get('name') ?? ''
 
-  const [selectMode, setSelectMode] = useState(false) // 用于标记是否进入多选状态
-  const [selectedImgList, setSelectedImgList] = useState([]) // 多选图片列表
+  const [imgGroupList, setImgGroupList] = useState<GroupList>({})
+  const [selectMode, setSelectMode] = useState<boolean>(false) // 用于标记是否进入多选状态
+  const [selectedImgList, setSelectedImgList] = useState<string[]>([]) // 多选图片列表
 
   const handleIconClick = (type: string): void => {
     console.log(type)
@@ -33,6 +31,27 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   const queryData = async () => {
     try {
       const res = await featchFavouritesData(params.item)
+      const { data, success } = res
+
+      // 把图片根据日期进行分栏
+      // 日期要从今往前排序
+      if (success && data?.length > 0) {
+        const groupedByDate = new Map()
+
+        data.forEach(item => {
+          const date = item.added_at
+          // 如果 Map 中还没有这个日期的键，初始化一个空数组
+          if (!groupedByDate.has(date)) {
+            groupedByDate.set(date, [])
+          }
+          // 将当前对象的 url 添加到对应日期的数组中
+          groupedByDate.get(date).push(item.image_url)
+        })
+
+        console.log(Object.fromEntries(groupedByDate))
+        setImgGroupList(Object.fromEntries(groupedByDate))
+      }
+
       console.log(res, 'res')
     } catch (err: any) {
       // todo error hanlder
@@ -57,13 +76,13 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
         >
           <Image src={fullSelectionIcon.src} alt="" />
         </Icon>
-        <For each={itemList}>
-          {(item, index: number) =>
-            item.imgList?.length > 0 && (
-              <Box key={item.id + index} mb={'2rem'}>
-                <SubTitle>{dayjs().isSame(item.date, 'day') ? 'Today' : dayjs(item.date).format('DD/MM/YYYY')}</SubTitle>
+        <For each={Object.entries(imgGroupList)}>
+          {([date, urls], index: number): React.ReactNode => {
+            return (
+              <Box key={date + index} mb={'2rem'}>
+                <SubTitle>{dayjs().isSame(date, 'day') ? 'Today' : dayjs(date).format('DD/MM/YYYY')}</SubTitle>
                 <Grid templateColumns="repeat(4, 1fr)" gap="3">
-                  <For each={item.imgList}>
+                  <For each={urls as string[]}>
                     {(item: string, index: number) => (
                       <GridItem position={'relative'}>
                         <Show when={selectMode}>
@@ -79,7 +98,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
                 </Grid>
               </Box>
             )
-          }
+          }}
         </For>
       </Box>
     </Container>
