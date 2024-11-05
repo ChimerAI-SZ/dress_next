@@ -17,8 +17,8 @@ export default async function CustomersTable() {
   const revenue: FavouriteItem[] = await featchFavouritesList()
 
   return (
-    <Container p={0}>
-      <Flex direction="row" wrap={'wrap'}>
+    <Container p={'8pt 12pt'}>
+      <Flex direction="row" wrap={'wrap'} gap={'12pt'}>
         <For each={revenue}>
           {(item: FavouriteItem, index: number) => (
             <StyledLink
@@ -39,5 +39,5 @@ export default async function CustomersTable() {
 
 const StyledLink = styled(Link)`
   display: block;
-  width: 50%;
+  width: calc(50% - 6pt);
 `

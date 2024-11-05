@@ -1,58 +1,44 @@
 'use client'
-import { Container, Show, Flex, Image, For, Box } from '@chakra-ui/react'
-import styled from '@emotion/styled'
+
+import { Container, Flex, Image, Box, Show } from '@chakra-ui/react'
+
+import Empty from 'app/components/Empty'
 
 import { FavouriteItem } from '@definitions/favourites'
 
 export default function Favourites({ favouriteData }: { favouriteData: FavouriteItem }) {
   return (
-    <Container px={'0.5rem'}>
-      <Flex direction={'column'} alignItems={'center'} mb={'24px'}>
-        <Show
-          when={favouriteData.isDefault}
-          fallback={
-            <Flex position={'relative'} w={'100%'} h={206}>
-              <Box w={'50%'} flex={'none'}>
-                <Image w={'100%'} h={'100%'} src={favouriteData.coverImg[0]} />
-              </Box>
-              <Box w={'50%'} flex={'none'} position={'relative'} overflow={'hidden'}>
-                <Image w="100%" minH={'50%'} top="0" position={'absolute'} zIndex={1} src={favouriteData.coverImg[1]} />
-                <Image w="100%" minH={'50%'} top={'50%'} position={'absolute'} zIndex={1} src={favouriteData.coverImg[2]} />
-              </Box>
-            </Flex>
-          }
-        >
-          <Box position={'relative'} w={'100%'} h={206}>
-            <For each={favouriteData.coverImg}>{(item: string, index: number) => <DefaultImg key={item + index} src={item} alt="History" />}</For>
-          </Box>
-        </Show>
-        <Box my={'0.5rem'} w={'100%'} color="#000" fontSize={'1rem'} fontWeight={'400'} letterSpacing={'0.4px'} h={'1.5rem'} lineHeight={'1.5rem'}>
+    <Container px={'0'}>
+      <Flex direction={'column'} alignItems={'center'}>
+        <Flex position={'relative'} w={'100%'} h={206} borderRadius={'20pt'} overflow={'hidden'} gap={'4pt'}>
+          <Show
+            when={Array.isArray(favouriteData.coverImg) && favouriteData.coverImg.length >= 3}
+            fallback={
+              <Show
+                when={Array.isArray(favouriteData.coverImg) && favouriteData.coverImg.length >= 1}
+                fallback={<Empty style={{ bg: '#F0F0F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />}
+              >
+                <Image w="100%" minH={'calc(50% - 2pt)'} zIndex={1} src={favouriteData.coverImg[0]} />
+              </Show>
+            }
+          >
+            {/* 有三张图片时分栏展示 */}
+            <Box w={'calc(60% - 2pt)'} flex={'none'} borderRadius={'4pt'} overflow={'hidden'}>
+              <Image w={'100%'} h={'100%'} src={favouriteData.coverImg[0]} />
+            </Box>
+            <Box w={'calc(40% - 2pt)'} flex={'none'} position={'relative'} overflow={'hidden'}>
+              <Image w="100%" minH={'calc(50% - 2pt)'} borderRadius={'4pt'} overflow={'hidden'} marginBottom={'4pt'} top="0" position={'absolute'} zIndex={1} src={favouriteData.coverImg[1]} />
+              <Image w="100%" minH={'calc(50% - 2pt)'} borderRadius={'4pt'} overflow={'hidden'} top={'50%'} position={'absolute'} zIndex={1} src={favouriteData.coverImg[2]} />
+            </Box>
+          </Show>
+        </Flex>
+        <Box mt={'8pt'} w={'100%'} color="#171717" fontSize={'1rem'} overflow={'hidden'} whiteSpace={'nowrap'} textOverflow={'ellipsis'}>
           {favouriteData.name}
         </Box>
-        <Box h={'22px'} w={'100%'} color="#A2A2A2" fontSize={'0.8rem'} fontWeight={'400'}>
-          {favouriteData.imgNumber} images
+        <Box h={'22px'} w={'100%'} color="#171717" fontSize={'0.8rem'} fontWeight={'400'}>
+          {favouriteData.imgNumber}
         </Box>
       </Flex>
     </Container>
   )
 }
-
-const DefaultImg = styled(Image)`
-  width: 47%;
-  height: 206px;
-  position: absolute;
-
-  &:nth-child(1) {
-    left: 0;
-    z-index: 3;
-  }
-  &:nth-child(2) {
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-  }
-  &:nth-child(3) {
-    right: 0;
-    z-index: 1;
-  }
-`

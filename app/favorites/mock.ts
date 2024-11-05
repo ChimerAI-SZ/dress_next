@@ -32,22 +32,14 @@ export function featchFavouritesList(): Promise<FavouriteItem[]> {
             id: '2',
             isDefault: false,
             name: 'My Style - 2',
-            coverImg: [
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_77.svg',
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_76.svg',
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_75.svg'
-            ],
+            coverImg: [],
             imgNumber: 1326
           },
           {
             id: '3',
             isDefault: false,
             name: 'My Style - 3',
-            coverImg: [
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_77.svg',
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_76.svg',
-              'https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_75.svg'
-            ],
+            coverImg: ['https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/Group_77.svg'],
             imgNumber: 11
           }
         ]),

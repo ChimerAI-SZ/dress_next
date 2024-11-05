@@ -26,10 +26,12 @@ export interface FavouritesHeaderProps {
   name: string | null
   addBtnvisible: boolean
   handleIconClick: (type: string) => void
+  favouriteId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
 }
 
 // 收藏页 弹窗 props 类型
 export interface FavouriteDialogProps {
   type: 'add' | 'edit'
   children: React.ReactNode
+  favouriteId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
 }

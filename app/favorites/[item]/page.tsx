@@ -3,11 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import styled from '@emotion/styled'
 import dayjs from 'dayjs'
-import { Container, Box, For, Grid, GridItem, Image, Icon, Show } from '@chakra-ui/react'
+import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button } from '@chakra-ui/react'
 import { useSearchParams } from 'next/navigation'
 
-import fullSelectionIcon from '@img/favourites/fullSelection.svg'
-
+import Toast from '@components/Toast'
 import Header from '../components/Header'
 
 import { featchFavouritesData } from '../mock'
@@ -23,9 +22,13 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   const [selectMode, setSelectMode] = useState<boolean>(false) // 用于标记是否进入多选状态
   const [selectedImgList, setSelectedImgList] = useState<string[]>([]) // 多选图片列表
+  const [deleteToastVisible, setDeleteToastVisible] = useState(false)
 
   const handleIconClick = (type: string): void => {
     console.log(type)
+    if (type === 'delete') {
+      setDeleteToastVisible(true)
+    }
   }
 
   const queryData = async () => {
@@ -64,18 +67,8 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 
   return (
     <Container px={'0'} className="favourite-item-container">
-      <Header name={decodeURIComponent(favouriteName)} addBtnvisible={false} handleIconClick={handleIconClick} />
+      <Header name={decodeURIComponent(favouriteName)} addBtnvisible={false} handleIconClick={handleIconClick} favouriteId={params.item} />
       <Box px={'1rem'} position={'relative'}>
-        <Icon
-          fontSize="2xl"
-          position={'absolute'}
-          right={'1rem'}
-          onClick={() => {
-            setSelectMode(!selectMode)
-          }}
-        >
-          <Image src={fullSelectionIcon.src} alt="" />
-        </Icon>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
             return (
@@ -101,6 +94,16 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
           }}
         </For>
       </Box>
+      <Show when={deleteToastVisible}>
+        <Toast>
+          <Box>Delete Album</Box>
+          <Box>Are you sure you want to delete this album?</Box>
+          <Flex>
+            <Button>Cancel</Button>
+            <Button>Delete</Button>
+          </Flex>
+        </Toast>
+      </Show>
     </Container>
   )
 }
