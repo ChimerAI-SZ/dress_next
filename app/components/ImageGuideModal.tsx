@@ -16,13 +16,7 @@ import {
     Input,
   } from "@chakra-ui/react";
   import { useEffect, useRef, useState } from "react";
-  import Index1 from "/assets/images/index-1.png";
-  import Index2 from "/assets/images/index-2.png";
-  import Index3 from "/assets/images/index-3.png";
-  import Index4 from "/assets/images/index-4.png";
-  import Index5 from "/assets/images/index-5.png";
-  import Index6 from "/assets/images/index-6.png";
-  import useAliyunOssUpload from "../hooks/useAliyunOssUpload";
+  import useAliyunOssUpload from "../../hooks/useAliyunOssUpload";
   
   interface ImageGuideModalProps {
     isOpen: boolean;
@@ -77,7 +71,7 @@ import {
             <Text mb={4} color="gray" fontSize="0.8rem" fontWeight="400">
               In order to have a better generative result, please upload a full display of the dress, as shown below:
             </Text>
-            <Stack spacing={4} align="stretch" h="40vh" overflowY="auto">
+            <Stack  align="stretch" h="40vh" overflowY="auto">
               <Box>
                 <Text mb={2} fontSize="0.8rem" fontWeight="400">Outfit</Text>
                 <Box columnGap="16px" display="grid" gridTemplateColumns="repeat(2, 1fr)">

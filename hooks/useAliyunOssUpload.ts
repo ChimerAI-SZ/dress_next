@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import OSS from 'ali-oss';
 
 interface UploadState {
@@ -21,28 +21,29 @@ const useAliyunOssUpload = (): UseAliyunOssUploadReturn => {
     uploadedUrl: undefined,
   });
 
-  const uploadToOss = async (file: File) => {
-    setUploadState({ ...uploadState, isUploading: true, uploadProgress: 0 });
+  const uploadToOss = useCallback(async (file: File) => {
+    setUploadState((prevState) => ({ ...prevState, isUploading: true, uploadProgress: 0 }));
 
     try {
       const client = new OSS({
-        region: import.meta.env.VITE_OSS_REGION!,
-        accessKeyId: import.meta.env.VITE_OSS_ACCESS_KEY_ID!,
-        accessKeySecret: import.meta.env.VITE_OSS_ACCESS_KEY_SECRET!,
-        bucket: import.meta.env.VITE_OSS_BUCKET!,
+        region: process.env.NEXT_PUBLIC_OSS_REGION!,
+        accessKeyId: process.env.NEXT_PUBLIC_OSS_ACCESS_KEY_ID!,
+        accessKeySecret: process.env.NEXT_PUBLIC_OSS_ACCESS_KEY_SECRET!,
+        bucket: process.env.NEXT_PUBLIC_OSS_BUCKET!,
       });
 
       const result = await client.multipartUpload(file.name, file, {
         progress: (p: number) => {
-          setUploadState({
-            ...uploadState,
+          setUploadState((prevState) => ({
+            ...prevState,
             uploadProgress: Math.round(p * 100),
-          });
+          }));
         },
       });
+
       // 构建文件的URL
-      const uploadedUrl = `https://${import.meta.env.VITE_OSS_BUCKET}.${import.meta.env.VITE_OSS_REGION}.aliyuncs.com/${result.name}`;
-      // console.log(uploadedUrl);
+      const uploadedUrl = `https://${process.env.NEXT_PUBLIC_OSS_BUCKET}.${process.env.NEXT_PUBLIC_OSS_REGION}.aliyuncs.com/${result.name}`;
+
       setUploadState({
         isUploading: false,
         uploadProgress: 100,
@@ -50,9 +51,9 @@ const useAliyunOssUpload = (): UseAliyunOssUploadReturn => {
       });
     } catch (err) {
       console.error('Error uploading to OSS:', err);
-      setUploadState({ ...uploadState, isUploading: false });
+      setUploadState((prevState) => ({ ...prevState, isUploading: false }));
     }
-  };
+  }, []);
 
   return {
     ...uploadState,

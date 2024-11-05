@@ -27,8 +27,11 @@
       "@img/*": ["./public/assets/images/*"],
       "@definitions/*": ["./definitions/*"],
       "@/*": ["./src/*"],
-      "@components/*": ["./components/*"]
-    }
+      "@components/*": ["./components/*"],
+      "@lib/*": ["./lib/*"],
+      "@hooks/*": ["./hooks/*"]
+    },
+    
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "declarations.d.ts"]
