@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Box, Flex, Text, Image, Textarea } from "@chakra-ui/react";
 import PhotoGallery from "./PhotoGallery";
-import PrintGeneration from "@img/upload/print-generation.svg";
-import ColorSelect from "./ColorSelect";
 function Page() {
   const [text, setText] = useState("");
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -18,12 +16,12 @@ function Page() {
       alignItems="center"
       justifyContent="center"
       mt={4}
-      mb={4}
       width="full"
       position="relative"
       bg={"#FFFFFF"}
       borderRadius={"0.5rem"}
       py="0.66rem"
+      mb="3.75rem"
     >
       <Flex px="0.75rem">
         <Text
@@ -32,41 +30,11 @@ function Page() {
           fontSize="1rem"
           color="#171717"
         >
-          Print selection
+          Fabric
         </Text>
       </Flex>
       <Flex gap="0.75rem" px="0.75rem" overflowX={"auto"} overflowY={"hidden"}>
         <PhotoGallery></PhotoGallery>
-      </Flex>
-      <Flex
-        mt="0.66rem"
-        borderTop="0.03rem solid #E4E4E4"
-        px="0.75rem"
-        pt={"0.75rem"}
-      >
-        <Text
-          fontFamily="PingFangSC"
-          fontWeight="500"
-          fontSize="1rem"
-          color="#171717"
-        >
-          Print selection
-        </Text>
-        <Image w="0.88rem" h="0.88rem" src={PrintGeneration.src}></Image>
-      </Flex>
-      <ColorSelect></ColorSelect>
-      <Flex px="0.75rem">
-        <Textarea
-          value={text}
-          onChange={handleChange}
-          placeholder="Provide more creative descriptions"
-          resize="vertical"
-          width="full"
-          height="10.31rem"
-          background="#F5F5F5"
-          borderRadius="0.5rem"
-          mt={"0.5rem"}
-        />
       </Flex>
     </Box>
   );

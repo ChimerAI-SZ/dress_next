@@ -18,14 +18,13 @@ function Page() {
       width="full"
       position="relative"
     >
-      {/* 将 IconButton 位置固定在左侧 */}
       <Link href="/">
         <IconButton
           variant="ghost"
           aria-label="Back"
           position="absolute"
-          left="0" // 微调 IconButton 的位置
-          top="50%" // 垂直居中
+          left="0"
+          top="50%"
           transform="translateY(-50%)"
         >
           <Image src={ArrowLeft.src} boxSize="1.9rem" />

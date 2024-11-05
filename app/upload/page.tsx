@@ -1,13 +1,14 @@
 "use client";
 
-import { Container, Text, Flex, Box } from "@chakra-ui/react";
+import { Container, Text, Flex, Box, Button } from "@chakra-ui/react";
 import Header from "./components/Header";
 import TypesClothing from "./components/TypesClothing";
 import UploadImage from "./components/UploadImage";
 import PrintSelect from "./components/PrintSelect";
+import Fabric from "./components/Fabric";
 function Page() {
   return (
-    <Container p={3} bg={"#f5f5f5"} h={"100vh"}>
+    <Container bg={"#f5f5f5"} h={"100%"} position={"relative"}>
       <Header></Header>
       <TypesClothing></TypesClothing>
       <UploadImage></UploadImage>
@@ -33,6 +34,30 @@ function Page() {
         />
       </Flex>
       <PrintSelect></PrintSelect>
+      <Fabric></Fabric>
+      <Flex
+        height="3.75rem"
+        position="fixed"
+        bottom="0"
+        zIndex={111}
+        bg={"#fff"}
+        maxW="100vw"
+        w={"full"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        left="50%"
+        transform="translateX(-50%)" // 水平居中
+      >
+        <Button
+          colorScheme="teal"
+          width="20.38rem"
+          height="2.5rem"
+          background="#EE3939"
+          borderRadius="1.25rem"
+        >
+          吸底按钮
+        </Button>
+      </Flex>
     </Container>
   );
 }
