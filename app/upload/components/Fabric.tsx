@@ -4,13 +4,6 @@ import { useState } from "react";
 import { Box, Flex, Text, Image, Textarea } from "@chakra-ui/react";
 import PhotoGallery from "./PhotoGallery";
 function Page() {
-  const [text, setText] = useState("");
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const inputText = event.target.value;
-    if (inputText.length <= 200) {
-      setText(inputText);
-    }
-  };
   return (
     <Box
       alignItems="center"

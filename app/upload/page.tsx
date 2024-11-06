@@ -8,7 +8,7 @@ import PrintSelect from "./components/PrintSelect";
 import Fabric from "./components/Fabric";
 function Page() {
   return (
-    <Container bg={"#f5f5f5"} h={"100%"} position={"relative"}>
+    <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
       <Header></Header>
       <TypesClothing></TypesClothing>
       <UploadImage></UploadImage>
@@ -46,7 +46,7 @@ function Page() {
         alignItems={"center"}
         justifyContent={"center"}
         left="50%"
-        transform="translateX(-50%)" // 水平居中
+        transform="translateX(-50%)"
       >
         <Button
           colorScheme="teal"
@@ -55,7 +55,7 @@ function Page() {
           background="#EE3939"
           borderRadius="1.25rem"
         >
-          吸底按钮
+          Generate
         </Button>
       </Flex>
     </Container>

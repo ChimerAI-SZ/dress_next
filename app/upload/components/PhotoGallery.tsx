@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import {
   Box,
   Flex,
@@ -9,10 +9,10 @@ import {
   Image,
   Input,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import Add from "@img/upload/add.svg";
@@ -21,6 +21,7 @@ import Delete from "@img/upload/delete.svg";
 const PatternSelector = () => {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
+  const uniqueId = useId();
   const [urlList, setUrlList] = useState([
     {
       url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=1",
@@ -113,10 +114,10 @@ const PatternSelector = () => {
                       type="file"
                       accept="image/*"
                       display="none"
-                      id="image"
+                      id={uniqueId}
                       onChange={(e) => handleImageChange(e)}
                     />
-                    <label htmlFor="image">
+                    <label htmlFor={uniqueId}>
                       <Box
                         w="4.69rem"
                         h="4.69rem"
@@ -135,6 +136,19 @@ const PatternSelector = () => {
                         />
                       </Box>
                     </label>
+                  </Box>
+                )}
+                {isUploading && pageIndex === 0 && (
+                  <Box
+                    w="4.69rem"
+                    h="4.69rem"
+                    borderRadius="0.5rem"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    background="#F5F5F5"
+                  >
+                    <Spinner size="xl" />
                   </Box>
                 )}
                 {urlList

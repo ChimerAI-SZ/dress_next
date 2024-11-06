@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { toaster } from "@components/ui/toaster";
 
-import ImageGuide from "@img/upload/image-guide.svg";
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload";
 import UploadImage from "@img/upload/upload-image.svg";
 import ReUpload from "@img/upload/re-upload.svg";
+import ImageGuide from "./ImageGuide";
 function Page() {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
@@ -69,17 +69,7 @@ function Page() {
             *
           </Text>
         </Flex>
-        <Button w="6.13rem" h="1.38rem" borderRadius="0.94rem" gap={"0.25rem"}>
-          <Image src={ImageGuide.src} w="0.75rem" h="0.75rem"></Image>
-          <Text
-            fontFamily="PingFangSC, PingFang SC"
-            fontWeight="400"
-            fontSize="0.75rem"
-            color="#FFFFFF"
-          >
-            Image guide
-          </Text>
-        </Button>
+        <ImageGuide></ImageGuide>
       </Flex>
       <Flex
         width="100%"
