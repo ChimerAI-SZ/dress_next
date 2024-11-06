@@ -1,12 +1,15 @@
 "use client";
 
 import { Container, Text, Flex, Box, Button } from "@chakra-ui/react";
-import Header from "./components/Header";
+import Header from "../../components/Header";
 import TypesClothing from "./components/TypesClothing";
 import UploadImage from "./components/UploadImage";
 import PrintSelect from "./components/PrintSelect";
 import Fabric from "./components/Fabric";
+
+import { useRouter } from "next/navigation";
 function Page() {
+  const router = useRouter();
   return (
     <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
       <Header></Header>
@@ -55,6 +58,9 @@ function Page() {
           height="2.5rem"
           background="#EE3939"
           borderRadius="1.25rem"
+          onClick={() => {
+            router.push("/generate");
+          }}
         >
           Generate
         </Button>
