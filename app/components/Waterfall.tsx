@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import Masonry from "react-masonry-css";
 import { Box, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
-// import ImageOverlay from "./ImageOverlay";
+import ImageOverlay from "./ImageOverlay";
 import { css, Global } from "@emotion/react";
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
@@ -55,13 +55,14 @@ const Waterfall: React.FC = () => {
       offset: page * 10,
       library: "top_sales",
     });
+
     if (res) {
       const newImages = res?.data;
+      console.log(newImages);
       setImageList((prev) => [...prev, ...newImages]);
       setHasMore(newImages.length > 0);
       setPage((prev) => prev + 1);
     }
-
     setLoading(false);
   }, [hasMore, loading, page]);
 
@@ -117,13 +118,13 @@ const Waterfall: React.FC = () => {
           {imageList.map((item, index) => (
             <Suspense fallback={<div>Loading...</div>} key={item.ID}>
               <Box>
-                {/* <ImageOverlay
+                <ImageOverlay
                   src={item.image_url}
                   openModal={() => openModal(item.image_url)}
                   isVisible={visibleImage === item.image_url}
                   ref={index === imageList.length - 1 ? lastImageRef : null}
                   onClick={() => handleImageClick(item.image_url)}
-                /> */}
+                />
               </Box>
             </Suspense>
           ))}
