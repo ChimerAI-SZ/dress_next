@@ -14,7 +14,7 @@ function Page() {
       bg={"#FFFFFF"}
       borderRadius={"0.5rem"}
       py="0.66rem"
-      mb="3.75rem"
+      mb="4.75rem"
     >
       <Flex px="0.75rem">
         <Text
