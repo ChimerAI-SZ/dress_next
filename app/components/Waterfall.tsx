@@ -1,11 +1,18 @@
 "use client";
-import React, { useState, useRef, useEffect, Suspense, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  Suspense,
+  useCallback,
+} from "react";
 import axios from "../../lib/axios";
 import Masonry from "react-masonry-css";
 import { Box, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import ImageOverlay from "./ImageOverlay";
 import { css, Global } from "@emotion/react";
-
+import { fetchHomePage } from "@lib/request/page";
+import { errorCaptureRes } from "@utils/index";
 interface Item {
   image_url: string;
   ID: number;
@@ -16,11 +23,11 @@ const masonryStyles = css`
   .my-masonry-grid {
     display: flex;
     width: auto;
-    margin-left: -15px; 
+    margin-left: -15px;
   }
 
   .my-masonry-grid_column {
-    padding-left: 15px; 
+    padding-left: 15px;
     background-clip: padding-box;
   }
 `;
@@ -44,27 +51,19 @@ const Waterfall: React.FC = () => {
   const fetchData = useCallback(async () => {
     if (loading || !hasMore) return; // 避免重复请求
     setLoading(true);
-
-    try {
-      const response = await axios.post(
-        "/api/image/list",
-        {
-          limit: 10,
-          offset: page * 10,
-          library: "top_sales",
-        },
-
-      );
-      const newImages = response.data.data;
-
+    const [err, res] = await errorCaptureRes(fetchHomePage, {
+      limit: 10,
+      offset: page * 10,
+      library: "top_sales",
+    });
+    if (res) {
+      const newImages = res?.data;
       setImageList((prev) => [...prev, ...newImages]);
       setHasMore(newImages.length > 0);
       setPage((prev) => prev + 1);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   }, [hasMore, loading, page]);
 
   const hasFetchedOnce = useRef(false);
@@ -75,7 +74,6 @@ const Waterfall: React.FC = () => {
       hasFetchedOnce.current = true; // 设置为 true，表示已经请求过
     }
   }, [fetchData]);
-  
 
   const lastImageRef = useCallback(
     (node: HTMLDivElement | null) => {

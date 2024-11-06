@@ -15,7 +15,7 @@ import useAliyunOssUpload from "@hooks/useAliyunOssUpload";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import Add from "@img/upload/add.svg";
+import Add from "@img/upload/add2.svg";
 import Delete from "@img/upload/delete.svg";
 
 const PatternSelector = () => {

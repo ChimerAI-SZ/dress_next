@@ -1,43 +1,108 @@
 import axios, {
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosResponse,
-    InternalAxiosRequestConfig,
-  } from "axios";
+  AxiosRequestConfig,
+  AxiosResponse,
+  CancelTokenSource,
+  InternalAxiosRequestConfig,
+  AxiosRequestHeaders,
+} from 'axios';
+import { exitLogin, storage } from '@utils/index';
 
-  const instance: AxiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_BASE_URL || "/", // 使用环境变量设置 base URL
-    timeout: 30000, // 设置请求超时时间
-    headers: {
-      "Content-Type": "text/plain",
-    },
-  });
-  // 请求拦截器
-  instance.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      const token = "534dc1cc256cd9c3f1b62f14900fa5978SnLbY";
-      if (token) {
-        // config.headers = config.headers || {};
-        // config.headers["ai-token"] = token;
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  cancelToken?: CancelTokenSource['token'];
+  headers: AxiosRequestHeaders;
+  data?: any;
+}
+
+// 为 `window` 添加 `$message` 的类型声明
+declare global {
+  interface Window {
+      $message?: {
+          destroy: () => void;
+          error: (options: { content: string; duration: number; onClose: () => void }) => void;
+      };
+  }
+}
+console.log(process.env.NEXT_PUBLIC_BASE_URL);
+const instance = axios.create({ baseURL: process.env.NEXT_PUBLIC_BASE_URL || "/", timeout: 30000 });
+
+// 用于存储 pending 的请求（处理多条相同请求）
+const pendingRequest = new Map<string, CancelTokenSource>();
+
+// 生成 request 的唯一 key
+const generateRequestKey = (config: AxiosRequestConfig): string => {
+  const { url, method, params, data } = config;
+  return [url, method, JSON.stringify(params), JSON.stringify(data)].join('&');
+};
+
+// 将重复请求添加到 pendingRequest 中
+const addPendingRequest = (config: ExtendedAxiosRequestConfig): void => {
+  const key = generateRequestKey(config);
+  if (!pendingRequest.has(key)) {
+      const source = axios.CancelToken.source();
+      config.cancelToken = source.token;
+      pendingRequest.set(key, source);
+  }
+};
+
+// 取消重复请求
+const removePendingRequest = (config: AxiosRequestConfig): void => {
+  const key = generateRequestKey(config);
+  if (pendingRequest.has(key)) {
+      const source = pendingRequest.get(key);
+      if (source) source.cancel(key); // 取消之前发送的请求
+      pendingRequest.delete(key); // 请求对象中删除 requestKey
+  }
+};
+
+instance.interceptors.request.use(
+  (config) => {
+      const extendedConfig = config as ExtendedAxiosRequestConfig;
+      removePendingRequest(extendedConfig); // 在一个 ajax 发送前执行一下取消操作
+      addPendingRequest(extendedConfig);
+
+      const TOKEN = storage.get("token");
+      if (TOKEN) {
+          extendedConfig.headers = extendedConfig.headers || {};
+          extendedConfig.headers['Content-Type'] = extendedConfig.headers['Content-Type'] || 'application/json';
+          extendedConfig.headers.Authorization = TOKEN;
       }
-      return config;
-    },
-    (error) => {
+
+      const factoryId = Number(storage.get("cid") || 0);
+
+      if (extendedConfig.headers['Content-Type'] === 'multipart/form-data' && extendedConfig.data instanceof FormData) {
+          extendedConfig.data.append('cid', factoryId.toString());
+      } else if (extendedConfig.method === 'post' && extendedConfig.data) {
+          extendedConfig.data = { cid: factoryId, ...extendedConfig.data };
+      } else if (extendedConfig.method === 'get') {
+          extendedConfig.params = { cid: factoryId, ...extendedConfig.params };
+      }
+
+      return extendedConfig;
+  },
+  (error) => {
       return Promise.reject(error);
-    }
-  );
-  
-  // 响应拦截器
-  instance.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error) => {
-      if (error.response && error.response.status === 401) {
-        // 处理401错误
-        console.error("Unauthorized: Please check your authentication.");
+  }
+);
+
+instance.interceptors.response.use(
+  (response: AxiosResponse) => {
+      // 在一个 ajax 响应后再执行一下取消操作，把已经完成的请求从 pending 中移除
+      removePendingRequest(response.config);
+      if (response.status === 401) {
+          exitLogin();
+      }
+      return response.data;
+  },
+  (error) => {
+      const { status } = error?.response || {};
+      if (status === 500) {
+          window.$message?.destroy();
+          console.error(status);
+      } else if (status === 401) {
+          exitLogin();
       }
       return Promise.reject(error);
-    }
-  );
-  
-  export default instance;
-  
+  }
+);
+
+export default instance;

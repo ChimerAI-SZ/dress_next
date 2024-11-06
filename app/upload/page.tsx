@@ -47,6 +47,7 @@ function Page() {
         justifyContent={"center"}
         left="50%"
         transform="translateX(-50%)"
+        borderRadius="0.75rem 0.75rem 0rem 0rem"
       >
         <Button
           colorScheme="teal"
