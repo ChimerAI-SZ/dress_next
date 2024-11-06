@@ -6,3 +6,11 @@ export interface EmptyProps {
   // 额外样式
   style?: { [key: string]: string }
 }
+
+export interface ToastProps {
+  children: React.ReactNode
+  boxStyle?: { [key: string]: string }
+  maskVisible?: boolean
+  close: () => void
+  maskClosable?: boolean
+}

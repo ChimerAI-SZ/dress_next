@@ -1,13 +1,17 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useReducer } from 'react'
 import styled from '@emotion/styled'
 import dayjs from 'dayjs'
-import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button } from '@chakra-ui/react'
+import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button, Heading } from '@chakra-ui/react'
+import { DrawerActionTrigger, DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerFooter, DrawerHeader, DrawerRoot, DrawerTitle, DrawerTrigger } from '@components/ui/drawer'
 import { useSearchParams } from 'next/navigation'
 
+import selectedIcon from '@img/favourites/selectedIcon.svg'
+import unselectedIcon from '@img/favourites/unselectedIcon.svg'
+
 import Toast from '@components/Toast'
-import Header from '../components/Header'
+import Header from './components/Header'
 
 import { featchFavouritesData } from '../mock'
 
@@ -24,11 +28,17 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   const [selectedImgList, setSelectedImgList] = useState<string[]>([]) // 多选图片列表
   const [deleteToastVisible, setDeleteToastVisible] = useState(false)
 
+  const [, forceUpdate] = useReducer(x => x + 1, 0)
+
   const handleIconClick = (type: string): void => {
     console.log(type)
     if (type === 'delete') {
       setDeleteToastVisible(true)
     }
+  }
+
+  const handleSetSelectMode = (value: boolean) => {
+    setSelectMode(value)
   }
 
   const queryData = async () => {
@@ -67,7 +77,10 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 
   return (
     <Container px={'0'} className="favourite-item-container">
-      <Header name={decodeURIComponent(favouriteName)} addBtnvisible={false} handleIconClick={handleIconClick} favouriteId={params.item} />
+      <Header handleIconClick={handleIconClick} favouriteId={params.item} selectMode={selectMode} handleSetSelectMode={handleSetSelectMode} />
+      <Heading p={'0 16pt'} mb={'8pt'}>
+        {decodeURIComponent(favouriteName)}
+      </Heading>
       <Box px={'1rem'} position={'relative'}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
@@ -79,10 +92,43 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
                     {(item: string, index: number) => (
                       <GridItem position={'relative'}>
                         <Show when={selectMode}>
-                          <Show when={selectedImgList.includes(item)}>
-                            <Cricle />
+                          <Show
+                            when={selectedImgList.includes(item)}
+                            fallback={
+                              <Box
+                                onClick={() => {
+                                  // todo 这里用url来作为key值是不合理的
+                                  selectedImgList.push(item)
+
+                                  setSelectedImgList(selectedImgList)
+
+                                  forceUpdate()
+                                }}
+                                position={'absolute'}
+                                top={'2pt'}
+                                right={'2pt'}
+                                w={'12pt'}
+                                h={'12pt'}
+                              >
+                                <Image src={unselectedIcon.src} alt="select-icon" />
+                              </Box>
+                            }
+                          >
+                            <Box position={'absolute'} top={'2pt'} right={'2pt'} w={'12pt'} h={'12pt'}>
+                              <Image
+                                onClick={() => {
+                                  // todo 这里用url来作为key值是不合理的
+                                  selectedImgList.push(item)
+
+                                  setSelectedImgList(selectedImgList.filter(img => img !== item))
+
+                                  forceUpdate()
+                                }}
+                                src={selectedIcon.src}
+                                alt="select-icon"
+                              />
+                            </Box>
                           </Show>
-                          <div>My Content</div>
                         </Show>
                         <Image key={item + index} src={item} />
                       </GridItem>
@@ -94,14 +140,44 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
           }}
         </For>
       </Box>
+      {/* <DrawerRoot placement="bottom" contained={true} open={selectMode}>
+        <DrawerContent offset={0}>
+          <DrawerBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</DrawerBody>
+        </DrawerContent>
+      </DrawerRoot> */}
+
+      {/* 删除的确认弹窗 */}
       <Show when={deleteToastVisible}>
-        <Toast>
-          <Box>Delete Album</Box>
-          <Box>Are you sure you want to delete this album?</Box>
-          <Flex>
-            <Button>Cancel</Button>
-            <Button>Delete</Button>
-          </Flex>
+        <Toast
+          boxStyle={{ borderRadius: '12px' }}
+          close={() => {
+            setDeleteToastVisible(false)
+          }}
+        >
+          <Box p={'12pt'} w={'75vw'}>
+            <Box textAlign={'center'} fontWeight={500} color={'#171717'} fontSize={'1.3rem'}>
+              Delete Album
+            </Box>
+            <Box color={'#171717'} fontWeight={400} textAlign={'center'} mb={'1rem'}>
+              Are you sure you want to delete this album?
+            </Box>
+            <Flex justifyContent={'space-between'}>
+              <Button
+                colorPalette={'gray'}
+                w={'40%'}
+                variant="outline"
+                borderRadius={'40px'}
+                onClick={() => {
+                  setDeleteToastVisible(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button borderRadius={'40px'} w={'40%'} bgColor={'#EE3939'}>
+                Delete
+              </Button>
+            </Flex>
+          </Box>
         </Toast>
       </Show>
     </Container>

@@ -23,10 +23,15 @@ export type FavouriteImage = {
 
 // 收藏页 header 的 props 类型
 export interface FavouritesHeaderProps {
-  name: string | null
-  addBtnvisible: boolean
+  name?: string | null
+  handleIconClick: (type: string) => void
+}
+
+export interface CollectionDetailHeaderProps {
   handleIconClick: (type: string) => void
   favouriteId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
+  selectMode: boolean
+  handleSetSelectMode: (value: boolean) => void
 }
 
 // 收藏页 弹窗 props 类型
