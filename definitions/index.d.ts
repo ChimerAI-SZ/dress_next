@@ -14,3 +14,10 @@ export interface ToastProps {
   close: () => void
   maskClosable?: boolean
 }
+
+export interface AlertProps {
+  content: string
+  iconVisible?: boolean
+  customIcon?: string
+  duration?: number
+}
