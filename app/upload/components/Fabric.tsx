@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Box, Flex, Text, Image, Textarea } from "@chakra-ui/react";
 import PhotoGallery from "./PhotoGallery";
-function Page() {
+import { TypesClothingProps } from "@definitions/update";
+function Page({ onParamsUpdate }: TypesClothingProps) {
   return (
     <Box
       alignItems="center"
@@ -14,7 +15,6 @@ function Page() {
       bg={"#FFFFFF"}
       borderRadius={"0.5rem"}
       py="0.66rem"
-      mb="4.75rem"
     >
       <Flex px="0.75rem">
         <Text
@@ -27,7 +27,10 @@ function Page() {
         </Text>
       </Flex>
       <Flex gap="0.75rem" px="0.75rem" overflowX={"auto"} overflowY={"hidden"}>
-        <PhotoGallery></PhotoGallery>
+        <PhotoGallery
+          onParamsUpdate={onParamsUpdate}
+          flied="Fabric"
+        ></PhotoGallery>
       </Flex>
     </Box>
   );

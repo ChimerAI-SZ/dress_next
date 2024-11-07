@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Text, Box, Image, Flex } from "@chakra-ui/react";
 import Spline from "@splinetool/react-spline/next";
 import { Application } from "@splinetool/runtime";
@@ -8,10 +8,22 @@ import Header from "@components/Header";
 import PrintGeneration from "@img/upload/print-generation.svg";
 import Bg from "@img/generate/bg.png";
 import Waterfall from "../components/Waterfall";
+import { useSearchParams } from "next/navigation";
+import { workflow } from "./workflow/workflow";
 function Page() {
+  const searchParams = useSearchParams();
+  const params = Object.fromEntries(searchParams.entries());
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(
     null
   );
+  const hasRunRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasRunRef.current) {
+      workflow(params);
+      hasRunRef.current = true;
+    }
+  }, []);
   useEffect(() => {
     const loadSpline = async () => {
       const component = await Spline({

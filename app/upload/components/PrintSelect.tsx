@@ -5,12 +5,14 @@ import { Box, Flex, Text, Image, Textarea } from "@chakra-ui/react";
 import PhotoGallery from "./PhotoGallery";
 import PrintGeneration from "@img/upload/print-generation.svg";
 import ColorSelect from "./ColorSelect";
-function Page() {
+import { TypesClothingProps } from "@definitions/update";
+function Page({ onParamsUpdate }: TypesClothingProps) {
   const [text, setText] = useState("");
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputText = event.target.value;
     if (inputText.length <= 200) {
       setText(inputText);
+      onParamsUpdate({ text: inputText });
     }
   };
   return (
@@ -36,7 +38,7 @@ function Page() {
         </Text>
       </Flex>
       <Flex gap="0.75rem" px="0.75rem" overflowX={"auto"} overflowY={"hidden"}>
-        <PhotoGallery></PhotoGallery>
+        <PhotoGallery onParamsUpdate={onParamsUpdate}></PhotoGallery>
       </Flex>
       <Flex
         mt="0.66rem"
@@ -54,7 +56,7 @@ function Page() {
         </Text>
         <Image w="0.88rem" h="0.88rem" src={PrintGeneration.src}></Image>
       </Flex>
-      <ColorSelect></ColorSelect>
+      <ColorSelect onParamsUpdate={onParamsUpdate}></ColorSelect>
       <Flex px="0.75rem">
         <Textarea
           value={text}

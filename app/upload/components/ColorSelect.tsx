@@ -1,15 +1,12 @@
 "use client";
-import React, { useState } from "react";
-import { Box, Flex, Text, Button, Image, Input } from "@chakra-ui/react";
-import { Slider } from "@components/ui/slider";
+import React, { useState, useEffect } from "react";
+import { Box, Flex, Text, Button, Image } from "@chakra-ui/react";
 import {
   DrawerActionTrigger,
   DrawerBackdrop,
   DrawerBody,
   DrawerCloseTrigger,
   DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
@@ -20,10 +17,10 @@ import Close from "@img/upload/close.svg";
 import ColourDisk from "@img/upload/colour-disk.svg";
 import Add from "@img/upload/add.svg";
 import ColorRight from "@img/upload/color-right.svg";
-import { HexColorPicker, RgbaColorPicker } from "react-colorful";
-const Page = () => {
-  const [color, setColor] = useState("#ff6b00"); // 初始颜色
-  const [brightness, setBrightness] = useState(1); // 初始亮度
+import { HexColorPicker } from "react-colorful";
+import { TypesClothingProps } from "@definitions/update";
+const Page = ({ onParamsUpdate }: TypesClothingProps) => {
+  const [color, setColor] = useState("#fdfdfb"); // 初始颜色
   const [customColors, setCustomColors] = useState<string[]>([
     "#ffffff",
     "#ffffff",
@@ -55,9 +52,9 @@ const Page = () => {
       return [color, ...updatedColors].slice(0, 8);
     });
   };
-  const handleColorChange = (newColor: string) => {
-    setColor(newColor);
-  };
+  useEffect(() => {
+    onParamsUpdate({ backgroundColor: color });
+  }, [color]);
   return (
     <Flex
       alignItems="center"

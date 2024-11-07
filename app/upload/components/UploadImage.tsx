@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Flex,
@@ -15,7 +15,9 @@ import useAliyunOssUpload from "@hooks/useAliyunOssUpload";
 import UploadImage from "@img/upload/upload-image.svg";
 import ReUpload from "@img/upload/re-upload.svg";
 import ImageGuide from "./ImageGuide";
-function Page() {
+import { TypesClothingProps } from "@definitions/update";
+
+function Page({ onParamsUpdate }: TypesClothingProps) {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
   const handleFileUpload = async (
@@ -33,6 +35,12 @@ function Page() {
       console.error("Upload failed", error);
     }
   };
+  useEffect(() => {
+    if (uploadProgress === 100) {
+      const newParams = { loadOriginalImage: uploadedUrl };
+      onParamsUpdate(newParams);
+    }
+  }, [uploadProgress]);
   return (
     <Box
       alignItems="center"

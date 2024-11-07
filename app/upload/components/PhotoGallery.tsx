@@ -17,8 +17,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Add from "@img/upload/add2.svg";
 import Delete from "@img/upload/delete.svg";
-
-const PatternSelector = () => {
+import { TypesClothingProps } from "@definitions/update";
+const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
   const uniqueId = useId();
@@ -68,7 +68,6 @@ const PatternSelector = () => {
     if (file) {
       try {
         await uploadToOss(file);
-        console.log(uploadedUrl);
       } catch (err) {}
     }
   };
@@ -94,6 +93,13 @@ const PatternSelector = () => {
           : { ...item, selected: false }
       )
     );
+    if (flied) {
+      console.log(111);
+      onParamsUpdate({ loadFabricImage: url });
+    } else {
+      console.log(222);
+      onParamsUpdate({ loadPrintingImage: url });
+    }
   };
 
   return (
@@ -158,7 +164,7 @@ const PatternSelector = () => {
                   )
                   .map((item, index) => (
                     <GridItem
-                      key={item.url}
+                      key={item.url + index}
                       position="relative"
                       w="4.68rem"
                       h="4.67rem"
