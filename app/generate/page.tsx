@@ -1,11 +1,29 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import { Text, Box, Image, Flex } from "@chakra-ui/react";
+import Spline from "@splinetool/react-spline/next";
+import { Application } from "@splinetool/runtime";
+
 import Header from "@components/Header";
-import Bg from "@img/generate/bg.png";
 import PrintGeneration from "@img/upload/print-generation.svg";
+import Bg from "@img/generate/bg.png";
 import Waterfall from "../components/Waterfall";
 function Page() {
+  const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(
+    null
+  );
+  useEffect(() => {
+    const loadSpline = async () => {
+      const component = await Spline({
+        scene: "https://prod.spline.design/OeaC0pc8AQW4AwPQ/scene.splinecode",
+        onLoad: (app: Application) => {
+          app.setZoom(1.5); // 缩小视角，数字越小视角越远
+        },
+      });
+      setSplineComponent(component);
+    };
+    loadSpline();
+  }, []);
   return (
     <Box
       //   bgSize="contain"
@@ -15,14 +33,26 @@ function Page() {
       h="100vh"
       position={"relative"}
     >
-      <Image
-        src={Bg.src}
+      <Box
         position={"absolute"}
-        zIndex={0}
         height="28.06rem"
-        objectFit="cover"
-        w={"full"}
-      ></Image>
+        zIndex={0}
+        borderRadius={"0rem  0rem  1.13rem  1.13rem"}
+        pointerEvents="none"
+        overflow={"hidden"}
+        width={"full"}
+      >
+        {splineComponent || (
+          <Image
+            src={Bg.src}
+            position={"absolute"}
+            zIndex={0}
+            height="28.06rem"
+            objectFit="cover"
+            w={"full"}
+          ></Image>
+        )}
+      </Box>
       <Box pt={4}></Box>
       <Header></Header>
       <Flex
