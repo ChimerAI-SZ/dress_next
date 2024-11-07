@@ -44,9 +44,9 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   }
 
   const handleSetSelectMode = (value: boolean) => {
-    // setSelectMode(value)
+    setSelectMode(value)
 
-    Alert.open({ content: "Sent Successfully!", icon: <img alt="" src={AlterWarningIcon.src} /> })
+    Alert.open({ content: "Sent Successfully!", iconVisible: false })
   }
 
   const queryData = async () => {
