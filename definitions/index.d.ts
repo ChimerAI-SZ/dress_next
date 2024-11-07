@@ -16,8 +16,8 @@ export interface ToastProps {
 }
 
 export interface AlertProps {
-  content: string
-  iconVisible?: boolean
-  customIcon?: string
-  duration?: number
+  content: string // 文字内容
+  iconVisible?: boolean // 是否展示图标
+  customIcon?: string // 自定义图标 src
+  duration?: number // alert存在时间 默认3000毫秒
 }
