@@ -13,7 +13,6 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   data?: any;
 }
 
-// 为 `window` 添加 `$message` 的类型声明
 declare global {
   interface Window {
       $message?: {
@@ -22,7 +21,6 @@ declare global {
       };
   }
 }
-console.log(process.env.NEXT_PUBLIC_BASE_URL);
 const instance = axios.create({ baseURL: process.env.NEXT_PUBLIC_BASE_URL || "/", timeout: 30000 });
 
 // 用于存储 pending 的请求（处理多条相同请求）
@@ -67,16 +65,6 @@ instance.interceptors.request.use(
           extendedConfig.headers.Authorization = TOKEN;
       }
 
-      const factoryId = Number(storage.get("cid") || 0);
-
-      if (extendedConfig.headers['Content-Type'] === 'multipart/form-data' && extendedConfig.data instanceof FormData) {
-          extendedConfig.data.append('cid', factoryId.toString());
-      } else if (extendedConfig.method === 'post' && extendedConfig.data) {
-          extendedConfig.data = { cid: factoryId, ...extendedConfig.data };
-      } else if (extendedConfig.method === 'get') {
-          extendedConfig.params = { cid: factoryId, ...extendedConfig.params };
-      }
-
       return extendedConfig;
   },
   (error) => {
@@ -89,7 +77,7 @@ instance.interceptors.response.use(
       // 在一个 ajax 响应后再执行一下取消操作，把已经完成的请求从 pending 中移除
       removePendingRequest(response.config);
       if (response.status === 401) {
-          exitLogin();
+          // exitLogin();
       }
       return response.data;
   },
@@ -99,7 +87,7 @@ instance.interceptors.response.use(
           window.$message?.destroy();
           console.error(status);
       } else if (status === 401) {
-          exitLogin();
+          // exitLogin();
       }
       return Promise.reject(error);
   }

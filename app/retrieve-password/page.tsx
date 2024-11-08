@@ -6,69 +6,92 @@ import {
   VStack,
   Text,
   Image,
+  Flex,
   Fieldset,
 } from "@chakra-ui/react";
 import { Field } from "@components/ui/field";
-import { InputGroup } from "@components/ui/input-group";
+import { useSearchParams, useRouter } from "next/navigation";
+import Back from "@img/login/back.svg";
+import { useState, useEffect } from "react";
+import { fetchResetPassword } from "@lib/request/login";
+import { errorCaptureRes } from "@utils/index";
 import { useForm } from "react-hook-form";
-import Book from "@img/login/book.svg";
-import Lock from "@img/login/lock.svg";
-import { useRouter } from "next/navigation";
+import { InputGroup } from "@components/ui/input-group";
 interface FormValues {
   email: string;
-  userName: string;
+  first: string;
+  last: string;
+  code: string;
+  password: string;
 }
-
-// 模拟检查邮箱是否已注册的函数
-const checkEmailRegistered = async (email: string) => {
-  // 模拟一个API请求，这里可以替换为实际的API调用
-  const registeredEmails = ["test@example.com", "user@domain.com"];
-  return registeredEmails.includes(email);
-};
-
 const Page = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = Object.fromEntries(searchParams.entries());
+  const [seconds, setSeconds] = useState(60); // 初始倒计时秒数
+  const [canResend, setCanResend] = useState(false); // 控制是否可以重新发送验证码
+  const [code, setCode] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
+    watch,
   } = useForm<FormValues>();
-  const naviRegister = () => {
-    router.push("/register");
-  };
-  const navPassword = () => {
-    router.push("/retrieve-password");
-  };
-  const onSubmit = async (data: FormValues) => {
-    const emailRegistered = await checkEmailRegistered(data.email);
-    if (emailRegistered) {
-      setError("email", {
-        type: "manual",
-        message: "This email is already registered",
-      });
-    } else {
-      console.log("Form Data:", data);
-      // 提交逻辑
+  useEffect(() => {
+    if (seconds === 0) {
+      setCanResend(true); // 倒计时结束后，允许重新发送验证码
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSeconds((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [seconds]);
+
+  // 处理发送验证码逻辑
+  const handleSendCode = async (data: FormValues) => {
+    const [err, res] = await errorCaptureRes(fetchResetPassword, data);
+    if (res.success) {
+      router.push(
+        `/register/verification-code?email=${data.email}&retrieve-password=true`
+      );
     }
   };
 
   return (
-    <Container maxW="md" px="1.8rem">
+    <Flex maxW="md" px="1.5rem" justifyContent={"center"} alignItems={"center"}>
       <VStack align="stretch" minH="100vh">
+        <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
+          <Image src={Back.src} w={"1.38rem"} h={"1.38rem"}></Image>
+        </Flex>
         <Text
-          fontFamily="Arial"
-          fontSize="1.5rem"
-          fontWeight="400"
-          pt="10rem"
-          textAlign="center"
+          fontSize="1.38rem"
+          fontWeight="600"
+          color="#171717"
+          fontFamily="PingFangSC, PingFang SC"
+          mt={"0.5rem"}
         >
-          Trouble logging in?
+          Forgot your password？
         </Text>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack pt="4rem" pb="4rem" w="100%">
+        <Text
+          fontFamily="PingFangSC, PingFang SC"
+          fontSize="0.88rem"
+          fontWeight="400"
+          color="#737373"
+          mt={"0.75rem"}
+        >
+          Don't worry. Please enter the email address you used to sign up. We'll
+          send a code to reset your password.
+        </Text>
+
+        <form>
+          <VStack pb="4rem" w="100%" mt={"2.25rem"}>
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
+                {/* 邮箱输入框 */}
                 <Field
                   label="Email"
                   fontFamily="Arial"
@@ -77,13 +100,7 @@ const Page = () => {
                   w="100%"
                   invalid={!!errors.email}
                 >
-                  <InputGroup
-                    w="100%"
-                    startElement={
-                      <Image src={Book.src} alt="Book" boxSize="0.75rem" />
-                    }
-                    bg={!!errors.email ? "#ffe0e0" : ""}
-                  >
+                  <InputGroup w="100%" bg={!!errors.email ? "#ffe0e0" : ""}>
                     <Input
                       {...register("email", {
                         required: "Email is required",
@@ -95,12 +112,11 @@ const Page = () => {
                       maxW="md"
                       name="email"
                       type="email"
-                      variant="flushed"
-                      placeholder="Email, Phone"
-                      borderBlockEnd="1px solid #A2A2A2"
+                      placeholder="Type your email"
                       _focusVisible={{
-                        borderColor: "#A2A2A2",
+                        borderColor: "#404040",
                         boxShadow: "none",
+                        outlineStyle: "none",
                       }}
                     />
                   </InputGroup>
@@ -110,47 +126,30 @@ const Page = () => {
                     </Text>
                   )}
                 </Field>
+                <VStack pb="4rem" w="100%">
+                  <Button
+                    width="20.44rem"
+                    height="2.75rem"
+                    background={"#EE3939"}
+                    borderRadius="1.38rem"
+                    onClick={handleSubmit(handleSendCode)}
+                  >
+                    <Text
+                      fontFamily="PingFangSC, PingFang SC"
+                      fontWeight="600"
+                      fontSize="1.06rem"
+                      color="#FFFFFF"
+                    >
+                      Send Code
+                    </Text>
+                  </Button>
+                </VStack>
               </Fieldset.Content>
             </Fieldset.Root>
           </VStack>
-          <VStack pb="4rem" w="100%">
-            <Text
-              fontFamily="Arial"
-              fontSize="0.75rem"
-              fontWeight="400"
-              color="#A2A2A2"
-              textAlign="center"
-            >
-              Enter you email, phone, or username and we’ll send you a link to
-              get back into your account.
-            </Text>
-            <Button w="100%" type="submit" py="1.75rem">
-              Send login link
-            </Button>
-            <Text
-              fontFamily="Arial"
-              fontSize="0.75rem"
-              fontWeight="400"
-              color="#A2A2A2"
-              textAlign="center"
-            >
-              Create new account
-            </Text>
-            <Text
-              fontFamily="Arial"
-              fontSize="0.75rem"
-              fontWeight="700"
-              color="#FA8929"
-              textAlign="center"
-              cursor="pointer"
-              onClick={naviRegister}
-            >
-              LOGIN
-            </Text>
-          </VStack>
         </form>
       </VStack>
-    </Container>
+    </Flex>
   );
 };
 

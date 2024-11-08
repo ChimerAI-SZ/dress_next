@@ -54,7 +54,7 @@ export const exitLogin = () => {
  * @param  {type: } data
  * @param  {type: bool, desc: 是否是自定义信息 } flag
  */
-export const errorCaptureRes = async (asyncFunc: (arg0: any) => any, data: any, flag = true) => {
+export const errorCaptureRes = async (asyncFunc: (arg0: any) => any, data?: any, flag = true) => {
     try {
         const res = await asyncFunc(data);
         if (res.code !== 200) {

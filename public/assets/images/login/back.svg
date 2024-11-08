@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>返回</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="忘记密码-输入新密码" transform="translate(-32, -108)">
+            <g id="编组-2" transform="translate(0, 86)">
+                <g id="返回" transform="translate(32, 22)">
+                    <rect id="矩形" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="44" height="44"></rect>
+                    <g id="编组" transform="translate(14.08, 7.7)" fill="#111827" fill-rule="nonzero">
+                        <path d="M15.5022751,0.536775166 C16.2179753,1.25269156 16.2179753,2.41319208 15.5022751,3.12910847 L4.42527514,14.2079418 L15.5041085,25.2867752 C16.1988901,26.0061366 16.1889534,27.1495968 15.4817751,27.8567751 C14.7745967,28.5639534 13.6311365,28.5738901 12.9117751,27.8791085 L0.536775145,15.5041085 C-0.178925048,14.7881921 -0.178925048,13.6276916 0.536775145,12.9117752 L12.9117751,0.536775166 C13.6276915,-0.178925055 14.7881921,-0.178925055 15.5041085,0.536775166 L15.5022751,0.536775166 Z" id="路径"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
