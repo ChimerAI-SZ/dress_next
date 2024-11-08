@@ -1,22 +1,18 @@
 "use client"
 
 import React, { useEffect, useState, useReducer } from "react"
-import styled from "@emotion/styled"
-import dayjs from "dayjs"
-import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
+import { Container, Box, For, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
 import { Radio, RadioGroup } from "@components/ui/radio"
 import { useSearchParams } from "next/navigation"
 
-import selectedIcon from "@img/favourites/selectedIcon.svg"
-import unselectedIcon from "@img/favourites/unselectedIcon.svg"
 import buyIcon from "@img/favourites/buy.svg"
 import likedIcon from "@img/favourites/liked.svg"
 import downloadIcon from "@img/favourites/download.svg"
 import descriptionBg from "@img/favourites/descriptionBg.png"
-import AlterWarningIcon from "@img/AlterWarningIcon.svg"
 
 import Toast from "@components/Toast"
 import { Alert } from "@components/Alert"
+import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
 
 import { featchFavouritesData } from "../mock"
@@ -30,7 +26,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   const favouriteName = searchParams.get("name") ?? ""
 
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
-  const [selectMode, setSelectMode] = useState<boolean>(false) // 用于标记是否进入多选状态
+  const [selectionMode, setSelectionMode] = useState<boolean>(false) // 用于标记是否进入多选状态
   const [selectedImgList, setSelectedImgList] = useState<string[]>([]) // 多选图片列表
   const [deleteToastVisible, setDeleteToastVisible] = useState(false)
 
@@ -44,9 +40,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   }
 
   const handleSetSelectMode = (value: boolean) => {
-    setSelectMode(value)
-
-    Alert.open({ content: "Sent Successfully!", iconVisible: false })
+    setSelectionMode(value)
   }
 
   const queryData = async () => {
@@ -79,13 +73,27 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
     }
   }
 
+  // 选择模式下图片的选择、取消选择事件
+  // 通过已选图片列表中是否有这个图片来判断是选择还是取消选择
+  const handleImgSelect = (img: string) => {
+    if (selectedImgList.includes(img)) {
+      setSelectedImgList(selectedImgList.filter(item => item !== img))
+    } else {
+      selectedImgList.push(img)
+      setSelectedImgList(selectedImgList)
+    }
+
+    forceUpdate()
+  }
+
   useEffect(() => {
+    // 查询收藏夹数据
     queryData()
   }, [])
 
   return (
     <Container px={"0"} className="favourite-item-container">
-      <Header handleIconClick={handleIconClick} favouriteId={params.item} selectMode={selectMode} handleSetSelectMode={handleSetSelectMode} />
+      <Header handleIconClick={handleIconClick} favouriteId={params.item} selectMode={selectionMode} handleSetSelectMode={handleSetSelectMode} />
       {/* 收藏夹名称 */}
       <Heading p={"0 16pt"} mb={"8pt"}>
         {decodeURIComponent(favouriteName)}
@@ -105,64 +113,12 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
       <Box px={"1rem"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
-            return (
-              <Box key={date + index} mb={"1rem"}>
-                <SubTitle>{dayjs().isSame(date, "day") ? "Today" : dayjs(date).format("MMMM DD, YYYY")}</SubTitle>
-                <Grid templateColumns="repeat(4, 1fr)" gap="3">
-                  <For each={urls as string[]}>
-                    {(item: string, index: number) => (
-                      <GridItem position={"relative"}>
-                        <Show when={selectMode}>
-                          <Show
-                            when={selectedImgList.includes(item)}
-                            fallback={
-                              <Box
-                                onClick={() => {
-                                  // todo 这里用url来作为key值是不合理的
-                                  selectedImgList.push(item)
-
-                                  setSelectedImgList(selectedImgList)
-
-                                  forceUpdate()
-                                }}
-                                position={"absolute"}
-                                top={"2pt"}
-                                right={"2pt"}
-                                w={"12pt"}
-                                h={"12pt"}
-                              >
-                                <Image src={unselectedIcon.src} alt="select-icon" />
-                              </Box>
-                            }
-                          >
-                            <Box position={"absolute"} top={"2pt"} right={"2pt"} w={"12pt"} h={"12pt"}>
-                              <Image
-                                onClick={() => {
-                                  // todo 这里用url来作为key值是不合理的
-                                  selectedImgList.push(item)
-
-                                  setSelectedImgList(selectedImgList.filter(img => img !== item))
-
-                                  forceUpdate()
-                                }}
-                                src={selectedIcon.src}
-                                alt="select-icon"
-                              />
-                            </Box>
-                          </Show>
-                        </Show>
-                        <Image key={item + index} src={item} />
-                      </GridItem>
-                    )}
-                  </For>
-                </Grid>
-              </Box>
-            )
+            return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelct={handleImgSelect} />
           }}
         </For>
       </Box>
 
-      <Show when={selectMode}>
+      <Show when={selectionMode}>
         <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
           <Flex alignItems={"center"} justifyContent={"space-between"}>
             <HStack>
@@ -171,9 +127,9 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
               </RadioGroup>
             </HStack>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <Image w={"22pt"} h={"22pt"} src={downloadIcon.src} alt="download-icon" />
-              <Image w={"22pt"} h={"22pt"} src={likedIcon.src} alt="liked-icon" />
-              <Image w={"22pt"} h={"22pt"} src={buyIcon.src} alt="buy-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={downloadIcon.src} alt="download-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={buyIcon.src} alt="buy-icon" />
             </Flex>
           </Flex>
         </Box>
@@ -216,10 +172,3 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
     </Container>
   )
 }
-
-const SubTitle = styled.div`
-  color: #737373;
-  font-weight: 400;
-  font-size: 1.2rem;
-  padding-bottom: 0.5rem;
-`
