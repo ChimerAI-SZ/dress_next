@@ -1,19 +1,25 @@
-'use client'
+"use client"
 
-import React, { useEffect, useState, useReducer } from 'react'
-import styled from '@emotion/styled'
-import dayjs from 'dayjs'
-import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button, Heading } from '@chakra-ui/react'
-import { DrawerActionTrigger, DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerFooter, DrawerHeader, DrawerRoot, DrawerTitle, DrawerTrigger } from '@components/ui/drawer'
-import { useSearchParams } from 'next/navigation'
+import React, { useEffect, useState, useReducer } from "react"
+import styled from "@emotion/styled"
+import dayjs from "dayjs"
+import { Container, Box, For, Grid, GridItem, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
+import { Radio, RadioGroup } from "@components/ui/radio"
+import { useSearchParams } from "next/navigation"
 
-import selectedIcon from '@img/favourites/selectedIcon.svg'
-import unselectedIcon from '@img/favourites/unselectedIcon.svg'
+import selectedIcon from "@img/favourites/selectedIcon.svg"
+import unselectedIcon from "@img/favourites/unselectedIcon.svg"
+import buyIcon from "@img/favourites/buy.svg"
+import likedIcon from "@img/favourites/liked.svg"
+import downloadIcon from "@img/favourites/download.svg"
+import descriptionBg from "@img/favourites/descriptionBg.png"
+import AlterWarningIcon from "@img/AlterWarningIcon.svg"
 
-import Toast from '@components/Toast'
-import Header from './components/Header'
+import Toast from "@components/Toast"
+import { Alert } from "@components/Alert"
+import Header from "./components/Header"
 
-import { featchFavouritesData } from '../mock'
+import { featchFavouritesData } from "../mock"
 
 type GroupList = {
   [key: string]: string[]
@@ -21,7 +27,7 @@ type GroupList = {
 
 export default function FavouriteItem({ params }: { params: { item: string } }) {
   const searchParams = useSearchParams()
-  const favouriteName = searchParams.get('name') ?? ''
+  const favouriteName = searchParams.get("name") ?? ""
 
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   const [selectMode, setSelectMode] = useState<boolean>(false) // 用于标记是否进入多选状态
@@ -32,13 +38,15 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 
   const handleIconClick = (type: string): void => {
     console.log(type)
-    if (type === 'delete') {
+    if (type === "delete") {
       setDeleteToastVisible(true)
     }
   }
 
   const handleSetSelectMode = (value: boolean) => {
     setSelectMode(value)
+
+    Alert.open({ content: "Sent Successfully!", iconVisible: false })
   }
 
   const queryData = async () => {
@@ -65,7 +73,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
         setImgGroupList(Object.fromEntries(groupedByDate))
       }
 
-      console.log(res, 'res')
+      console.log(res, "res")
     } catch (err: any) {
       // todo error hanlder
     }
@@ -76,21 +84,34 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
   }, [])
 
   return (
-    <Container px={'0'} className="favourite-item-container">
+    <Container px={"0"} className="favourite-item-container">
       <Header handleIconClick={handleIconClick} favouriteId={params.item} selectMode={selectMode} handleSetSelectMode={handleSetSelectMode} />
-      <Heading p={'0 16pt'} mb={'8pt'}>
+      {/* 收藏夹名称 */}
+      <Heading p={"0 16pt"} mb={"8pt"}>
         {decodeURIComponent(favouriteName)}
       </Heading>
-      <Box px={'1rem'} position={'relative'}>
+      {/* 收藏夹说明 */}
+      <Show when={true}>
+        <Box backgroundImage={`url(${descriptionBg.src})`} backgroundSize={"cover"} backgroundPosition={"center"}>
+          <Box>
+            <Box fontWeight={500} fontSize={"1.3rem"} p={"8pt 16pt 2pt"}>
+              Description
+            </Box>
+            {/* todo 这里用图片当背景不太合理 */}
+            <Box px={"16pt"}>Graphic patterns are visual elements made of repeating shapes, lines, and colors, arranged deliberately to create a cohesive design.</Box>
+          </Box>
+        </Box>
+      </Show>
+      <Box px={"1rem"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
             return (
-              <Box key={date + index} mb={'2rem'}>
-                <SubTitle>{dayjs().isSame(date, 'day') ? 'Today' : dayjs(date).format('DD/MM/YYYY')}</SubTitle>
+              <Box key={date + index} mb={"1rem"}>
+                <SubTitle>{dayjs().isSame(date, "day") ? "Today" : dayjs(date).format("MMMM DD, YYYY")}</SubTitle>
                 <Grid templateColumns="repeat(4, 1fr)" gap="3">
                   <For each={urls as string[]}>
                     {(item: string, index: number) => (
-                      <GridItem position={'relative'}>
+                      <GridItem position={"relative"}>
                         <Show when={selectMode}>
                           <Show
                             when={selectedImgList.includes(item)}
@@ -104,17 +125,17 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 
                                   forceUpdate()
                                 }}
-                                position={'absolute'}
-                                top={'2pt'}
-                                right={'2pt'}
-                                w={'12pt'}
-                                h={'12pt'}
+                                position={"absolute"}
+                                top={"2pt"}
+                                right={"2pt"}
+                                w={"12pt"}
+                                h={"12pt"}
                               >
                                 <Image src={unselectedIcon.src} alt="select-icon" />
                               </Box>
                             }
                           >
-                            <Box position={'absolute'} top={'2pt'} right={'2pt'} w={'12pt'} h={'12pt'}>
+                            <Box position={"absolute"} top={"2pt"} right={"2pt"} w={"12pt"} h={"12pt"}>
                               <Image
                                 onClick={() => {
                                   // todo 这里用url来作为key值是不合理的
@@ -140,40 +161,52 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
           }}
         </For>
       </Box>
-      {/* <DrawerRoot placement="bottom" contained={true} open={selectMode}>
-        <DrawerContent offset={0}>
-          <DrawerBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</DrawerBody>
-        </DrawerContent>
-      </DrawerRoot> */}
+
+      <Show when={selectMode}>
+        <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+          <Flex alignItems={"center"} justifyContent={"space-between"}>
+            <HStack>
+              <RadioGroup size="sm">
+                <Radio value="1">Select all</Radio>
+              </RadioGroup>
+            </HStack>
+            <Flex alignItems={"center"} justifyContent={"flex-start"}>
+              <Image w={"22pt"} h={"22pt"} src={downloadIcon.src} alt="download-icon" />
+              <Image w={"22pt"} h={"22pt"} src={likedIcon.src} alt="liked-icon" />
+              <Image w={"22pt"} h={"22pt"} src={buyIcon.src} alt="buy-icon" />
+            </Flex>
+          </Flex>
+        </Box>
+      </Show>
 
       {/* 删除的确认弹窗 */}
       <Show when={deleteToastVisible}>
         <Toast
-          boxStyle={{ borderRadius: '12px' }}
+          boxStyle={{ borderRadius: "12px" }}
           close={() => {
             setDeleteToastVisible(false)
           }}
         >
-          <Box p={'12pt'} w={'75vw'}>
-            <Box textAlign={'center'} fontWeight={500} color={'#171717'} fontSize={'1.3rem'}>
+          <Box p={"12pt"} w={"75vw"}>
+            <Box textAlign={"center"} fontWeight={500} color={"#171717"} fontSize={"1.3rem"}>
               Delete Album
             </Box>
-            <Box color={'#171717'} fontWeight={400} textAlign={'center'} mb={'1rem'}>
+            <Box color={"#171717"} fontWeight={400} textAlign={"center"} mb={"1rem"}>
               Are you sure you want to delete this album?
             </Box>
-            <Flex justifyContent={'space-between'}>
+            <Flex justifyContent={"space-between"}>
               <Button
-                colorPalette={'gray'}
-                w={'40%'}
+                colorPalette={"gray"}
+                w={"40%"}
                 variant="outline"
-                borderRadius={'40px'}
+                borderRadius={"40px"}
                 onClick={() => {
                   setDeleteToastVisible(false)
                 }}
               >
                 Cancel
               </Button>
-              <Button borderRadius={'40px'} w={'40%'} bgColor={'#EE3939'}>
+              <Button borderRadius={"40px"} w={"40%"} bgColor={"#EE3939"}>
                 Delete
               </Button>
             </Flex>
@@ -185,15 +218,8 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 }
 
 const SubTitle = styled.div`
-  color: #a2a2a2;
+  color: #737373;
   font-weight: 400;
   font-size: 1.2rem;
   padding-bottom: 0.5rem;
-`
-const Cricle = styled.div`
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid #fff;
-  border-radius: 50%;
-  background-clip: padding-box;
 `

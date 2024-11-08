@@ -14,3 +14,10 @@ export interface ToastProps {
   close: () => void
   maskClosable?: boolean
 }
+
+export interface AlertProps {
+  content: string // 文字内容
+  iconVisible?: boolean // 是否展示图标
+  customIcon?: string // 自定义图标 src
+  duration?: number // alert存在时间 默认3000毫秒
+}

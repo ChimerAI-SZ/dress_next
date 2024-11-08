@@ -3,6 +3,6 @@ module.exports = {
   reactStrictMode: true,
   experimental: {
     externalDir: true,
-    optimizePackageImports: ['@chakra-ui/react']
+    optimizePackageImports: ["@chakra-ui/react"]
   }
 }
