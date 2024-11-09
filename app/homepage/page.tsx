@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import styled from "@emotion/styled"
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import styled from '@emotion/styled'
 
-import { Container, Box, Flex, Heading } from "@chakra-ui/react"
-import { LeftOutlined } from "@ant-design/icons"
+import { Container, Box, Flex, Heading, Image } from '@chakra-ui/react'
+import { LeftOutlined } from '@ant-design/icons'
 
-import homepageBg from "@img/homepage/homepageBg.png"
+import homepageBg from '@img/homepage/homepageBg.png'
 
 function Homepage() {
   const router = useRouter()
@@ -17,42 +17,49 @@ function Homepage() {
   }, [])
 
   return (
-    <Container p={0} position={"relative"}>
-      <Container className="homepate-header-contaienr" p={"11pt 16pt"} zIndex={1}>
-        <Flex gap="4" alignItems={"center"} justify="space-between" position={"relative"}>
+    <Container p={0} position={'relative'}>
+      <Container className="homepate-header-contaienr" p={'11pt 16pt'} zIndex={1}>
+        <Flex gap="4" alignItems={'center'} justify="space-between" position={'relative'}>
           <LeftOutlined
-            style={{ width: "22pt", height: "22pt" }}
+            style={{ width: '22pt', height: '22pt' }}
             onClick={() => {
               router.back()
             }}
           />
-          <Heading position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
+          <Heading position={'absolute'} left={'50%'} transform={'translateX(-50%)'}>
             Avatar
           </Heading>
           {/* 布局占位容器 */}
           <Box />
         </Flex>
       </Container>
-      <Box
-        className="homepage-avatar-container"
-        backgroundImage={`url(${homepageBg.src})`}
-        backgroundSize={"cover"}
-        h={"25vh"}
-        position={"absolute"}
-        w={"100vw"}
-        top={0}
-        zIndex={0}
-        borderRadius={"50% / 15%"}
-        borderTopLeftRadius={0}
-        borderTopRightRadius={0}
-      >
+      <AvatarWrapper className="homepage-avatar-container">
+        <Image src={homepageBg.src} alt="" w={'100%'} h={'100%'} />
         <AvatarContainer>
           <AvatarBg></AvatarBg>
         </AvatarContainer>
-      </Box>
+      </AvatarWrapper>
     </Container>
   )
 }
+const AvatarWrapper = styled.div`
+  position: absolute;
+  height: 25vh;
+  width: 100vw;
+  top: 0;
+  z-index: 0;
+  &::after {
+    content: '';
+    padding: 20px;
+    height: 20px;
+    display: inline-block;
+    width: 100%;
+    bottom: -5px;
+    position: absolute;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+    backdrop-filter: blur(10px);
+  }
+`
 
 const AvatarContainer = styled.div`
   z-index: 1;
