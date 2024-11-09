@@ -44,6 +44,7 @@
   "devDependencies": {
     "@types/ali-oss": "^6.16.11",
     "@types/jsrsasign": "^10.5.14",
-    "@types/prop-types": "^15.7.13"
+    "@types/prop-types": "^15.7.13",
+    "file-loader": "^6.2.0"
   }
 }
