@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import {
   Container,
   Flex,
@@ -9,7 +9,10 @@ import {
   Image,
 } from "@chakra-ui/react";
 import ArrowLeft from "@img/upload/arrow-left.svg";
-function Page() {
+import SelectMore from "@img/generate-result/select-more.svg";
+import Active from "@img/generate-result/active.svg";
+function Page({ show, cb }: { show?: boolean; cb?: (e: boolean) => void }) {
+  const [active, setActive] = useState(false);
   return (
     <Flex
       alignItems="center"
@@ -40,6 +43,22 @@ function Page() {
       >
         CREAMODA
       </Text>
+      {show && (
+        <IconButton
+          variant="ghost"
+          aria-label="Back"
+          position="absolute"
+          right="0"
+          top="50%"
+          transform="translateY(-50%)"
+          onClick={() => {
+            cb && cb(!active);
+            setActive(!active);
+          }}
+        >
+          <Image src={active ? Active.src : SelectMore.src} boxSize="1.9rem" />
+        </IconButton>
+      )}
     </Flex>
   );
 }

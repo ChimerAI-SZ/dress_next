@@ -7,7 +7,7 @@ import UploadImage from "./components/UploadImage";
 import PrintSelect from "./components/PrintSelect";
 import Fabric from "./components/Fabric";
 import Link from "next/link";
-import {Params} from '@definitions/update'
+import { Params } from "@definitions/update";
 function Page() {
   const [params, setParams] = useState<Params>({
     loadOriginalImage: undefined,
@@ -23,7 +23,6 @@ function Page() {
       ...newParams, // 合并新的参数数据
     }));
   };
-  console.log(params);
 
   return (
     <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>返回</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="收藏成功提醒" transform="translate(-602, -1334)">
+            <g id="编组-59" transform="translate(92, 1300)">
+                <g id="编组-58" transform="translate(404, 27)">
+                    <g id="返回" transform="translate(122, 23) scale(-1, 1) translate(-122, -23)translate(106, 7)">
+                        <rect id="矩形" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="32" height="32"></rect>
+                        <g id="编组" transform="translate(10.24, 5.6)" fill="#EE3939" fill-rule="nonzero">
+                            <path d="M11.2743819,0.390381939 C11.7948912,0.911048408 11.7948912,1.75504878 11.2743819,2.27571525 L3.21838192,10.3330486 L11.2757153,18.3903819 C11.781011,18.9135539 11.7737843,19.7451613 11.2594728,20.2594728 C10.7451613,20.7737843 9.91355385,20.781011 9.39038192,20.2757153 L0.390381924,11.2757153 C-0.130127308,10.7550488 -0.130127308,9.91104841 0.390381924,9.39038194 L9.39038192,0.390381939 C9.9110484,-0.130127313 10.7550488,-0.130127313 11.2757153,0.390381939 L11.2743819,0.390381939 Z" id="路径"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
