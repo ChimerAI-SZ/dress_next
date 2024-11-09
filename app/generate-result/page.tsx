@@ -39,6 +39,19 @@ function Page() {
       );
     }
   }, [likeList]);
+  const handleDownload = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Download Image",
+          text: "Save this image to your album.",
+          url: selectImage,
+        })
+        .catch((error) => console.log("Error sharing:", error));
+    } else {
+      window.location.href = selectImage;
+    }
+  };
   return (
     <Box h="100vh" position={"relative"} pt={4} px="1rem">
       <Header show cb={cb}></Header>
@@ -60,9 +73,11 @@ function Page() {
               pb={"0.87rem"}
               pr={"0.87rem"}
             >
-              <a href={selectImage} download>
-                <Image boxSize={"2.25rem"} src={Download.src}></Image>
-              </a>
+              <Image
+                boxSize={"2.25rem"}
+                src={Download.src}
+                onClick={handleDownload}
+              ></Image>
               <Image
                 boxSize={"2.25rem"}
                 src={Like.src}
