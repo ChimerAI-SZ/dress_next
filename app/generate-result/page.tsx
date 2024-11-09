@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button, Box, Image, Flex, Text } from "@chakra-ui/react";
-import { Toaster, toaster } from "@components/toaster";
+import { Toaster, toaster } from "@components/Toaster";
 import Header from "@components/Header";
 import Download from "@img/generate-result/download.png";
 import Like from "@img/generate-result/like.png";
