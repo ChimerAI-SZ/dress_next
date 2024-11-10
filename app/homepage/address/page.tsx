@@ -5,6 +5,7 @@ import { Container, Grid, For, Image, Box, Button, Show, Flex } from "@chakra-ui
 import { useRouter } from "next/navigation"
 import styled from "@emotion/styled"
 import { RightOutlined } from "@ant-design/icons"
+import Link from "next/link"
 
 import addressIcon from "@img/homepage/address.svg"
 
@@ -46,9 +47,9 @@ const addressList = [
 const EditAvatar: React.FC = () => {
   const router = useRouter()
 
-  // done btn clicked
-  const handleSave = () => {
-    router.back()
+  // 新增地址或修改地址事件
+  const jump = (type: string) => {
+    router.push(`address/${type}`)
   }
 
   useEffect(() => {
@@ -66,7 +67,11 @@ const EditAvatar: React.FC = () => {
                 <Show when={item.isDefault} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
                   <DefaultMark>Default</DefaultMark>
                 </Show>
-                <RightOutlined />
+                <RightOutlined
+                  onClick={() => {
+                    jump(item.id)
+                  }}
+                />
               </Flex>
               <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
                 <span>{item.address},</span>
@@ -83,9 +88,22 @@ const EditAvatar: React.FC = () => {
       </For>
 
       <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
-        <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} onClick={handleSave}>
+        {/* <Link
+          href={{
+            pathname: `homepage/address/${"add"}`
+          }}
+        > */}
+        <Button
+          borderRadius={"40px"}
+          w={"100%"}
+          bgColor={"#EE3939"}
+          onClick={() => {
+            jump("add")
+          }}
+        >
           Add New Address
         </Button>
+        {/* </Link> */}
       </Box>
     </Container>
   )
