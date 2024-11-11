@@ -14,13 +14,11 @@ import { useEffect } from "react";
 import { Field } from "@components/ui/field";
 import { InputGroup } from "@components/ui/input-group";
 import { useForm } from "react-hook-form";
-import Right from "@img/login/right.svg";
-import Lock from "@img/login/.svg";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { fetchLogin } from "@lib/request/login";
 import { errorCaptureRes, storage } from "@utils/index";
-
+import Bg from "@img/login/bg.png";
 interface FormValues {
   email: string;
   first: string;
@@ -28,12 +26,6 @@ interface FormValues {
   code: string;
   password: string;
 }
-
-// 模拟检查邮箱是否已注册的函数
-const checkEmailRegistered = async (email: string) => {
-  const registeredEmails = ["test@example.com", "user@domain.com"];
-  return registeredEmails.includes(email);
-};
 
 // 定义页面状态
 
@@ -75,8 +67,17 @@ const Page = () => {
   };
 
   return (
-    <VStack align="stretch" minH="100vh" px={"1.5rem"} position={"relative"}>
-      <Box height="16.15rem">
+    <VStack align="stretch" minH="100vh" position={"relative"}>
+      <Box
+        height="16.15rem"
+        bgImage={`url(${Bg.src})`}
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        position="center"
+        width={"100%"}
+        p={3}
+        px={5}
+      >
         <Text
           fontSize="2.75rem"
           fontWeight="600"
@@ -91,6 +92,7 @@ const Page = () => {
           fontSize="2.75rem"
           fontWeight="600"
           color="#171717"
+          mt={"-0.9rem"}
         >
           back!
         </Text>
@@ -99,13 +101,13 @@ const Page = () => {
           fontSize="0.81rem"
           fontWeight="400"
           color="#737373"
-          mt={"0.63rem"}
+          mt={"0.64rem"}
         >
           Please login before you like a design!
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack pb="4rem" w="100%">
+        <VStack p={3} px={5} pb="1.5rem" w="100%" mt={"-1rem"}>
           <Fieldset.Root w="100%">
             <Fieldset.Content w="100%">
               {/* 邮箱输入框 */}
@@ -126,9 +128,9 @@ const Page = () => {
                         message: "Invalid email format",
                       },
                     })}
-                    maxW="md"
                     name="email"
                     type="email"
+                    flex="1"
                     placeholder="Type your email"
                     _focusVisible={{
                       borderColor: "#404040",
@@ -150,6 +152,7 @@ const Page = () => {
                 fontSize="0.75rem"
                 fontWeight="400"
                 invalid={!!errors.password}
+                mt={"1rem"}
               >
                 <InputGroup w="100%" bg={!!errors.password ? "#ffe0e0" : ""}>
                   <Input
@@ -225,7 +228,7 @@ const Page = () => {
         alignItems={"center"}
         justifyContent={"center"}
         position="fixed"
-        bottom="1.25rem"
+        bottom="2.25rem"
         width={"100vw"}
         left="50%"
         transform="translateX(-50%)"
@@ -247,7 +250,7 @@ const Page = () => {
             router.push("register");
           }}
         >
-          Sign Up
+          &ensp;Sign Up
         </Text>
       </Flex>
     </VStack>

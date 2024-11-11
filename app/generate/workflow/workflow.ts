@@ -17,6 +17,9 @@ export const workflow = async (p: Params) => {
     text,
     loadFabricImage,
   } = p;
+  const newFabricImage =
+    loadFabricImage &&
+    "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg";
   if (
     loadPrintingImage &&
     backgroundColor === "#fdfdfb" &&
@@ -24,12 +27,12 @@ export const workflow = async (p: Params) => {
     !loadFabricImage
   ) {
     const results = await Promise.allSettled([
-      dressPrintingTryon(p),
-      dressPrintingTryon(p),
-      dressPrintingTryon(p),
-      dressPrintingTryon(p),
-      dressPrintingTryon(p),
-      dressPrintingTryon(p),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
     ]);
     const successfulResults = results.filter(
       (result) => result.status === "fulfilled"
@@ -52,8 +55,8 @@ export const workflow = async (p: Params) => {
   } else if (!loadPrintingImage && text?.trim() && !loadFabricImage) {
     console.log(3);
     const results = await Promise.allSettled([
-      generatePrintingFromPrompt(p),
-      generatePrintingFromPrompt(p),
+      generatePrintingFromPrompt({ ...p, loadFabricImage: newFabricImage }),
+      generatePrintingFromPrompt({ ...p, loadFabricImage: newFabricImage }),
     ]);
     const successfulResults = results.filter(
       (result) => result.status === "fulfilled"
@@ -76,8 +79,8 @@ export const workflow = async (p: Params) => {
   } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
     console.log(4);
     const results = await Promise.allSettled([
-      generatePrintingFromPrompt(p),
-      generatePrintingFromPrompt(p),
+      generatePrintingFromPrompt({ ...p, loadFabricImage: newFabricImage }),
+      generatePrintingFromPrompt({ ...p, loadFabricImage: newFabricImage }),
     ]);
     const successfulResults = results.filter(
       (result) => result.status === "fulfilled"
@@ -101,10 +104,10 @@ export const workflow = async (p: Params) => {
     console.log(5);
   } else {
     const results = await Promise.allSettled([
-      dressVariation20PCT(p),
-      dressPatternVariation(p),
-      dressVariation50PCT(p),
-      transferAAndB(p),
+      dressVariation20PCT({ ...p, loadFabricImage: newFabricImage }),
+      dressPatternVariation({ ...p, loadFabricImage: newFabricImage }),
+      dressVariation50PCT({ ...p, loadFabricImage: newFabricImage }),
+      transferAAndB({ ...p, loadFabricImage: newFabricImage }),
     ]);
     const successfulResults = results.filter(
       (result) => result.status === "fulfilled"

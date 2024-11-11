@@ -8,7 +8,7 @@ import Header from "@components/Header";
 import PrintGeneration from "@img/upload/print-generation.svg";
 import Bg from "@img/generate/bg.png";
 import Waterfall from "../components/Waterfall";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { workflow } from "./workflow/workflow";
 import { getResult } from "@lib/request/generate";
 function Page() {
@@ -19,7 +19,7 @@ function Page() {
     null
   );
   const [taskIDs, setTaskIDs] = useState<string[]>([]);
-
+  const router = useRouter(); //
   const hasRunRef = useRef(false);
   useEffect(() => {
     if (!hasRunRef.current) {
@@ -43,6 +43,14 @@ function Page() {
     };
     loadSpline();
   }, []);
+  useEffect(() => {
+    if (taskIDs.length === 0 && imageList.length > 0) {
+      const imageListParam = encodeURIComponent(JSON.stringify(imageList));
+      router.push(
+        `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
+      );
+    }
+  }, [taskIDs, imageList, router]);
 
   const getImage = async (taskID: string) => {
     try {

@@ -18,49 +18,21 @@ import "swiper/css/pagination";
 import Add from "@img/upload/add2.svg";
 import Delete from "@img/upload/delete.svg";
 import { TypesClothingProps } from "@definitions/update";
+import { fetchHomePage } from "@lib/request/page";
+import { errorCaptureRes } from "@utils/index";
 const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
   const uniqueId = useId();
-  const [urlList, setUrlList] = useState([
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=1",
-      drc: "asdk",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=2",
-      drc: "asdk",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=3",
-      drc: "asdk",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=7",
-      drc: "asdk",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=4",
-      drc: "asdkkasdhgakssdafhkua",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=5",
-      drc: "asdk",
-      selected: false,
-    },
-    {
-      url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg?id=6",
-      drc: "asdk",
-      selected: false,
-    },
-  ]);
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(urlList.length / itemsPerPage);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const [urlList, setUrlList] = useState<
+    { image_url: string; tags: string; selected?: boolean }[]
+  >([]);
+  const itemsPerPage = activeIndex === 0 ? 5 : 6;
+  const totalPages = Math.ceil(total / itemsPerPage);
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -72,42 +44,64 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     }
   };
   const handleImageDelete = (src: string) => {
-    setUrlList((prevList) => prevList.filter((item) => item.url !== src));
+    setUrlList((prevList) =>
+      prevList.filter((item) => item?.image_url !== src)
+    );
   };
-  const [activeIndex, setActiveIndex] = useState(0);
+  const fetchData = async (index?: number) => {
+    const [err, res] = await errorCaptureRes(fetchHomePage, {
+      limit: index === 0 ? 5 : 6,
+      offset: (index || 0) * (index === 0 ? 5 : 6),
+      library: flied ? "fabrics" : "prints",
+    });
+    if (res?.success) {
+      const newImages = res?.data;
+      setTotal(res.total);
+      setUrlList((prev) => [...prev, ...newImages]);
+    }
+  };
   useEffect(() => {
     if (uploadProgress === 100) {
       setUrlList((pre) =>
         uploadedUrl
-          ? [{ url: uploadedUrl, drc: "upload", selected: false }, ...pre]
+          ? [
+              { image_url: uploadedUrl, tags: "upload", selected: false },
+              ...pre,
+            ]
           : pre
       );
     }
   }, [uploadProgress]);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
   const handleSelectImage = (url: string) => {
     setUrlList((prevList) =>
       prevList.map((item) =>
-        item.url === url
+        item.image_url === url
           ? { ...item, selected: true }
           : { ...item, selected: false }
       )
     );
-    console.log(flied);
     if (flied) {
-      console.log(111);
       onParamsUpdate({ loadFabricImage: url });
     } else {
-      console.log(222);
       onParamsUpdate({ loadPrintingImage: url });
     }
   };
-
   return (
     <Flex w="full" flexDirection={"column"}>
       <Box h={"11rem"} overflow={"hidden"}>
-        <Swiper onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}>
-          {[...Array(2)].map((_, pageIndex) => (
+        <Swiper
+          onSlideChange={(swiper) => {
+            if (Math.ceil(urlList.length / 6) <= swiper.activeIndex) {
+              fetchData(swiper.activeIndex);
+            }
+            setActiveIndex(swiper.activeIndex);
+          }}
+        >
+          {[...Array(totalPages)].map((_, pageIndex) => (
             <SwiperSlide key={pageIndex}>
               <Grid
                 templateColumns="repeat(3, 1fr)"
@@ -165,12 +159,12 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                   )
                   .map((item, index) => (
                     <GridItem
-                      key={item.url + index}
+                      key={item.image_url + index}
                       position="relative"
                       w="4.68rem"
                       h="4.67rem"
                       borderRadius="0.5rem"
-                      onClick={() => handleSelectImage(item.url)}
+                      onClick={() => handleSelectImage(item.image_url)}
                       border={
                         item.selected
                           ? "1px solid #dd4d4d"
@@ -179,7 +173,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                       zIndex={33}
                     >
                       <Image
-                        src={`${item.url}`}
+                        src={`${item.image_url}`}
                         alt={`Small Image ${index + 1}`}
                         w="4.68rem"
                         h="4.5rem"
@@ -187,7 +181,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                         cursor="pointer"
                         borderRadius="0.5rem"
                       />
-                      {item.drc === "upload" ? (
+                      {item.tags === "upload" ? (
                         <Image
                           src={Delete.src}
                           alt={`Small Image ${index + 1}`}
@@ -200,7 +194,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                           cursor={"pointer"}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleImageDelete(item.url);
+                            handleImageDelete(item.image_url);
                           }}
                         />
                       ) : (
@@ -225,7 +219,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                             wordBreak="break-word"
                             fontWeight="400"
                           >
-                            {item.drc}
+                            {item.tags}
                           </Text>
                         </Flex>
                       )}
@@ -237,7 +231,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
         </Swiper>
       </Box>
       <Flex justifyContent="center" mt={4} gap={2}>
-        {[...Array(4)].map((_, index) => (
+        {[...Array(totalPages)].map((_, index) => (
           <Box
             key={index}
             width={index === activeIndex ? "1rem" : "0.44rem"}

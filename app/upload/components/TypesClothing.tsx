@@ -1,6 +1,10 @@
 "use client";
 
 import { Box, Flex, Text, Image } from "@chakra-ui/react";
+import ComingSoon from "@img/upload/comingSoon.jpg";
+import ComingSoon2 from "@img/upload/comingSoon2.jpg";
+import Dress from "@img/upload/dress.jpg";
+import comingSvg from "@img/upload/comingSoon.svg";
 function Page() {
   return (
     <Box
@@ -44,7 +48,7 @@ function Page() {
           flexShrink="0"
         >
           <Image
-            src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
+            src={Dress.src}
             w="100%"
             h="100%"
             borderRadius="0.5rem"
@@ -79,7 +83,7 @@ function Page() {
           flexShrink="0"
         >
           <Image
-            src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
+            src={ComingSoon.src}
             w="100%"
             h="100%"
             borderRadius="0.5rem"
@@ -96,9 +100,9 @@ function Page() {
             flexFlow={"column"}
           >
             <Image
-              src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
-              w="0.56rem"
-              h="0.77rem"
+              src={comingSvg.src}
+              w="1.13rem"
+              h="1.13rem"
               borderRadius="0.5rem"
               mb={"0.2rem"}
             ></Image>
@@ -125,7 +129,7 @@ function Page() {
           flexShrink="0"
         >
           <Image
-            src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
+            src={ComingSoon2.src}
             w="100%"
             h="100%"
             borderRadius="0.5rem"
@@ -142,55 +146,9 @@ function Page() {
             flexFlow={"column"}
           >
             <Image
-              src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
-              w="0.56rem"
-              h="0.77rem"
-              borderRadius="0.5rem"
-              mb={"0.2rem"}
-            ></Image>
-            <Text
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="400"
-              fontSize="0.81rem"
-              color="#E5E5E5"
-              textAlign={"center"}
-              whiteSpace="normal" // 允许文本自动换行
-              maxWidth="80%" // 限制最大宽度
-              lineHeight="0.8rem"
-            >
-              Coming soon
-            </Text>
-          </Flex>
-        </Box>
-        <Box
-          w="5.94rem"
-          h="7.81rem"
-          bg="#F5F5F5"
-          borderRadius="0.5rem"
-          position={"relative"}
-          flexShrink="0"
-        >
-          <Image
-            src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
-            w="100%"
-            h="100%"
-            borderRadius="0.5rem"
-          ></Image>
-          <Flex
-            w="5.94rem"
-            h="7.81rem"
-            borderRadius="0.5rem"
-            bg="rgba(23,23,23,0.5)"
-            position={"absolute"}
-            top={0}
-            justifyContent="center"
-            alignItems="center"
-            flexFlow={"column"}
-          >
-            <Image
-              src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
-              w="0.56rem"
-              h="0.77rem"
+              src={comingSvg.src}
+              w="1.13rem"
+              h="1.13rem"
               borderRadius="0.5rem"
               mb={"0.2rem"}
             ></Image>
