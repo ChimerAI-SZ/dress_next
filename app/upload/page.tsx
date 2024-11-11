@@ -20,10 +20,10 @@ function Page() {
   const handleParamsUpdate = (newParams: Params) => {
     setParams((prev: Params) => ({
       ...prev,
-      ...newParams, // 合并新的参数数据
+      ...newParams,
     }));
   };
-
+  console.log("params", params);
   return (
     <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
       <Header></Header>

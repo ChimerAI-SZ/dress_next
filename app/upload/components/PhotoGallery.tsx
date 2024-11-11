@@ -93,6 +93,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
           : { ...item, selected: false }
       )
     );
+    console.log(flied);
     if (flied) {
       console.log(111);
       onParamsUpdate({ loadFabricImage: url });

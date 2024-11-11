@@ -10,20 +10,27 @@ import Bg from "@img/generate/bg.png";
 import Waterfall from "../components/Waterfall";
 import { useSearchParams } from "next/navigation";
 import { workflow } from "./workflow/workflow";
+import { getResult } from "@lib/request/generate";
 function Page() {
   const searchParams = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
+  const [imageList, setImageList] = useState<string[]>([]);
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(
     null
   );
-  const hasRunRef = useRef(false);
+  const [taskIDs, setTaskIDs] = useState<string[]>([]);
 
+  const hasRunRef = useRef(false);
   useEffect(() => {
     if (!hasRunRef.current) {
-      workflow(params);
+      workflow(params).then((newTaskIDs) => {
+        if (newTaskIDs) {
+          setTaskIDs(newTaskIDs);
+        }
+      });
       hasRunRef.current = true;
     }
-  }, []);
+  }, [params]);
   useEffect(() => {
     const loadSpline = async () => {
       const component = await Spline({
@@ -36,6 +43,49 @@ function Page() {
     };
     loadSpline();
   }, []);
+
+  const getImage = async (taskID: string) => {
+    try {
+      const result = await getResult({ taskID });
+      if ("code" in result) {
+        console.log(result.code);
+        if (result.code !== 0) {
+          setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+          return;
+        }
+      }
+      const { progress, imageFiles } = result.data;
+      if (progress === 100) {
+        imageFiles.forEach((element: { url: any }, index: number) => {
+          const newUrl = `${element.url}?id=${taskID}`;
+          setImageList((pre) => [...pre, newUrl]);
+        });
+        setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+      } else {
+        console.log(`Task ${taskID} still in progress`);
+      }
+    } catch (err) {
+      setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (taskIDs.length > 0) {
+        taskIDs.forEach((taskID) => {
+          getImage(taskID);
+        });
+      } else {
+        console.log("All tasks complete or no tasks left.");
+      }
+    }, 15000);
+
+    return () => {
+      console.log("Cleaning up interval");
+      clearInterval(interval);
+    };
+  }, [taskIDs]);
+
   return (
     <Box
       //   bgSize="contain"

@@ -4,38 +4,52 @@
 export const storage = {
     // 设置值为字符串
     set(name: string, value: string): void {
-        localStorage.setItem(name, value);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(name, value);
+        }
     },
     // 设置值为对象
     setObj<T>(name: string, value: T): void {
-        localStorage.setItem(name, JSON.stringify(value));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(name, JSON.stringify(value));
+        }
     },
     // 获取字符串值
     get(name: string): string | null {
-        return localStorage.getItem(name);
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem(name);
+        }
+        return null;
     },
     // 获取对象值
     getObj<T>(name: string): T | null {
-        const item = localStorage.getItem(name);
-        if (item) {
-            try {
-                return JSON.parse(item) as T;
-            } catch (error) {
-                console.error("Failed to parse item from localStorage:", error);
-                return null;
+        if (typeof window !== 'undefined') {
+            const item = localStorage.getItem(name);
+            if (item) {
+                try {
+                    return JSON.parse(item) as T;
+                } catch (error) {
+                    console.error("Failed to parse item from localStorage:", error);
+                    return null;
+                }
             }
         }
         return null;
     },
     // 删除项
     remove(name: string): void {
-        localStorage.removeItem(name);
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(name);
+        }
     },
     // 清除所有项
     clear(): void {
-        localStorage.clear();
+        if (typeof window !== 'undefined') {
+            localStorage.clear();
+        }
     },
 };
+
 
 
 

@@ -4,5 +4,5 @@ module.exports = {
   experimental: {
     externalDir: true,
     optimizePackageImports: ["@chakra-ui/react"]
-  }
+  },
 }

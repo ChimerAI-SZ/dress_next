@@ -19,7 +19,7 @@ import Lock from "@img/login/.svg";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { fetchLogin } from "@lib/request/login";
-import { errorCaptureRes } from "@utils/index";
+import { errorCaptureRes, storage } from "@utils/index";
 
 interface FormValues {
   email: string;
@@ -60,7 +60,10 @@ const Page = () => {
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchLogin, data);
+    console.log(res.data.user_id);
     if (res.success) {
+      storage.set("user_id", res.data.user_id.toString());
+      storage.set("token", res.data.token);
       router.push("/");
     }
   };
