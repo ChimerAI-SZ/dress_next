@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>返回</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="个人主页" transform="translate(-674, -831)">
+            <g id="编组-8" transform="translate(0, 797)">
+                <g id="返回" transform="translate(692, 52) scale(-1, 1) translate(-692, -52)translate(674, 34)">
+                    <rect id="矩形" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="36" height="36"></rect>
+                    <g id="编组" transform="translate(11.52, 6.3)" fill="#BFBFBF" fill-rule="nonzero">
+                        <path d="M12.6836797,0.439179682 C13.2692525,1.02492946 13.2692525,1.97442988 12.6836797,2.56017966 L3.62067966,11.6246797 L12.6851797,20.6891797 C13.2536374,21.2777481 13.2455073,22.2133065 12.6669069,22.7919069 C12.0883064,23.3705074 11.1527481,23.3786374 10.5641797,22.8101797 L0.439179664,12.6851797 C-0.146393221,12.0994299 -0.146393221,11.1499295 0.439179664,10.5641797 L10.5641797,0.439179682 C11.1499294,-0.146393227 12.0994299,-0.146393227 12.6851797,0.439179682 L12.6836797,0.439179682 Z" id="路径"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
