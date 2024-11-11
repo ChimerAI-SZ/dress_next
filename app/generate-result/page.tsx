@@ -12,22 +12,42 @@ import NoSelect from "@img/generate-result/no-select.svg";
 import Selected from "@img/generate-result/selected.svg";
 import ModalRight from "@img/generate-result/modal-right.svg";
 import ModalBack from "@img/generate-result/modal-back.svg";
+import { useSearchParams } from "next/navigation";
+import ToastTest from "@components/ToastTest";
+import { errorCaptureRes, storage } from "@utils/index";
+import { fetchShoppingAdd } from "@lib/request/generate-result";
 function Page() {
-  const [imageList, setImageList] = useState<string[]>([
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=1",
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=2",
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=3",
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=4",
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=5",
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg&id=6",
-  ]);
+  const userId = storage.get("user_id");
+
+  const searchParams = useSearchParams();
+  const params = Object.fromEntries(searchParams.entries());
+  const [imageList, setImageList] = useState<string[]>(
+    JSON.parse(params.imageList)
+  );
   const [selectImage, setSelectImage] = useState(imageList[0]);
   const [likeList, setLikeList] = useState<string[]>([]);
-  const [originImage, setOriginImage] = useState(
-    "https://mind-file.oss-cn-beijing.aliyuncs.com/5f3efc5648b5436d8d50dcf5bbd68e63?x-oss-process=image/format,jpg"
-  );
+  const [originImage, setOriginImage] = useState(params.loadOriginalImage);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [active, setActive] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const openDialog = () => setIsOpen(true);
+  const fetchData = async (index?: number) => {
+    const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
+      user_id: userId,
+      img_urls: selectImage,
+      phone: phoneNumber,
+    });
+    if (res?.success) {
+      console.log(1);
+    }
+  };
+  const affirmDialog = () => {
+    setIsOpen(false);
+    fetchData();
+  };
+  const closeDialog = () => setIsOpen(false);
   const cb = (b: boolean) => {
     setActive(b);
   };
@@ -103,7 +123,11 @@ function Page() {
                   });
                 }}
               ></Image>
-              <Image boxSize={"2.25rem"} src={Shop.src}></Image>
+              <Image
+                boxSize={"2.25rem"}
+                src={Shop.src}
+                onClick={openDialog}
+              ></Image>
             </Flex>
           )}
         </Box>
@@ -307,6 +331,14 @@ function Page() {
           </Button>
         )}
       </Flex>
+      <ToastTest
+        isOpen={isOpen}
+        phoneNumber={phoneNumber}
+        onOpen={openDialog}
+        onClose={closeDialog}
+        affirmDialog={affirmDialog}
+        setPhoneNumber={setPhoneNumber}
+      ></ToastTest>
     </Box>
   );
 }

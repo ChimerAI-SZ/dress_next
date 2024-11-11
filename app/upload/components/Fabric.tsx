@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Box, Flex, Text, Image, Textarea } from "@chakra-ui/react";
 import PhotoGallery from "./PhotoGallery";
 import { TypesClothingProps } from "@definitions/update";
+
 function Page({ onParamsUpdate }: TypesClothingProps) {
   return (
     <Box

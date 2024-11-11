@@ -14,7 +14,7 @@ export const toaster = createToaster({
   placement: "bottom-end",
   pauseOnPageIdle: true,
   offsets: { left: "20px", top: "20px", right: "20px", bottom: "5rem" },
-  // max: 1,
+  max: 1,
 });
 
 export const Toaster = () => {
