@@ -2,11 +2,5 @@
   "editor.formatOnSave": true,
   "typescript.tsdk": "../../node_modules/.pnpm/typescript@4.7.4/node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "cSpell.words": [
-    "Aliyun",
-    "chakra",
-    "lucide",
-    "splinetool",
-    "swiper"
-  ]
+  "cSpell.words": ["Aliyun", "chakra", "lucide", "splinetool", "swiper"]
 }

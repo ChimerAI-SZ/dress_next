@@ -1,10 +1,14 @@
 // 收藏夹数据类型
 export type FavouriteItem = {
-  id: string
-  isDefault: boolean
-  name: string
-  coverImg: string[]
-  imgNumber: number
+  collection_id: string | number
+  user_id: string | number
+  is_default: boolean
+  is_deleted: boolean
+  title: string
+  images: string[]
+  description: string
+  created_at: string
+  total: number
 }
 
 interface FavouriteItemImage {

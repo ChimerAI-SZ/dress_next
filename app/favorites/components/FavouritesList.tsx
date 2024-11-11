@@ -5,28 +5,28 @@ import { FavouriteItem } from '@definitions/favourites'
 
 import Favourites from './Favourites'
 
-import { featchFavouritesList } from '../mock'
 import styled from '@emotion/styled'
 
 interface NextRouter {
   pathname: string
   query?: { name: string }
 }
+interface CustomersTableProps {
+  collectionList: FavouriteItem[]
+}
 
-export default async function CustomersTable() {
-  const revenue: FavouriteItem[] = await featchFavouritesList()
-
+const CustomersTable: React.FC<CustomersTableProps> = ({ collectionList }) => {
   return (
     <Container p={'8pt 12pt'}>
       <Flex direction="row" wrap={'wrap'} gap={'12pt'}>
-        <For each={revenue}>
+        <For each={collectionList}>
           {(item: FavouriteItem, index: number) => (
             <StyledLink
               href={{
-                pathname: `/favorites/${item.id}`,
-                query: { name: encodeURIComponent(item.name) } as NextRouter['query']
+                pathname: `/favorites/${item.collection_id}`,
+                query: { name: encodeURIComponent(item.title) } as NextRouter['query']
               }}
-              key={item.id + index}
+              key={item.collection_id + '' + index}
             >
               <Favourites favouriteData={item} />
             </StyledLink>
@@ -36,6 +36,8 @@ export default async function CustomersTable() {
     </Container>
   )
 }
+
+export default CustomersTable
 
 const StyledLink = styled(Link)`
   display: block;
