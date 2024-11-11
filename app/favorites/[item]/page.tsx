@@ -4,24 +4,31 @@ import React, { useEffect, useState, useReducer } from "react"
 import { Container, Box, For, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
 import { Radio, RadioGroup } from "@components/ui/radio"
 import { useSearchParams } from "next/navigation"
+import { Provider } from "react-redux"
+import styled from "@emotion/styled"
+import { useRouter } from "next/navigation"
 
 import buyIcon from "@img/favourites/buy.svg"
 import likedIcon from "@img/favourites/liked.svg"
 import downloadIcon from "@img/favourites/download.svg"
-import descriptionBg from "@img/favourites/descriptionBg.png"
+import descriptionIcon from "@img/favourites/collectionDescription.svg"
 
 import Toast from "@components/Toast"
-import { Alert } from "@components/Alert"
 import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
 
-import { featchFavouritesData } from "../mock"
+import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
+import { store } from "../store"
 
 type GroupList = {
   [key: string]: string[]
 }
+interface FavouriteItemProps {
+  params: { item: string }
+}
 
-export default function FavouriteItem({ params }: { params: { item: string } }) {
+const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const favouriteName = searchParams.get("name") ?? ""
 
@@ -43,9 +50,10 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
     setSelectionMode(value)
   }
 
+  // 查询收藏夹数据
   const queryData = async () => {
     try {
-      const res = await featchFavouritesData(params.item)
+      const res = await queryAllImageInCollection({ collection_id: params.item })
       const { data, success } = res
 
       // 把图片根据日期进行分栏
@@ -53,7 +61,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
       if (success && data?.length > 0) {
         const groupedByDate = new Map()
 
-        data.forEach(item => {
+        data.forEach((item: any) => {
           const date = item.added_at
           // 如果 Map 中还没有这个日期的键，初始化一个空数组
           if (!groupedByDate.has(date)) {
@@ -68,6 +76,21 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
       }
 
       console.log(res, "res")
+    } catch (err: any) {
+      // todo error hanlder
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      const res = await deleteCollection({ collection_id: params.item })
+      const { data, success } = res
+
+      if (success) {
+        router.back()
+      } else {
+        // todo error hanlder
+      }
     } catch (err: any) {
       // todo error hanlder
     }
@@ -93,21 +116,22 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
 
   return (
     <Container px={"0"} className="favourite-item-container">
-      <Header handleIconClick={handleIconClick} favouriteId={params.item} selectMode={selectionMode} handleSetSelectMode={handleSetSelectMode} />
+      <Header handleIconClick={handleIconClick} collectionId={params.item} selectMode={selectionMode} handleSetSelectMode={handleSetSelectMode} />
       {/* 收藏夹名称 */}
       <Heading p={"0 16pt"} mb={"8pt"}>
         {decodeURIComponent(favouriteName)}
       </Heading>
       {/* 收藏夹说明 */}
       <Show when={true}>
-        <Box backgroundImage={`url(${descriptionBg.src})`} backgroundSize={"cover"} backgroundPosition={"center"}>
-          <Box>
-            <Box fontWeight={500} fontSize={"1.3rem"} p={"8pt 16pt 2pt"}>
-              Description
-            </Box>
+        <Box>
+          <DescriptionBox>
+            <Flex fontWeight={500} fontSize={"1.3rem"} p={"8pt 16pt 2pt"} alignItems={"center"} justifyContent={"flex-start"}>
+              <Image w={"28pt"} h={"28pt"} src={descriptionIcon.src} alt="description-icon" />
+              <span>Description</span>
+            </Flex>
             {/* todo 这里用图片当背景不太合理 */}
             <Box px={"16pt"}>Graphic patterns are visual elements made of repeating shapes, lines, and colors, arranged deliberately to create a cohesive design.</Box>
-          </Box>
+          </DescriptionBox>
         </Box>
       </Show>
       <Box px={"1rem"} position={"relative"}>
@@ -162,7 +186,7 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
               >
                 Cancel
               </Button>
-              <Button borderRadius={"40px"} w={"40%"} bgColor={"#EE3939"}>
+              <Button borderRadius={"40px"} w={"40%"} bgColor={"#EE3939"} onClick={handleDelete}>
                 Delete
               </Button>
             </Flex>
@@ -170,5 +194,33 @@ export default function FavouriteItem({ params }: { params: { item: string } }) 
         </Toast>
       </Show>
     </Container>
+  )
+}
+
+const DescriptionBox = styled.div`
+  background: #ffeaf4;
+  margin: 0 1rem;
+  border-radius: 8px;
+  position: relative;
+  padding-bottom: 20px;
+  &:: after {
+    content: "";
+    padding: 10px;
+    height: 10px;
+    display: inline-block;
+    width: 100%;
+    bottom: -5px;
+    position: absolute;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+`
+
+export default ({ params }: FavouriteItemProps) => {
+  return (
+    <Provider store={store}>
+      <FavouriteItem params={params} />
+    </Provider>
   )
 }

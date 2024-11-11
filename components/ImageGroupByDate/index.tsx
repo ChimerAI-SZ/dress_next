@@ -21,6 +21,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ date, imageList, se
         <For each={imageList as string[]}>
           {(item: string, index: number) => (
             <GridItem
+              key={item + index}
               position={"relative"}
               onClick={() => {
                 handleSelct(item)

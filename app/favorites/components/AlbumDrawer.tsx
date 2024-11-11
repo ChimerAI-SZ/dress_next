@@ -1,12 +1,68 @@
+/**!SECTION
+ * 新增/编辑收藏夹信息
+ */
 "use client"
 
-import { Button, Fieldset, Input, Textarea, Box } from "@chakra-ui/react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useSelector } from "react-redux"
+
+import { Button, Fieldset, Input, Text, Textarea, Box, VStack } from "@chakra-ui/react"
+import { InputGroup } from "@components/ui/input-group"
 import { DrawerBackdrop, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, DrawerRoot, DrawerTitle, DrawerTrigger } from "@components/ui/drawer"
 import { Field } from "@components/ui/field"
-import { FavouriteDialogProps } from "@definitions/favourites"
 import { CloseOutlined } from "@ant-design/icons"
 
-const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ children, type, favouriteId }) => {
+import { storage } from "@utils/index"
+
+import { FavouriteDialogProps } from "@definitions/favourites"
+
+import { addNewAlbum } from "@lib/request/favourites" // 接口 - 新建收藏夹
+
+interface FormValues {
+  title: string
+  description: string
+}
+
+const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ children, type, collectionId }) => {
+  const collectionList = useSelector((state: any) => state.collectionList.value)
+  const [drawerVisible, setDrawerVisible] = useState(true)
+  console.log(collectionList, "collectionList")
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<FormValues>({
+    defaultValues: {
+      title: collectionId ? (collectionList.find((item: any) => item.collection_id + "" === collectionId)?.title ?? "") : "",
+      description: collectionId ? (collectionList.find((item: any) => item.collection_id + "" === collectionId)?.description ?? "") : ""
+    }
+  })
+
+  // 表单最终提交逻辑
+  const onSubmit = async (formData: FormValues) => {
+    console.log("Registration data:", formData)
+    // 执行最终注册逻辑
+    if (type === "add") {
+      const params = {
+        user_id: storage.get("user_id") ?? "",
+        title: formData.title,
+        description: formData.description ?? ""
+      }
+      const { message, data, success } = await addNewAlbum(params)
+
+      if (success) {
+        setDrawerVisible(false)
+      }
+    } else {
+      console.log(collectionList, collectionId)
+      // if (success) {
+      setDrawerVisible(false)
+      // }
+    }
+  }
+
   return (
     <DrawerRoot placement="bottom">
       <DrawerBackdrop />
@@ -15,30 +71,72 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ children, type, favourite
         <DrawerHeader py={"9pt"} height={"44pt"} position={"relative"}>
           <DrawerTitle display={"flex"} position={"relative"} justifyContent={"center"} alignItems={"center"}>
             <DrawerTrigger asChild>
-              <Box position="absolute" left="0">
+              <Box
+                position="absolute"
+                left="0"
+                onClick={() => {
+                  setDrawerVisible(false)
+                }}
+              >
                 <CloseOutlined />
               </Box>
             </DrawerTrigger>
-            {type === "add" ? "Add" : "Edit"} New Album
+            {type === "add" ? "Add New" : "Edit"} Album
           </DrawerTitle>
         </DrawerHeader>
-        <DrawerBody>
-          <Fieldset.Root w="100%">
-            <Fieldset.Content w="100%">
-              <Field label="Title">
-                <Input bgColor={"#f5f5f5"} name="title" />
-              </Field>
-              <Field label="Description">
-                <Textarea bgColor={"#f5f5f5"} name="description" placeholder="Provide some descriptions of new album" />
-              </Field>
-            </Fieldset.Content>
-          </Fieldset.Root>
-        </DrawerBody>
-        <DrawerFooter>
-          <Button w={"100%"} bgColor={"#ee3939"} borderRadius={"40px"}>
-            Done
-          </Button>
-        </DrawerFooter>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DrawerBody>
+            <VStack pb="4rem" w="100%">
+              <Fieldset.Root w="100%">
+                <Fieldset.Content w="100%">
+                  {/* Titile */}
+                  <Field label="Title" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.title}>
+                    <InputGroup w="100%" bg={!!errors.title ? "#ffe0e0" : ""}>
+                      <Input
+                        {...register("title", {
+                          required: "title is required"
+                        })}
+                        flex="1"
+                        name="title"
+                        // placeholder="Type your title"
+                        _focusVisible={{
+                          borderColor: "#404040",
+                          boxShadow: "none",
+                          outlineStyle: "none"
+                        }}
+                      />
+                    </InputGroup>
+                    {errors.title && (
+                      <Text color="red.500" fontSize="0.75rem">
+                        {errors.title.message}
+                      </Text>
+                    )}
+                  </Field>
+                  {/* Description */}
+                  <Field label="Description" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.description}>
+                    <InputGroup w="100%" bg={!!errors.description ? "#ffe0e0" : ""}>
+                      <Textarea
+                        {...register("description", {})}
+                        flex="1"
+                        name="description"
+                        _focusVisible={{
+                          borderColor: "#404040",
+                          boxShadow: "none",
+                          outlineStyle: "none"
+                        }}
+                      />
+                    </InputGroup>
+                  </Field>
+                </Fieldset.Content>
+              </Fieldset.Root>
+            </VStack>
+          </DrawerBody>
+          <DrawerFooter>
+            <Button w={"100%"} bgColor={"#ee3939"} borderRadius={"40px"} type="submit">
+              Done
+            </Button>
+          </DrawerFooter>
+        </form>
       </DrawerContent>
     </DrawerRoot>
   )

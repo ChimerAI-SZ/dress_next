@@ -33,14 +33,14 @@ export interface FavouritesHeaderProps {
 
 export interface CollectionDetailHeaderProps {
   handleIconClick: (type: string) => void
-  favouriteId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
+  collectionId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
   selectMode: boolean
   handleSetSelectMode: (value: boolean) => void
 }
 
 // 收藏页 弹窗 props 类型
 export interface FavouriteDialogProps {
-  type: 'add' | 'edit'
+  type: "add" | "edit"
   children: React.ReactNode
-  favouriteId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
+  collectionId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
 }
