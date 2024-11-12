@@ -184,7 +184,7 @@ const Waterfall: React.FC = () => {
     <>
       <Global styles={masonryStyles} />
       <Box ref={containerRef} position={'relative'}>
-        <Box position={'absolute'} top={'-30pt'} left={'50%'} transform={'translateX(-50%)'}>
+        <Box className="main-page-hidden-loading-icon" position={'absolute'} top={'-40pt'} left={'50%'} transform={'translateX(-50%)'}>
           <StyledLoading src={loadingIcon.src} alt="loading-icon" boxSize="24pt" />
         </Box>
         <Masonry breakpointCols={breakpointColumnsObj} className="my-masonry-grid" columnClassName="my-masonry-grid_column">
