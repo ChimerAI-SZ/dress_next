@@ -19,6 +19,7 @@ import { useState } from "react";
 import { fetchLogin } from "@lib/request/login";
 import { errorCaptureRes, storage } from "@utils/index";
 import Bg from "@img/login/bg.png";
+import { Toaster, toaster } from "@components/Toaster";
 interface FormValues {
   email: string;
   first: string;
@@ -52,11 +53,15 @@ const Page = () => {
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchLogin, data);
-    console.log(res.data.user_id);
     if (res.success) {
       storage.set("user_id", res.data.user_id.toString());
       storage.set("token", res.data.token);
       router.push("/");
+    } else {
+      toaster.create({
+        title: res.message,
+        type: "error",
+      });
     }
   };
 
@@ -105,6 +110,7 @@ const Page = () => {
         >
           Please login before you like a design!
         </Text>
+        <Toaster />
       </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack p={3} px={5} pb="1.5rem" w="100%" mt={"-1rem"}>
