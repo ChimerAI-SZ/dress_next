@@ -44,6 +44,7 @@ function Page() {
   useEffect(() => {
     if (!hasRunRef.current) {
       workflow(params).then((newTaskIDs) => {
+        console.log("workflow");
         if (newTaskIDs) {
           setTaskIDs(newTaskIDs);
         }
@@ -67,9 +68,9 @@ function Page() {
   useEffect(() => {
     if (taskIDs.length === 0 && imageList.length > 0) {
       const imageListParam = encodeURIComponent(JSON.stringify(imageList));
-      // router.push(
-      //   `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
-      // );
+      router.push(
+        `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
+      );
     }
   }, [taskIDs, imageList, router]);
 
@@ -104,8 +105,8 @@ function Page() {
         taskIDs.forEach((taskID) => {
           getImage(taskID);
         });
-        fetchData();
       } else {
+        fetchData();
         console.log("All tasks complete or no tasks left.");
       }
     }, 15000);

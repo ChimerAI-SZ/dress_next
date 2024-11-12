@@ -35,8 +35,11 @@ function Page() {
   const [make, setMake] = useState(0);
   const openDialog = () => setIsOpen(true);
   const fetchData = async (list: string[]) => {
+    if (userId === null) {
+      throw new Error("userId cannot be null");
+    }
     const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
-      user_id: userId,
+      user_id: +userId as number,
       img_urls: list,
       phone: phoneNumber,
     });
@@ -45,10 +48,13 @@ function Page() {
     }
   };
 
-  const AddImage = async () => {
+  const AddImage = async (list: string[]) => {
+    if (userId === null) {
+      throw new Error("userId cannot be null");
+    }
     const [err, res] = await errorCaptureRes(fetchAddImage, {
-      user_id: userId,
-      img_urls: selectImage,
+      user_id: +userId as number,
+      img_urls: list,
     });
     if (res?.success) {
       console.log(1);
@@ -103,7 +109,7 @@ function Page() {
                 boxSize={"2.25rem"}
                 src={Like.src}
                 onClick={() => {
-                  AddImage();
+                  AddImage([selectImage]);
                   toaster.create({
                     description: (
                       <Flex
@@ -322,7 +328,9 @@ function Page() {
                 <Image
                   boxSize={"2.25rem"}
                   src={Like.src}
-                  onClick={() => {}}
+                  onClick={() => {
+                    AddImage(likeList);
+                  }}
                 ></Image>
               </Flex>
               <Flex

@@ -45,6 +45,15 @@ export const generatePrintingFromPrompt = (params: object) => {
   });
 };
 
+// 提示词生成印花
+export const generatePrintingSparseArrange = (params: object) => {
+  return axios.post("/v1/generate_printing_sparse_arrange", {
+    userUUID: userId,
+    batchSize: 3,
+    ...params,
+  });
+};
+
 // a and b
 export const transferAAndB = (params: object) => {
   return axios.post("/v1/transfer_a_and_b", {
