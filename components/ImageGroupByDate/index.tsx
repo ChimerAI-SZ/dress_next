@@ -5,31 +5,33 @@ import { Box, For, Grid, GridItem, Image, Show } from "@chakra-ui/react"
 import selectedIcon from "@img/favourites/selectedIcon.svg"
 import unselectedIcon from "@img/favourites/unselectedIcon.svg"
 
+import { HistoryItem } from "@definitions/history"
+
 interface ImageGroupByDataProps {
   date: string
-  imageList: string[]
+  imageList: HistoryItem[]
   selectionMode: boolean // 多选态
-  selectedImageList: string[]
-  handleSelct: (img: string) => void
+  selectedImageList: number[]
+  handleSelect: (img: number) => void
 }
 
-const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ date, imageList, selectionMode, selectedImageList, handleSelct }): React.ReactNode => {
+const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ date, imageList, selectionMode, selectedImageList, handleSelect }): React.ReactNode => {
   return (
     <Box mb={"1rem"}>
       <SubTitle>{dayjs().isSame(date, "day") ? "Today" : dayjs(date).format("MMMM DD, YYYY")}</SubTitle>
       <Grid templateColumns="repeat(4, 1fr)" gap="3">
-        <For each={imageList as string[]}>
-          {(item: string, index: number) => (
+        <For each={imageList as HistoryItem[]}>
+          {(item: HistoryItem, index: number) => (
             <GridItem
-              key={item + index}
+              key={item.history_id + index}
               position={"relative"}
               onClick={() => {
-                handleSelct(item)
+                handleSelect(item.history_id)
               }}
             >
               <Show when={selectionMode}>
                 <Show
-                  when={selectedImageList.includes(item)}
+                  when={selectedImageList.includes(item.history_id)}
                   fallback={
                     <Box position={"absolute"} top={"2pt"} right={"2pt"} w={"12pt"} h={"12pt"}>
                       <Image src={unselectedIcon.src} alt="select-icon" />
@@ -41,7 +43,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ date, imageList, se
                   </Box>
                 </Show>
               </Show>
-              <Image key={item + index} src={item} />
+              <Image key={item.history_id + index} src={item.image_url} />
             </GridItem>
           )}
         </For>

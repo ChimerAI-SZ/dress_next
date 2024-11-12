@@ -15,10 +15,10 @@ import { Field } from "@components/ui/field"
 import Header from "../../components/Header"
 
 interface FormValues {
-  username: string
-  pronouns: string
-  bio: string
-  email: string
+  fullName: string
+  country: string
+  street_address_1: string
+  city: string
   phone: string
 }
 interface EditAddressProps {
@@ -62,16 +62,15 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           <VStack pb="4rem" w="100%">
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
-                {/* Username */}
-                <Field label="Username" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.username}>
-                  <InputGroup w="100%" bg={!!errors.username ? "#ffe0e0" : ""}>
+                {/* full name */}
+                <Field label="Full Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.fullName}>
+                  <InputGroup w="100%" bg={!!errors.fullName ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("username", {
-                        required: "username is required"
+                      {...register("fullName", {
+                        required: "Full Name is required"
                       })}
                       flex="1"
-                      name="username"
-                      // placeholder="Type your username"
+                      name="fullName"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -79,22 +78,21 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                       }}
                     />
                   </InputGroup>
-                  {errors.username && (
+                  {errors.fullName && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.username.message}
+                      {errors.fullName.message}
                     </Text>
                   )}
                 </Field>
-                {/* Pronouns */}
-                <Field label="Pronouns" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.pronouns}>
-                  <InputGroup w="100%" bg={!!errors.pronouns ? "#ffe0e0" : ""}>
+                {/* country */}
+                <Field label="Pronouns" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.country}>
+                  <InputGroup w="100%" bg={!!errors.country ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("pronouns", {
-                        required: "Pronouns is required"
+                      {...register("country", {
+                        required: "Country is required"
                       })}
                       flex="1"
-                      name="pronouns"
-                      // placeholder="Type your pronouns"
+                      name="country"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -102,22 +100,21 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                       }}
                     />
                   </InputGroup>
-                  {errors.pronouns && (
+                  {errors.country && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.pronouns.message}
+                      {errors.country.message}
                     </Text>
                   )}
                 </Field>
-                {/* bil */}
-                <Field label="Bio" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.bio}>
-                  <InputGroup w="100%" bg={!!errors.bio ? "#ffe0e0" : ""}>
-                    <Textarea
-                      {...register("bio", {
-                        required: "Bio is required"
+                {/* address */}
+                <Field label="Address" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_1}>
+                  <InputGroup w="100%" bg={!!errors.street_address_1 ? "#ffe0e0" : ""}>
+                    <Input
+                      {...register("street_address_1", {
+                        required: "Address is required"
                       })}
                       flex="1"
-                      name="bio"
-                      // placeholder="Type your bio"
+                      name="street_address_1"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -125,21 +122,51 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                       }}
                     />
                   </InputGroup>
-                  {errors.bio && (
+                  {errors.street_address_1 && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.bio.message}
+                      {errors.street_address_1.message}
+                    </Text>
+                  )}
+                </Field>
+                {/* city */}
+                <Field label="City" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.city}>
+                  <InputGroup w="100%" bg={!!errors.city ? "#ffe0e0" : ""}>
+                    <Input
+                      {...register("city", {
+                        required: "City is required"
+                      })}
+                      flex="1"
+                      name="city"
+                      _focusVisible={{
+                        borderColor: "#404040",
+                        boxShadow: "none",
+                        outlineStyle: "none"
+                      }}
+                    />
+                  </InputGroup>
+                  {errors.city && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.city.message}
                     </Text>
                   )}
                 </Field>
 
-                <Field label="Email" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.email}>
-                  <InputGroup w="100%" bg={!!errors.email ? "#ffe0e0" : ""}>
+                <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
+                  <PhoneInputWithCountry
+                    {...register("phone", {
+                      required: "Phone Number is required"
+                    })}
+                    control={control}
+                    rules={{ required: true }}
+                    inputComponent={CustomInput}
+                  />
+                  {/* <InputGroup w="100%" bg={!!errors.phone ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("email", {
-                        required: "Email is required"
+                      {...register("phone", {
+                        required: "Phone Number is required"
                       })}
                       flex="1"
-                      name="email"
+                      name="phone"
                       // placeholder="Type your email"
                       _focusVisible={{
                         borderColor: "#404040",
@@ -147,15 +174,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         outlineStyle: "none"
                       }}
                     />
-                  </InputGroup>
-                  {errors.email && (
+                  </InputGroup> */}
+                  {errors.phone && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.email.message}
+                      {errors.phone.message}
                     </Text>
                   )}
                 </Field>
-
-                <PhoneInputWithCountry name="phoneInputWithCountrySelect" control={control} rules={{ required: true }} inputComponent={CustomInput} />
               </Fieldset.Content>
             </Fieldset.Root>
           </VStack>
