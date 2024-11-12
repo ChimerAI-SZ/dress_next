@@ -52,7 +52,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     const [err, res] = await errorCaptureRes(fetchHomePage, {
       limit: index === 0 ? 5 : 6,
       offset: (index || 0) * (index === 0 ? 5 : 6),
-      library: flied ? "fabrics" : "prints",
+      library: flied ? "fabric" : "print",
     });
     if (res?.success) {
       const newImages = res?.data;
@@ -210,6 +210,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                               : "rgba(23,23,23,0.6)"
                           }
                           borderRadius="0rem 0rem 0.4rem 0.4rem"
+                          px={"0.2rem"}
                         >
                           <Text
                             fontFamily="PingFangSC, PingFang SC"
@@ -218,6 +219,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                             whiteSpace="normal"
                             wordBreak="break-word"
                             fontWeight="400"
+                            textAlign={"center"}
                           >
                             {item.tags}
                           </Text>

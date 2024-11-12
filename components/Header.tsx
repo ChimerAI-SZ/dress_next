@@ -8,10 +8,18 @@ import {
   Text,
   Image,
 } from "@chakra-ui/react";
-import ArrowLeft from "@img/upload/arrow-left.svg";
+import ArrowLeft from "@img/login/back.svg";
 import SelectMore from "@img/generate-result/select-more.svg";
 import Active from "@img/generate-result/active.svg";
-function Page({ show, cb }: { show?: boolean; cb?: (e: boolean) => void }) {
+function Page({
+  show,
+  noTitle,
+  cb,
+}: {
+  show?: boolean;
+  noTitle?: boolean;
+  cb?: (e: boolean) => void;
+}) {
   const [active, setActive] = useState(false);
   return (
     <Flex
@@ -30,16 +38,17 @@ function Page({ show, cb }: { show?: boolean; cb?: (e: boolean) => void }) {
           top="50%"
           transform="translateY(-50%)"
         >
-          <Image src={ArrowLeft.src} boxSize="1.9rem" />
+          <Image src={ArrowLeft.src} w={"1.38rem"} h={"1.38rem"} />
         </IconButton>
       </Link>
 
       <Text
-        fontSize="1.3rem"
+        fontSize="1.1rem"
         fontWeight="bold"
-        letterSpacing="0.1rem"
-        fontFamily="Arial"
+        letterSpacing="0rem"
+        fontFamily="PingFangSC, PingFang SC"
         textAlign="center"
+        color={noTitle ? "transparent" : "#171717"}
       >
         CREAMODA
       </Text>

@@ -19,7 +19,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     <Box
       alignItems="center"
       justifyContent="center"
-      mt={4}
+      mt="0.5rem"
       mb={4}
       width="full"
       position="relative"
@@ -54,10 +54,15 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         >
           Print selection
         </Text>
-        <Image w="0.88rem" h="0.88rem" src={PrintGeneration.src}></Image>
+        <Image
+          w="0.88rem"
+          h="0.88rem"
+          src={PrintGeneration.src}
+          ml={"0.3rem"}
+        ></Image>
       </Flex>
       <ColorSelect onParamsUpdate={onParamsUpdate}></ColorSelect>
-      <Flex px="0.75rem">
+      <Flex px="0.75rem" mt={"0.7rem"}>
         <Textarea
           value={text}
           onChange={handleChange}

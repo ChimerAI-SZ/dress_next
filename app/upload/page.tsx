@@ -23,7 +23,6 @@ function Page() {
       ...newParams,
     }));
   };
-  console.log("params", params);
   return (
     <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
       <Header></Header>
@@ -52,7 +51,7 @@ function Page() {
       </Flex>
       <PrintSelect onParamsUpdate={handleParamsUpdate}></PrintSelect>
       <Fabric onParamsUpdate={handleParamsUpdate}></Fabric>
-      <Box h="4.25rem"></Box>
+      <Box h="4.55rem"></Box>
       <Flex
         height="3.75rem"
         position="fixed"

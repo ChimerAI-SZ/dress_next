@@ -61,7 +61,7 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
       justifyContent="center"
       flexDirection="column"
       px="0.75rem"
-      pt="0.63rem"
+      pt="1.2rem"
     >
       <Flex width={"full"} overflowY={"auto"} gap={"0.56rem"}>
         <DrawerRoot placement="bottom">
@@ -73,11 +73,14 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
               height="1.75rem"
             ></Image>
           </DrawerTrigger>
-          <DrawerContent roundedTop={"13"}>
+          <DrawerContent
+            roundedTop={"13"}
+            borderRadius="0.75rem 0.75rem 0rem 0rem"
+          >
             <Flex
               alignItems="center"
               justifyContent="center"
-              mt={"0.56rem"}
+              mt={"0.7rem"}
               width="full"
               position="relative"
               cursor={"pointer"}
@@ -85,19 +88,20 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
               <DrawerActionTrigger asChild>
                 <Image
                   src={Close.src}
-                  boxSize="0.81rem"
+                  boxSize="1.3rem"
                   position="absolute"
-                  left="0.7rem"
+                  left="1rem"
                   top="50%"
                   transform="translateY(-50%)"
                 />
               </DrawerActionTrigger>
               <Text
-                fontSize="1.3rem"
-                fontWeight="bold"
+                fontSize="1.06rem"
+                fontWeight="500"
                 letterSpacing="0.1rem"
-                fontFamily="Arial"
+                fontFamily="PingFangSC, PingFang SC"
                 textAlign="center"
+                color="#171717"
               >
                 Custom
               </Text>
@@ -108,7 +112,7 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
                 onChange={setColor}
                 style={{
                   width: "100%",
-                  height: "10.66rem",
+                  height: "11.4rem",
                   padding: "10px",
                   background: "white",
                   borderRadius: "8px",
@@ -120,8 +124,8 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
               gap={"0.57rem"}
               px="0.75rem"
               overflowY={"auto"}
+              mt={"0.3rem"}
             >
-              {/* 添加按钮 */}
               <Button
                 onClick={handleAddColor}
                 h={"1.69rem"}

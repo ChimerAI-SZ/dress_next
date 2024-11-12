@@ -11,7 +11,6 @@ function Page() {
       alignItems="center"
       justifyContent="center"
       mt={4}
-      mb={4}
       width="full"
       position="relative"
       bg={"#FFFFFF"}

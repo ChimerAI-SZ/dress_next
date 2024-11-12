@@ -10,7 +10,14 @@ import Bg from "@img/generate/bg.png";
 import Waterfall from "../components/Waterfall";
 import { useSearchParams, useRouter } from "next/navigation";
 import { workflow } from "./workflow/workflow";
-import { getResult } from "@lib/request/generate";
+import { getResult } from "@lib/request/workflow";
+import { fetchUtilWait } from "@lib/request/generate";
+import { errorCaptureRes } from "@utils/index";
+import {
+  ProgressCircleRing,
+  ProgressCircleRoot,
+  ProgressCircleValueText,
+} from "@components/ui/progress-circle";
 function Page() {
   const searchParams = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
@@ -18,9 +25,22 @@ function Page() {
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(
     null
   );
+  const [info, setInfo] = useState({ total_messages: 0, wait_time: 0 });
   const [taskIDs, setTaskIDs] = useState<string[]>([]);
   const router = useRouter(); //
   const hasRunRef = useRef(false);
+
+  const fetchData = async () => {
+    const [err, res] = await errorCaptureRes(fetchUtilWait);
+    if (res?.success) {
+      setInfo((pre) => ({
+        ...pre,
+        total_messages: Math.ceil(res.total_messages / 3.5),
+        wait_time: Math.ceil(res.wait_time / 60),
+      }));
+    }
+  };
+
   useEffect(() => {
     if (!hasRunRef.current) {
       workflow(params).then((newTaskIDs) => {
@@ -42,13 +62,14 @@ function Page() {
       setSplineComponent(component);
     };
     loadSpline();
+    fetchData();
   }, []);
   useEffect(() => {
     if (taskIDs.length === 0 && imageList.length > 0) {
       const imageListParam = encodeURIComponent(JSON.stringify(imageList));
-      router.push(
-        `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
-      );
+      // router.push(
+      //   `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
+      // );
     }
   }, [taskIDs, imageList, router]);
 
@@ -76,13 +97,14 @@ function Page() {
       setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
     }
   };
-
+  console.log(taskIDs);
   useEffect(() => {
     const interval = setInterval(() => {
       if (taskIDs.length > 0) {
         taskIDs.forEach((taskID) => {
           getImage(taskID);
         });
+        fetchData();
       } else {
         console.log("All tasks complete or no tasks left.");
       }
@@ -95,17 +117,10 @@ function Page() {
   }, [taskIDs]);
 
   return (
-    <Box
-      //   bgSize="contain"
-      //   bgRepeat={"no-repeat"}
-      //   bgImage={`url(${Bg.src})`}
-      //   backgroundPositionY="-1rem"
-      h="100vh"
-      position={"relative"}
-    >
+    <Box h="100vh" position={"relative"}>
       <Box
         position={"absolute"}
-        height="28.06rem"
+        height="25rem"
         zIndex={0}
         borderRadius={"0rem  0rem  1.13rem  1.13rem"}
         pointerEvents="none"
@@ -117,33 +132,62 @@ function Page() {
             src={Bg.src}
             position={"absolute"}
             zIndex={0}
-            height="28.06rem"
+            height="25.66rem"
             objectFit="cover"
             w={"full"}
           ></Image>
         )}
       </Box>
       <Box pt={4}></Box>
-      <Header></Header>
+      <Header noTitle={true}></Header>
       <Flex
         justifyContent={"center"}
         alignItems={"center"}
-        mt={"3.63rem"}
+        mt={"5.5rem"}
         position={"relative"}
         flexDirection={"column"}
       >
-        <Image
-          boxSize={"7.13rem"}
+        <Flex
+          zIndex={0}
+          bgColor={"transparent"}
+          width="8.13rem"
+          height="8.13rem"
+          background="rgba(255,255,255,0.1)"
+          boxShadow="0rem 0rem 0.31rem 0rem rgba(255,255,255,0.5), inset 0rem 0rem 0.47rem 0rem rgba(255,255,255,0.8)"
+          border="0.06rem solid #fffeff"
+          justifyContent={"center"}
+          alignItems={"center"}
           borderRadius="full"
-          src="https://aimoda-ai.oss-us-east-1.aliyuncs.com/6d73505035e44870b42dc0290f8c3651%20(1).jpg"
-        ></Image>
+        >
+          <Image
+            boxSize={"7.13rem"}
+            borderRadius="full"
+            src={params.loadOriginalImage}
+            border="0.06rem solid #fffeff"
+          ></Image>
+        </Flex>
+
         <Text
           fontFamily="PingFangSC, PingFang SC"
           fontWeight="600"
           fontSize="1.25rem"
           color="#404040"
+          mt={"2.69rem"}
         >
-          Estimated wait 6 mins
+          {info?.total_messages
+            ? `Estimated wait ${info?.wait_time ?? "--"} mins`
+            : ""}
+        </Text>
+        <Text
+          font-family="PingFangSC, PingFang SC"
+          font-weight="400"
+          font-size="0.88rem"
+          color=" #404040"
+          mt={"0.44rem"}
+        >
+          {!info?.total_messages
+            ? "Generating for you..."
+            : "Queuing to generate preview..."}
         </Text>
         <Text
           font-family="PingFangSC, PingFang SC"
@@ -151,15 +195,9 @@ function Page() {
           font-size="0.88rem"
           color=" #404040"
         >
-          Queuing to generate preview...
-        </Text>
-        <Text
-          font-family="PingFangSC, PingFang SC"
-          font-weight="400"
-          font-size="0.88rem"
-          color=" #404040"
-        >
-          8 people before you
+          {!info?.total_messages
+            ? "people before you"
+            : "You can check results anytime in history"}
         </Text>
       </Flex>
       <Text
@@ -167,7 +205,7 @@ function Page() {
         fontWeight="500"
         fontSize="1rem"
         color="#171717"
-        mt={"10rem"}
+        mt={"4.5rem"}
         px={"1rem"}
       >
         While you wait
@@ -181,7 +219,12 @@ function Page() {
         >
           Check out our amazing creations!
         </Text>
-        <Image src={PrintGeneration.src} w={"0.88rem"} h="0.88rem"></Image>
+        <Image
+          src={PrintGeneration.src}
+          w={"0.88rem"}
+          h="0.88rem"
+          ml={"0.3rem"}
+        ></Image>
       </Flex>
       <Box
         overflowY="auto"

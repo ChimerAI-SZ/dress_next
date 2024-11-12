@@ -45,19 +45,20 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     <Box
       alignItems="center"
       justifyContent="center"
-      mt={4}
-      mb={4}
+      mt="0.8rem"
       width="full"
       position="relative"
       bg={"#FFFFFF"}
       borderRadius={"0.5rem"}
-      py="0.66rem"
       px="0.75rem"
+      pb={"0.75rem"}
+      mb={"0.5rem"}
     >
       <Flex
         justifyContent={"space-between"}
         alignItems={"center"}
         py={"0.66rem"}
+        pl={"0.1rem"}
       >
         <Flex>
           <Text

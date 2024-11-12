@@ -13,14 +13,13 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   data?: any;
 }
 
-
 // 统一定义一下 axios 返回类型
-declare module 'axios' {
-  export interface AxiosResponse<T=any,D=any> {
-    data: T
-    code?: number
-    message: string
-    success?: boolean
+declare module "axios" {
+  export interface AxiosResponse<T = any, D = any> {
+    data: T;
+    code?: number;
+    message: string;
+    success?: boolean;
   }
 }
 

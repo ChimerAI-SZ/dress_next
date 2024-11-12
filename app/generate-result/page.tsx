@@ -15,7 +15,8 @@ import ModalBack from "@img/generate-result/modal-back.svg";
 import { useSearchParams } from "next/navigation";
 import ToastTest from "@components/ToastTest";
 import { errorCaptureRes, storage } from "@utils/index";
-import { fetchShoppingAdd } from "@lib/request/generate-result";
+import { fetchShoppingAdd, fetchAddImage } from "@lib/request/generate-result";
+import AllNo from "@img/generate-result/all-no.svg";
 function Page() {
   const userId = storage.get("user_id");
 
@@ -31,21 +32,36 @@ function Page() {
   const [active, setActive] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
-
+  const [make, setMake] = useState(0);
   const openDialog = () => setIsOpen(true);
-  const fetchData = async (index?: number) => {
+  const fetchData = async (list: string[]) => {
     const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
       user_id: userId,
-      img_urls: selectImage,
+      img_urls: list,
       phone: phoneNumber,
     });
     if (res?.success) {
       console.log(1);
     }
   };
+
+  const AddImage = async () => {
+    const [err, res] = await errorCaptureRes(fetchAddImage, {
+      user_id: userId,
+      img_urls: selectImage,
+    });
+    if (res?.success) {
+      console.log(1);
+    }
+  };
+
   const affirmDialog = () => {
     setIsOpen(false);
-    fetchData();
+    if (make) {
+      fetchData(likeList);
+    } else {
+      fetchData([selectImage]);
+    }
   };
   const closeDialog = () => setIsOpen(false);
   const cb = (b: boolean) => {
@@ -61,7 +77,7 @@ function Page() {
   }, [likeList]);
   return (
     <Box h="100vh" position={"relative"} pt={4} px="1rem">
-      <Header show cb={cb}></Header>
+      <Header show noTitle cb={cb}></Header>
       <Toaster />
       <Flex height="28.59rem" w={"full"} justifyContent={"center"}>
         <Box height="28.59rem" w={"21.44rem"} position={"relative"}>
@@ -87,6 +103,7 @@ function Page() {
                 boxSize={"2.25rem"}
                 src={Like.src}
                 onClick={() => {
+                  AddImage();
                   toaster.create({
                     description: (
                       <Flex
@@ -126,7 +143,10 @@ function Page() {
               <Image
                 boxSize={"2.25rem"}
                 src={Shop.src}
-                onClick={openDialog}
+                onClick={() => {
+                  setMake(0);
+                  openDialog();
+                }}
               ></Image>
             </Flex>
           )}
@@ -269,8 +289,8 @@ function Page() {
             >
               <Image
                 boxSize="1.12rem"
-                src={isAllSelected ? Selected.src : NoSelect.src}
-                border="0.06rem solid #BFBFBF"
+                src={isAllSelected ? Selected.src : AllNo.src}
+                // border="0.06rem solid #BFBFBF"
                 backdropFilter="blur(50px)"
                 borderRadius={"50%"}
               ></Image>
@@ -299,7 +319,11 @@ function Page() {
                 alignItems={"center"}
                 justifyContent={"center"}
               >
-                <Image boxSize={"2.25rem"} src={Like.src}></Image>
+                <Image
+                  boxSize={"2.25rem"}
+                  src={Like.src}
+                  onClick={() => {}}
+                ></Image>
               </Flex>
               <Flex
                 width="2.5rem"
@@ -311,7 +335,14 @@ function Page() {
                 alignItems={"center"}
                 justifyContent={"center"}
               >
-                <Image boxSize={"2.25rem"} src={Shop.src}></Image>
+                <Image
+                  boxSize={"2.25rem"}
+                  src={Shop.src}
+                  onClick={() => {
+                    setMake(1);
+                    setIsOpen(true);
+                  }}
+                ></Image>
               </Flex>
             </Flex>
           </Flex>

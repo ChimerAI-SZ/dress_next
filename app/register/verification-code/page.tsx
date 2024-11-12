@@ -95,95 +95,106 @@ const Page = () => {
     }
   };
   return (
-    <Flex maxW="md" px="1.5rem" justifyContent={"center"} alignItems={"center"}>
-      <VStack align="stretch" minH="100vh">
-        <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
-          <Image src={Back.src} w={"1.38rem"} h={"1.38rem"}></Image>
-        </Flex>
-        <Text
-          fontSize="1.38rem"
-          fontWeight="600"
-          color="#171717"
-          fontFamily="PingFangSC, PingFang SC"
-          mt={"0.5rem"}
-        >
-          Vertify Email
-        </Text>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="0.88rem"
-          fontWeight="400"
-          color="#737373"
-          mt={"0.75rem"}
-        >
-          Please check your mail. We've sent a code to:
-        </Text>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="0.88rem"
-          fontWeight="700"
-          color="#000"
-        >
-          {params.email}
-        </Text>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="0.81rem"
-          fontWeight="400"
-          color="#737373"
-          mt={"2.5rem"}
-        >
-          Please enter verification code below:
-        </Text>
-        <PinInput
-          placeholder=""
-          mt={"0.5rem"}
-          onValueComplete={(e) => {
-            setCode(e.valueAsString);
+    <VStack align="stretch" minH="100vh" p={3} px={5}>
+      <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
+        <Image
+          src={Back.src}
+          w={"1.38rem"}
+          h={"1.38rem"}
+          onClick={() => {
+            router.back();
           }}
-          css={{
-            _focusVisible: {
-              borderColor: "#ef4444",
-              boxShadow: "none",
-              outlineStyle: "none",
-            },
-          }}
-        ></PinInput>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="0.81rem"
-          fontWeight="400"
-          color="#737373"
-          mt={"0.5rem"}
+        ></Image>
+      </Flex>
+      <Text
+        fontSize="1.38rem"
+        fontWeight="600"
+        color="#171717"
+        fontFamily="PingFangSC, PingFang SC"
+        mt={"0.1rem"}
+        pl={"0.25rem"}
+      >
+        Vertify Email
+      </Text>
+      <Text
+        fontFamily="PingFangSC, PingFang SC"
+        fontSize="0.88rem"
+        fontWeight="400"
+        color="#737373"
+        mt={"0.19rem"}
+        pl={"0.25rem"}
+      >
+        Please check your mail. We've sent a code to:
+      </Text>
+      <Text
+        fontFamily="PingFangSC, PingFang SC"
+        fontSize="0.88rem"
+        fontWeight="700"
+        color="#000"
+        mt={"-0.2rem"}
+        pl={"0.25rem"}
+      >
+        {params.email}
+      </Text>
+      <Text
+        fontFamily="PingFangSC, PingFang SC"
+        fontSize="0.81rem"
+        fontWeight="400"
+        color="#737373"
+        mt={"2.1rem"}
+        pl={"0.25rem"}
+      >
+        Please enter verification code below:
+      </Text>
+      <PinInput
+        placeholder=""
+        mt={"0.5rem"}
+        onValueComplete={(e) => {
+          setCode(e.valueAsString);
+        }}
+        css={{
+          _focusVisible: {
+            borderColor: "#ef4444",
+            boxShadow: "none",
+            outlineStyle: "none",
+          },
+        }}
+      ></PinInput>
+      <Text
+        fontFamily="PingFangSC, PingFang SC"
+        fontSize="0.81rem"
+        fontWeight="400"
+        color="#737373"
+        mt={"0rem"}
+        pl={"0.25rem"}
+      >
+        {canResend ? (
+          <Text color="#EE3939" onClick={handleSendCode}>
+            Resend code
+          </Text>
+        ) : (
+          `Resend code in ${seconds}s`
+        )}
+      </Text>
+      <VStack pb="4rem" w="100%" mt={"1.2rem"}>
+        <Button
+          width="20.44rem"
+          height="2.75rem"
+          background={"#EE3939"}
+          borderRadius="1.38rem"
+          onClick={vertify}
         >
-          {canResend ? (
-            <Text color="#EE3939" onClick={handleSendCode}>
-              Resend code
-            </Text>
-          ) : (
-            `Resend code in ${seconds}s`
-          )}
-        </Text>
-        <VStack pb="4rem" w="100%">
-          <Button
-            width="20.44rem"
-            height="2.75rem"
-            background={"#EE3939"}
-            borderRadius="1.38rem"
-            onClick={vertify}
+          <Text
+            fontFamily="PingFangSC, PingFang SC"
+            fontWeight="600"
+            fontSize="1.06rem"
+            color="#FFFFFF"
           >
-            <Text
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="600"
-              fontSize="1.06rem"
-              color="#FFFFFF"
-            >
-              Vertify
-            </Text>
-          </Button>
-        </VStack>
+            Vertify
+          </Text>
+        </Button>
       </VStack>
-    </Flex>
+    </VStack>
   );
 };
 

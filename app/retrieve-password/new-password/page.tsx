@@ -24,6 +24,7 @@ interface FormValues {
   last: string;
   code: string;
   password: string;
+  newPassword: string;
 }
 const Page = () => {
   const router = useRouter();
@@ -70,149 +71,189 @@ const Page = () => {
     setIsNumberValid(/\d/.test(password)); // 检查是否包含数字
   }, [password]);
   return (
-    <Flex maxW="md" px="1.5rem" justifyContent={"center"} alignItems={"center"}>
-      <VStack align="stretch" minH="100vh">
-        <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
-          <Image src={Back.src} w={"1.38rem"} h={"1.38rem"}></Image>
-        </Flex>
-        <Text
-          fontSize="1.38rem"
-          fontWeight="600"
-          color="#171717"
-          fontFamily="PingFangSC, PingFang SC"
-          mt={"0.5rem"}
-        >
-          Reset Password
-        </Text>
+    <VStack align="stretch" minH="100vh" p={3} px={5}>
+      <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
+        <Image
+          src={Back.src}
+          w={"1.38rem"}
+          h={"1.38rem"}
+          onClick={() => {
+            router.back();
+          }}
+        ></Image>
+      </Flex>
+      <Text
+        fontSize="1.38rem"
+        fontWeight="600"
+        color="#171717"
+        fontFamily="PingFangSC, PingFang SC"
+        mt={"0.1rem"}
+        pl={"0.25rem"}
+      >
+        Reset Password
+      </Text>
 
-        <form>
-          <VStack pb="4rem" w="100%" mt={"2.25rem"}>
-            <Fieldset.Root w="100%">
-              <Fieldset.Content w="100%">
-                {/* 密码输入框 */}
-                <Field
-                  label="Password"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.password}
-                >
-                  <InputGroup w="100%" bg={!!errors.password ? "#ffe0e0" : ""}>
-                    <Input
-                      {...register("password", {
-                        required: "Password is required",
-                        minLength: {
-                          value: 6,
-                          message: "Password must be at least 6 characters",
-                        },
-                      })}
-                      flex="1"
-                      name="password"
-                      type="password"
-                      placeholder="Type your password"
-                      _focusVisible={{
-                        borderColor: "#404040",
-                        boxShadow: "none",
-                        outlineStyle: "none",
-                      }}
-                    />
-                  </InputGroup>
-                  {errors.password && (
-                    <Text color="red.500" fontSize="0.75rem">
-                      {errors.password.message}
-                    </Text>
+      <form>
+        <VStack pb="4rem" w="100%" mt={"2.1rem"} pl={"0.25rem"}>
+          <Fieldset.Root w="100%">
+            <Fieldset.Content w="100%">
+              {/* 密码输入框 */}
+              <Field
+                label="New Password"
+                fontFamily="Arial"
+                fontSize="0.75rem"
+                fontWeight="400"
+                invalid={!!errors.password}
+              >
+                <InputGroup w="100%" bg={!!errors.password ? "#ffe0e0" : ""}>
+                  <Input
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                    })}
+                    flex="1"
+                    name="password"
+                    type="password"
+                    _focusVisible={{
+                      borderColor: "#404040",
+                      boxShadow: "none",
+                      outlineStyle: "none",
+                    }}
+                  />
+                </InputGroup>
+                {errors.password && (
+                  <Text color="red.500" fontSize="0.75rem">
+                    {errors.password.message}
+                  </Text>
+                )}
+                <Flex alignItems={"center"} gap={"0.56rem"} mt={"0.7rem"}>
+                  {isLengthValid ? (
+                    <Image src={Right.src} boxSize="0.44rem"></Image>
+                  ) : (
+                    <Box
+                      boxSize={"0.19rem"}
+                      bg={"#737373"}
+                      borderRadius={"50%"}
+                    ></Box>
                   )}
-                  <Flex alignItems={"center"} gap={"0.56rem"}>
-                    {isLengthValid ? (
-                      <Image src={Right.src} boxSize="0.44rem"></Image>
-                    ) : (
-                      <Box
-                        boxSize={"0.19rem"}
-                        bg={"#737373"}
-                        borderRadius={"50%"}
-                      ></Box>
-                    )}
 
-                    <Text
-                      fontFamily="PingFangSC, PingFang SC"
-                      fontWeight="400"
-                      fontSize="0.81rem"
-                      color={isLengthValid ? "#299E46" : "#737373"} // 动态变色
-                    >
-                      At least 8 characters
-                    </Text>
-                  </Flex>
-                  <Flex alignItems={"center"} gap={"0.56rem"}>
-                    {isUppercaseValid ? (
-                      <Image src={Right.src} boxSize="0.44rem"></Image>
-                    ) : (
-                      <Box
-                        boxSize={"0.19rem"}
-                        bg={"#737373"}
-                        borderRadius={"50%"}
-                      ></Box>
-                    )}
-                    <Text
-                      fontFamily="PingFangSC, PingFang SC"
-                      fontWeight="400"
-                      fontSize="0.81rem"
-                      color={isUppercaseValid ? "#299E46" : "#737373"} // 动态变色
-                    >
-                      Both upper and lower case letters
-                    </Text>
-                  </Flex>
-                  <Flex alignItems={"center"} gap={"0.56rem"}>
-                    {isNumberValid ? (
-                      <Image src={Right.src} boxSize="0.44rem"></Image>
-                    ) : (
-                      <Box
-                        boxSize={"0.19rem"}
-                        bg={"#737373"}
-                        borderRadius={"50%"}
-                      ></Box>
-                    )}
-                    <Text
-                      fontFamily="PingFangSC, PingFang SC"
-                      fontWeight="400"
-                      fontSize="0.81rem"
-                      color={isNumberValid ? "#299E46" : "#737373"} // 动态变色
-                    >
-                      At least 1 number
-                    </Text>
-                  </Flex>
-                </Field>
-                <VStack pb="4rem" w="100%">
-                  <Button
-                    width="20.44rem"
-                    height="2.75rem"
-                    background={"#EE3939"}
-                    borderRadius="1.38rem"
-                    onClick={handleSubmit(handleSendCode)}
-                    disabled={
-                      !(
-                        isLengthValid &&
-                        isUppercaseValid &&
-                        isNumberValid &&
-                        Object.keys(errors).length === 0
-                      )
-                    }
+                  <Text
+                    fontFamily="PingFangSC, PingFang SC"
+                    fontWeight="400"
+                    fontSize="0.81rem"
+                    color={isLengthValid ? "#299E46" : "#737373"} // 动态变色
                   >
-                    <Text
-                      fontFamily="PingFangSC, PingFang SC"
-                      fontWeight="600"
-                      fontSize="1.06rem"
-                      color="#FFFFFF"
-                    >
-                      Reset
-                    </Text>
-                  </Button>
-                </VStack>
-              </Fieldset.Content>
-            </Fieldset.Root>
-          </VStack>
-        </form>
-      </VStack>
-    </Flex>
+                    At least 8 characters
+                  </Text>
+                </Flex>
+                <Flex alignItems={"center"} gap={"0.56rem"}>
+                  {isUppercaseValid ? (
+                    <Image src={Right.src} boxSize="0.44rem"></Image>
+                  ) : (
+                    <Box
+                      boxSize={"0.19rem"}
+                      bg={"#737373"}
+                      borderRadius={"50%"}
+                    ></Box>
+                  )}
+                  <Text
+                    fontFamily="PingFangSC, PingFang SC"
+                    fontWeight="400"
+                    fontSize="0.81rem"
+                    color={isUppercaseValid ? "#299E46" : "#737373"} // 动态变色
+                  >
+                    Both upper and lower case letters
+                  </Text>
+                </Flex>
+                <Flex alignItems={"center"} gap={"0.56rem"}>
+                  {isNumberValid ? (
+                    <Image src={Right.src} boxSize="0.44rem"></Image>
+                  ) : (
+                    <Box
+                      boxSize={"0.19rem"}
+                      bg={"#737373"}
+                      borderRadius={"50%"}
+                    ></Box>
+                  )}
+                  <Text
+                    fontFamily="PingFangSC, PingFang SC"
+                    fontWeight="400"
+                    fontSize="0.81rem"
+                    color={isNumberValid ? "#299E46" : "#737373"} // 动态变色
+                  >
+                    At least 1 number
+                  </Text>
+                </Flex>
+              </Field>
+              {/* 确认密码输入 */}
+              <Field
+                label="Retype new password"
+                fontFamily="Arial"
+                fontSize="0.75rem"
+                fontWeight="400"
+                invalid={!!errors.newPassword}
+                mt={"0.3rem"}
+              >
+                <InputGroup w="100%" bg={!!errors.newPassword ? "#ffe0e0" : ""}>
+                  <Input
+                    {...register("newPassword", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                    })}
+                    flex="1"
+                    name="newPassword"
+                    type="password"
+                    _focusVisible={{
+                      borderColor: "#404040",
+                      boxShadow: "none",
+                      outlineStyle: "none",
+                    }}
+                  />
+                </InputGroup>
+                {errors.password && (
+                  <Text color="red.500" fontSize="0.75rem">
+                    {errors.password.message}
+                  </Text>
+                )}
+              </Field>
+              <VStack pb="4rem" w="100%">
+                <Button
+                  width="20.44rem"
+                  height="2.75rem"
+                  background={"#EE3939"}
+                  borderRadius="1.38rem"
+                  onClick={handleSubmit(handleSendCode)}
+                  mt={"0.5rem"}
+                  disabled={
+                    !(
+                      isLengthValid &&
+                      isUppercaseValid &&
+                      isNumberValid &&
+                      Object.keys(errors).length === 0
+                    )
+                  }
+                >
+                  <Text
+                    fontFamily="PingFangSC, PingFang SC"
+                    fontWeight="600"
+                    fontSize="1.06rem"
+                    color="#FFFFFF"
+                  >
+                    Reset
+                  </Text>
+                </Button>
+              </VStack>
+            </Fieldset.Content>
+          </Fieldset.Root>
+        </VStack>
+      </form>
+    </VStack>
   );
 };
 
