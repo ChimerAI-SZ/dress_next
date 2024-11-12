@@ -14,7 +14,7 @@ const ImageOverlay = forwardRef<HTMLDivElement, ImageOverlayProps>(({ src, isVis
   const thumbnailUrl = `${src}/resize,w_200`
   // console.log('thumbnailUrl',thumbnailUrl);
   return (
-    <Box ref={ref} position="relative" width="100%" mb="16px" borderRadius={'12px'} overflow={'hidden'} border={`1px solid rgba(255,255,255,0.5)`}>
+    <Box ref={ref} position="relative" width="100%" mb="16px" borderRadius={'12px'} overflow={'hidden'} border={`1px solid rgba(211,211,211,0.5)`}>
       <Image src={thumbnailUrl} alt="Displayed Image" onClick={onClick} width="100%" style={{ display: 'block' }} borderRadius="4px" />
       {isVisible && (
         <Box

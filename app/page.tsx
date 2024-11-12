@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef, useEffect } from 'react'
 import { Container, Box, Flex, Link, Image, Button, Text, useDisclosure } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 
@@ -11,6 +12,28 @@ function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
   const router = useRouter()
 
+  const headerRef = useRef<HTMLDivElement>(null) // 容器ref
+
+  // header 在页面滚动之后设置白色背景色
+  useEffect(() => {
+    if (headerRef.current) {
+      const el = headerRef.current
+
+      const handleScroll = () => {
+        if (window.scrollY > 0) {
+          el.style.backgroundColor = '#fff'
+        } else if (window.scrollY === 0) {
+          el.style.backgroundColor = 'transparent'
+        }
+      }
+      window.addEventListener('scroll', handleScroll)
+
+      return () => {
+        window.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [headerRef.current])
+
   return (
     <Container p={0} position={'relative'}>
       <BackgroundBox>
@@ -18,7 +41,22 @@ function Dashboard() {
       </BackgroundBox>
       <Box>
         {/* Header Section */}
-        <Flex as="header" justify="space-between" align="center" h={'8vh'} px={'1rem'} mb={'3rem'} position="sticky" top={0} bg="white" zIndex="100" mt="-0.2rem" background={'transparent'}>
+        <Flex
+          ref={headerRef}
+          as="header"
+          justify="space-between"
+          align="center"
+          h={'8vh'}
+          px={'1rem'}
+          mb={'3rem'}
+          position="sticky"
+          top={0}
+          bg="white"
+          zIndex="100"
+          mt="-0.2rem"
+          background={'transparent'}
+          transition={'background-color 0.3s'}
+        >
           <Text fontSize="1.3rem" fontWeight="bold" letterSpacing="0.1rem" fontFamily="Arial" textAlign="center">
             CREAMODA
           </Text>
