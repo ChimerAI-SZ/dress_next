@@ -1,20 +1,20 @@
-"use client"
-import { useEffect, useState } from "react"
-import { Container } from "@chakra-ui/react"
-import { useDispatch } from "react-redux"
-import { Provider } from "react-redux"
+'use client'
+import { useEffect, useState } from 'react'
+import { Container } from '@chakra-ui/react'
+import { useDispatch } from 'react-redux'
+import { Provider } from 'react-redux'
 
 // 引用组件
-import Header from "./components/Header"
-import FavouritesList from "./components/FavouritesList"
+import Header from './components/Header'
+import FavouritesList from './components/FavouritesList'
 
-import { FavouriteItem } from "@definitions/favourites"
-import { setList } from "./collectionSlice"
-import { store } from "./store"
-import { storage } from "@utils/index"
+import { FavouriteItem } from '@definitions/favourites'
+import { setList } from './collectionSlice'
+import { store } from './store'
+import { storage } from '@utils/index'
 
 // 接口 - 收藏夹列表
-import { queryCollectionList } from "@lib/request/favourites"
+import { queryCollectionList } from '@lib/request/favourites'
 
 function Page() {
   const [collectionList, setCollectionList] = useState<FavouriteItem[]>([])
@@ -24,32 +24,18 @@ function Page() {
   const handleIconClick = (type: string): void => {}
 
   const queryCollectionData = async () => {
-    const { message, data, success } = await queryCollectionList({ user_id: storage.get("user_id") ?? "" })
+    const user_id = storage.get('user_id')
 
-    if (success) {
-      setCollectionList(data)
-      dispatch(setList(data))
-    } else {
-      // todo erro hanlder
+    if (user_id) {
+      const { message, data, success } = await queryCollectionList({ user_id: +user_id })
+
+      if (success) {
+        setCollectionList(data)
+        dispatch(setList(data))
+      } else {
+        // todo erro hanlder
+      }
     }
-    // setCollectionList(revenue){
-    // const res = {
-    //   data: [
-    //     {
-    //       collection_id: 2,
-    //       user_id: 3,
-    //       title: "Default Collection",
-    //       description: "",
-    //       is_deleted: false,
-    //       is_default: true,
-    //       created_at: "2024-11-11T15:30:51.732917011+08:00",
-    //       images: [],
-    //       total: 0
-    //     }
-    //   ],
-    //   message: "",
-    //   success: true
-    // }
   }
 
   useEffect(() => {
