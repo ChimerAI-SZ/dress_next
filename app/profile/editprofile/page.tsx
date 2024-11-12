@@ -4,15 +4,22 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import styled from "@emotion/styled"
 import { useForm } from "react-hook-form"
+import { Provider, useSelector } from "react-redux"
 
 import { Container, VStack, Fieldset, Textarea, Box, Button, Input, Text } from "@chakra-ui/react"
 import { InputGroup } from "@components/ui/input-group"
 import { Field } from "@components/ui/field"
 
+import { store } from "../store"
+import { storage } from "@utils/index"
+
+import { editProdile } from "@lib/request/profile"
+
 import Header from "../components/Header"
 
 interface FormValues {
-  username: string
+  first_name: string
+  last_name: string
   pronouns: string
   bio: string
   email: string
@@ -21,6 +28,8 @@ interface FormValues {
 
 const EditProfile: React.FC = () => {
   const router = useRouter()
+  const profileData = useSelector((state: any) => state.profileData.value)
+  console.log(profileData)
 
   const {
     register,
@@ -28,21 +37,22 @@ const EditProfile: React.FC = () => {
     formState: { errors },
     setError,
     watch
-  } = useForm<FormValues>()
-
-  // done btn clicked
-  const handleSave = () => {
-    router.back()
-  }
+  } = useForm<FormValues>({
+    defaultValues: profileData
+  })
 
   // 表单最终提交逻辑
-  const onSubmit = (data: FormValues) => {
-    console.log("Registration data:", data)
-    // 执行最终注册逻辑
-  }
+  const onSubmit = async (formData: FormValues) => {
+    const user_id = storage.get("user_id")
 
-  // 处理发送验证码逻辑
-  const handleSendCode = async (data: FormValues) => {}
+    const { success, data, message } = await editProdile({ ...formData, user_id: +(user_id ? user_id : "0") })
+
+    if (success) {
+      router.back()
+    }
+
+    // router.back()
+  }
 
   return (
     <Container className="homepage-edit-profile-contaienr" p={"0"} zIndex={1}>
@@ -54,16 +64,15 @@ const EditProfile: React.FC = () => {
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
                 <SubTitle>Display Information</SubTitle>
-                {/* Username */}
-                <Field label="Username" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.username}>
-                  <InputGroup w="100%" bg={!!errors.username ? "#ffe0e0" : ""}>
+                {/* first name */}
+                <Field label="First Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first_name}>
+                  <InputGroup w="100%" bg={!!errors.first_name ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("username", {
-                        required: "username is required"
+                      {...register("first_name", {
+                        required: "first name is required"
                       })}
                       flex="1"
-                      name="username"
-                      // placeholder="Type your username"
+                      name="first_name"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -71,9 +80,31 @@ const EditProfile: React.FC = () => {
                       }}
                     />
                   </InputGroup>
-                  {errors.username && (
+                  {errors.first_name && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.username.message}
+                      {errors.first_name.message}
+                    </Text>
+                  )}
+                </Field>
+                {/* last name */}
+                <Field label="Last Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.last_name}>
+                  <InputGroup w="100%" bg={!!errors.last_name ? "#ffe0e0" : ""}>
+                    <Input
+                      {...register("last_name", {
+                        required: "last name is required"
+                      })}
+                      flex="1"
+                      name="last_name"
+                      _focusVisible={{
+                        borderColor: "#404040",
+                        boxShadow: "none",
+                        outlineStyle: "none"
+                      }}
+                    />
+                  </InputGroup>
+                  {errors.first_name && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.first_name.message}
                     </Text>
                   )}
                 </Field>
@@ -81,9 +112,7 @@ const EditProfile: React.FC = () => {
                 <Field label="Pronouns" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.pronouns}>
                   <InputGroup w="100%" bg={!!errors.pronouns ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("pronouns", {
-                        required: "Pronouns is required"
-                      })}
+                      {...register("pronouns", {})}
                       flex="1"
                       name="pronouns"
                       // placeholder="Type your pronouns"
@@ -104,12 +133,9 @@ const EditProfile: React.FC = () => {
                 <Field label="Bio" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.bio}>
                   <InputGroup w="100%" bg={!!errors.bio ? "#ffe0e0" : ""}>
                     <Textarea
-                      {...register("bio", {
-                        required: "Bio is required"
-                      })}
+                      {...register("bio", {})}
                       flex="1"
                       name="bio"
-                      // placeholder="Type your bio"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -151,12 +177,9 @@ const EditProfile: React.FC = () => {
                 <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
                   <InputGroup w="100%" bg={!!errors.phone ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("phone", {
-                        required: "Phone Number is required"
-                      })}
+                      {...register("phone", {})}
                       flex="1"
                       name="phone"
-                      // placeholder="Type your phone"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -176,7 +199,7 @@ const EditProfile: React.FC = () => {
 
           <VStack pb="4rem" w="100%">
             <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
-              <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} onClick={handleSave}>
+              <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} type="submit">
                 Save
               </Button>
             </Box>
@@ -195,4 +218,10 @@ const SubTitle = styled.div`
   text-align: left;
 `
 
-export default EditProfile
+export default () => {
+  return (
+    <Provider store={store}>
+      <EditProfile />
+    </Provider>
+  )
+}

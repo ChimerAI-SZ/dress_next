@@ -16,12 +16,14 @@ import descriptionIcon from "@img/favourites/collectionDescription.svg"
 import Toast from "@components/Toast"
 import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
+import FavouritesDialog from "../components/AlbumDrawer"
 
+import { HistoryItem } from "@definitions/history"
 import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
 import { store } from "../store"
 
 type GroupList = {
-  [key: string]: string[]
+  [key: string]: HistoryItem[]
 }
 interface FavouriteItemProps {
   params: { item: string }
@@ -32,9 +34,10 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
   const searchParams = useSearchParams()
   const favouriteName = searchParams.get("name") ?? ""
 
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   const [selectionMode, setSelectionMode] = useState<boolean>(false) // 用于标记是否进入多选状态
-  const [selectedImgList, setSelectedImgList] = useState<string[]>([]) // 多选图片列表
+  const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [deleteToastVisible, setDeleteToastVisible] = useState(false)
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
@@ -43,6 +46,8 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
     console.log(type)
     if (type === "delete") {
       setDeleteToastVisible(true)
+    } else if (type === "edit") {
+      setDialogVisible(true)
     }
   }
 
@@ -53,7 +58,7 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
   // 查询收藏夹数据
   const queryData = async () => {
     try {
-      const res = await queryAllImageInCollection({ collection_id: params.item })
+      const res = await queryAllImageInCollection({ collection_id: +params.item })
       const { data, success } = res
 
       // 把图片根据日期进行分栏
@@ -83,7 +88,7 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
 
   const handleDelete = async () => {
     try {
-      const res = await deleteCollection({ collection_id: params.item })
+      const res = await deleteCollection({ collection_id: +params.item })
       const { data, success } = res
 
       if (success) {
@@ -98,7 +103,7 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
 
   // 选择模式下图片的选择、取消选择事件
   // 通过已选图片列表中是否有这个图片来判断是选择还是取消选择
-  const handleImgSelect = (img: string) => {
+  const handleImgSelect = (img: number) => {
     if (selectedImgList.includes(img)) {
       setSelectedImgList(selectedImgList.filter(item => item !== img))
     } else {
@@ -107,6 +112,11 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
     }
 
     forceUpdate()
+  }
+
+  // 关闭弹窗
+  const closeDialog = () => {
+    setDialogVisible(false)
   }
 
   useEffect(() => {
@@ -137,7 +147,7 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
       <Box px={"1rem"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
-            return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelct={handleImgSelect} />
+            return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
           }}
         </For>
       </Box>
@@ -193,6 +203,8 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
           </Box>
         </Toast>
       </Show>
+
+      <FavouritesDialog type="edit" collectionId={+params.item} visible={dialogVisible} close={closeDialog} />
     </Container>
   )
 }

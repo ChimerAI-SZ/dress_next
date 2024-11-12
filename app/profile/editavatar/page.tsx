@@ -4,6 +4,9 @@ import { useState } from "react"
 import { Container, Grid, For, Image, Box, Button, Show } from "@chakra-ui/react"
 import { useRouter } from "next/navigation"
 import styled from "@emotion/styled"
+import { storage } from "@utils/index"
+
+import { editProdile } from "@lib/request/profile"
 
 import Header from "../components/Header"
 
@@ -21,8 +24,23 @@ const EditAvatar: React.FC = () => {
   }
 
   // done btn clicked
-  const handleSaveAvatar = () => {
-    router.back()
+  const handleSaveAvatar = async () => {
+    const user_id = storage.get("user_id")
+
+    if (selectedAvatar) {
+      const params = {
+        user_id: +(user_id ? user_id : "0"),
+        avatar_url: selectedAvatar
+      }
+
+      const { success, data, message } = await editProdile(params)
+
+      if (success) {
+        router.back()
+      }
+    } else {
+      //TODO - 没有选择头像时的交互
+    }
   }
 
   return (

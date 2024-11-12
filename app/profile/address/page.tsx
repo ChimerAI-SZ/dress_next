@@ -1,11 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Grid, For, Image, Box, Button, Show, Flex } from "@chakra-ui/react"
 import { useRouter } from "next/navigation"
 import styled from "@emotion/styled"
+import { storage } from "@utils/index"
+
+import { Container, Grid, For, Image, Box, Button, Show, Flex } from "@chakra-ui/react"
 import { RightOutlined } from "@ant-design/icons"
+
 import Link from "next/link"
+
+import { queryAllAddress } from "@lib/request/profile"
 
 import addressIcon from "@img/homepage/address.svg"
 
@@ -45,6 +50,7 @@ const addressList = [
 ]
 
 const EditAvatar: React.FC = () => {
+  const [addressList, setAddressList] = useState([])
   const router = useRouter()
 
   // 新增地址或修改地址事件
@@ -52,8 +58,22 @@ const EditAvatar: React.FC = () => {
     router.push(`address/${type}`)
   }
 
+  const queryData = async () => {
+    const user_id = storage.get("user_id")
+    const params = {
+      user_id: +(user_id ? user_id : "0")
+    }
+    const { success, data, message } = await queryAllAddress(params)
+    if (success) {
+      setAddressList(data)
+    } else {
+      //todo error hanlder
+    }
+  }
+
   useEffect(() => {
     // query address list
+    queryData()
   }, [])
 
   return (
@@ -62,27 +82,28 @@ const EditAvatar: React.FC = () => {
       <For each={addressList}>
         {(item, index) => {
           return (
-            <AddressWrapper key={item.id} isDefault={item.isDefault}>
-              <Flex alignItems={"center"} justifyContent={"space-between"} mb={"6pt"}>
-                <Show when={item.isDefault} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
-                  <DefaultMark>Default</DefaultMark>
-                </Show>
-                <RightOutlined
-                  onClick={() => {
-                    jump(item.id)
-                  }}
-                />
-              </Flex>
-              <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
-                <span>{item.address},</span>
-                <span>{item.city},</span>
-                <span>{item.state},</span>
-                <span>{item.country}</span>
-              </Flex>
-              <Box color={"#737373"} fontWeight={"400"} fontSize={"0.9rem"}>
-                {item.name} | {item.phone}
-              </Box>
-            </AddressWrapper>
+            // <AddressWrapper key={item.id} isDefault={item.isDefault}>
+            //   <Flex alignItems={"center"} justifyContent={"space-between"} mb={"6pt"}>
+            //     <Show when={item.isDefault} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
+            //       <DefaultMark>Default</DefaultMark>
+            //     </Show>
+            //     <RightOutlined
+            //       onClick={() => {
+            //         jump(item.id)
+            //       }}
+            //     />
+            //   </Flex>
+            //   <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
+            //     <span>{item.address},</span>
+            //     <span>{item.city},</span>
+            //     <span>{item.state},</span>
+            //     <span>{item.country}</span>
+            //   </Flex>
+            //   <Box color={"#737373"} fontWeight={"400"} fontSize={"0.9rem"}>
+            //     {item.name} | {item.phone}
+            //   </Box>
+            // </AddressWrapper>
+            <div></div>
           )
         }}
       </For>

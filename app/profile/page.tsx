@@ -1,55 +1,65 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import styled from '@emotion/styled'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from "react"
+import styled from "@emotion/styled"
+import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { Provider } from "react-redux"
 
-import { Container, For, Image, Show } from '@chakra-ui/react'
-import { Avatar } from '@components/ui/avatar'
+import { Container, For, Image, Show } from "@chakra-ui/react"
+import { Avatar } from "@components/ui/avatar"
+import { storage } from "@utils/index"
+import { store } from "./store"
 
-import Header from './components/Header'
+import Header from "./components/Header"
 
-import homepageBg from '@img/homepage/homepageBg.png' // 顶部彩色背景图
-import defaultAvatar from '@img/homepage/avatar/001.png'
-import editAvatar from '@img/homepage/editAvatar.png' // 编辑头像icon
-import editProfileIconf from '@img/homepage/editProfile.svg'
-import shoppingAddressIcon from '@img/homepage/shoppingAddress.svg'
-import settingIcon from '@img/homepage/setting.svg'
-import LinkIcon from '@img/homepage/linkIcon.svg'
+import homepageBg from "@img/homepage/homepageBg.png" // 顶部彩色背景图
+import editAvatar from "@img/homepage/editAvatar.png" // 编辑头像icon
+import editProfileIconf from "@img/homepage/editProfile.svg"
+import shoppingAddressIcon from "@img/homepage/shoppingAddress.svg"
+import settingIcon from "@img/homepage/setting.svg"
+import LinkIcon from "@img/homepage/linkIcon.svg"
+
+import { queryProfileData } from "@lib/request/profile"
+import { profileDataType } from "@definitions/profile"
+import { setData } from "./profileSlice"
 
 const operatorList = [
   {
-    key: 'editProfile',
-    label: 'Edit Profile',
+    key: "editProfile",
+    label: "Edit Profile",
     icon: editProfileIconf,
-    link: 'editprofile',
+    link: "editprofile",
     isDanger: false,
     redirectable: true
   },
   {
-    key: 'shoppingAddress',
-    label: 'Shipping Address',
+    key: "shoppingAddress",
+    label: "Shipping Address",
     icon: shoppingAddressIcon,
-    link: 'address',
+    link: "address",
     redirectable: true,
     isDanger: false
   },
   {
-    key: 'setting',
-    label: 'Settings',
+    key: "setting",
+    label: "Settings",
     icon: settingIcon,
-    link: 'setting',
+    link: "setting",
     redirectable: true,
     isDanger: false
   }
 ]
 
 function Profile() {
+  const dispatch = useDispatch()
   const route = useRouter()
   const [profileData, setProfileData] = useState({
-    name: 'Agnes Vaughn',
-    gender: 'She/Her/Hers',
-    bio: '✨Design Fast, Seeking for Beauty \n 👉#CREAMODA \n 📮CREAMODA@gmail.com'
+    first_name: "",
+    last_name: "",
+    pronouns: "",
+    bio: "",
+    avatar_url: ""
   })
 
   // 切换到子页面
@@ -57,26 +67,54 @@ function Profile() {
     route.push(`/profile/${link}`)
   }
 
+  const queryData = async () => {
+    const user_id = storage.get("user_id")
+    const params = {
+      user_id: +(user_id ? user_id : "0")
+    }
+    const { success, data, message } = await queryProfileData(params)
+
+    if (success) {
+      const newProfileData = {
+        ...profileData,
+        ...data
+      }
+
+      setProfileData(newProfileData)
+
+      dispatch(setData(newProfileData))
+    } else {
+      // todo error handler
+    }
+  }
+
   useEffect(() => {
     // query home page data
+    queryData()
   }, [])
 
   return (
-    <Container p={0} position={'relative'}>
+    <Container p={0} position={"relative"}>
       <Header title="Profile" />
 
       {/* 头像 */}
       <AvatarWrapper className="profile-avatar-container">
-        <Image src={homepageBg.src} alt="" w={'100%'} h={'100%'} />
+        <Image src={homepageBg.src} alt="" w={"100%"} h={"100%"} />
         <AvatarContainer>
           <AvatarBg>
-            <Avatar background={'linear-gradient(to bottom, #ffd2d3, #ffbada)'} w={'calc(100% - 8pt)'} h={'calc(100% - 8pt)'} name="" src={defaultAvatar.src} />
+            <Avatar
+              background={"linear-gradient(to bottom, #ffd2d3, #ffbada)"}
+              w={"calc(100% - 8pt)"}
+              h={"calc(100% - 8pt)"}
+              name=""
+              src={`/assets/images/homepage/avatar/${profileData.avatar_url ? profileData.avatar_url + ".png" : "defaultAvatar.svg"}`}
+            />
             <EiitAvatarBtn>
               <Image
                 src={editAvatar.src}
                 alt="edit-icon"
                 onClick={() => {
-                  handleJump('editavatar')
+                  handleJump("editavatar")
                 }}
               />
             </EiitAvatarBtn>
@@ -85,16 +123,18 @@ function Profile() {
       </AvatarWrapper>
 
       {/* name */}
-      <Name className="homepage-name-wrapper">{profileData.name}</Name>
+      <Name className="homepage-name-wrapper">{profileData.first_name + " " + profileData.last_name}</Name>
 
-      {/* gender */}
-      <Gender className="homepage-gender-wrapper">
-        <span>{profileData.gender}</span>
-      </Gender>
+      {/* pronouns */}
+      <Show when={profileData.pronouns}>
+        <Pronouns className="homepage-pronouns-wrapper">
+          <span>{profileData.pronouns}</span>
+        </Pronouns>
+      </Show>
 
       {/* bio */}
       <Bio className="homepage-bio-wrapper">
-        {profileData.bio.split('\n').map((item, index) => (
+        {profileData.bio.split("\n").map((item, index) => (
           <div key={item + index}>{item}</div>
         ))}
       </Bio>
@@ -132,7 +172,7 @@ const AvatarWrapper = styled.div`
   top: 0;
   z-index: 0;
   &::after {
-    content: '';
+    content: "";
     padding: 20px;
     height: 20px;
     display: inline-block;
@@ -183,7 +223,7 @@ const Name = styled.div`
   font-weight: 500;
   font-size: 1.5rem;
 `
-const Gender = styled.div`
+const Pronouns = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,7 +282,13 @@ const OperatorBox = styled.div`
   }
 `
 const OperatorLabel = styled.div<OperatorLabelProps>`
-  color: ${props => (props.isDanger ? '#F50C00' : '#171717')};
+  color: ${props => (props.isDanger ? "#F50C00" : "#171717")};
 `
 
-export default Profile
+export default () => {
+  return (
+    <Provider store={store}>
+      <Profile />
+    </Provider>
+  )
+}
