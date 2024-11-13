@@ -63,23 +63,23 @@ function Page() {
       const user_id = storage.get("user_id")
 
       const params = { user_id: +(user_id ? user_id : "0"), start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"), end_date: dayjs().format("YYYY-MM-DD") }
-      // const { message, data, success } = await queryHistory(params)
-      const data = [
-        {
-          history_id: 1,
-          user_id: 3,
-          task_id: "task_456",
-          image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/AIMODA_small.svg",
-          created_date: "2024-11-12T11:12:05.873813316+08:00"
-        },
-        {
-          history_id: 2,
-          user_id: 3,
-          task_id: "task_456",
-          image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/aa4.svg",
-          created_date: "2024-11-12T11:12:05.873813316+08:00"
-        }
-      ]
+      const { message, data, success } = await queryHistory(params)
+      // const data = [
+      //   {
+      //     history_id: 1,
+      //     user_id: 3,
+      //     task_id: "task_456",
+      //     image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/AIMODA_small.svg",
+      //     created_date: "2024-11-12T11:12:05.873813316+08:00"
+      //   },
+      //   {
+      //     history_id: 2,
+      //     user_id: 3,
+      //     task_id: "task_456",
+      //     image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/aa4.svg",
+      //     created_date: "2024-11-12T11:12:05.873813316+08:00"
+      //   }
+      // ]
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
