@@ -1,5 +1,7 @@
+"use client";
 import Provider from "./provider";
 import { Suspense } from "react";
+import "./global.css";
 export default function RootLayout({
   children,
 }: {
@@ -8,7 +10,11 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <head />
-      <body>
+      <body
+        style={{
+          overflow: "auto",
+        }}
+      >
         <Suspense>
           <Provider>{children}</Provider>
         </Suspense>

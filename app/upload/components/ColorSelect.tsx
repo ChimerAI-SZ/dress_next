@@ -63,7 +63,7 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
       px="0.75rem"
       pt="1.2rem"
     >
-      <Flex width={"full"} overflowY={"auto"} gap={"0.56rem"}>
+      <Flex width={"full"} overflowY={"auto"} gap={"0.56rem"} h={"1.9rem"}>
         <DrawerRoot placement="bottom">
           <DrawerBackdrop />
           <DrawerTrigger asChild>

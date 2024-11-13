@@ -93,8 +93,8 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           <ReactLoading
             type={"spinningBubbles"}
             color={"#ffffff"}
-            height={"1.38rem"}
-            width={"1.38rem"}
+            height={"3.38rem"}
+            width={"3.38rem"}
           />
         ) : uploadedUrl ? (
           <Flex
