@@ -28,7 +28,6 @@ export type FavouriteImage = {
 // 收藏页 header 的 props 类型
 export interface FavouritesHeaderProps {
   name?: string | null
-  handleIconClick: (type: string) => void
 }
 
 export interface CollectionDetailHeaderProps {
@@ -40,7 +39,7 @@ export interface CollectionDetailHeaderProps {
 
 // 收藏页 弹窗 props 类型
 export interface FavouriteDialogProps {
-  type: 'add' | 'edit'
+  type: "add" | "edit"
   collectionId?: number // 在收藏夹内部的header要传一下当前收藏夹的id
   visible: boolean
   close: () => void
