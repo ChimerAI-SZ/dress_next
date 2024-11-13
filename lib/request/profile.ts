@@ -29,3 +29,19 @@ interface queryAllAddressProps {
 export const queryAllAddress = (params: queryAllAddressProps) => {
   return axios.post("/api/addresses/list", params)
 }
+
+interface addAddressProps {
+  user_id: number
+  full_name: string
+  country: string
+  street_address_1: string
+  street_address_2?: string
+  city: string
+  phone: string
+  state: string
+  postal_code: string
+  is_default: boolean
+}
+export const addAddress = (params: addAddressProps) => {
+  return axios.post("/api/addresses/add", params)
+}

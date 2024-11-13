@@ -2,36 +2,41 @@
 import React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import styled from "@emotion/styled"
 import { useForm } from "react-hook-form"
 
-import "react-phone-number-input/style.css"
 import PhoneInputWithCountry from "react-phone-number-input/react-hook-form"
 
-import { Container, VStack, Fieldset, Textarea, Box, Button, Input, Text } from "@chakra-ui/react"
+import { Container, VStack, Fieldset, Flex, Box, Button, Input, Text } from "@chakra-ui/react"
+import { Checkbox } from "@components/ui/checkbox"
 import { InputGroup } from "@components/ui/input-group"
 import { Field } from "@components/ui/field"
+import { addAddress } from "@lib/request/profile"
+import { Alert } from "@components/Alert"
+import { storage } from "@utils/index"
 
 import Header from "../../components/Header"
 
+import "react-phone-number-input/style.css"
+import "./index.css"
+
 interface FormValues {
-  fullName: string
+  full_name: string
   country: string
   street_address_1: string
+  street_address_2: string
   city: string
   phone: string
+  state: string
+  postal_code: string
+  is_default: boolean
 }
 interface EditAddressProps {
   params: { addressId: string }
 }
 
-const CustomInput = React.forwardRef<HTMLInputElement>((_, ref) => <Input ref={ref} />)
-
 const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
   const router = useRouter()
   const [isAddingAddress, setIsAddingAddress] = useState(params.addressId === "add")
-
-  const [value, setValue] = useState()
 
   const {
     register,
@@ -42,15 +47,25 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
     watch
   } = useForm<FormValues>()
 
-  // done btn clicked
-  const handleSave = () => {
-    router.back()
-  }
-
   // 表单最终提交逻辑
-  const onSubmit = (data: FormValues) => {
-    console.log("Registration data:", data)
-    // 执行最终注册逻辑
+  const onSubmit = async (formData: FormValues) => {
+    console.log("submit data:", formData)
+    const user_id = storage.get("user_id")
+    const params = {
+      user_id: +(user_id ? user_id : "0"),
+      ...formData
+    }
+
+    const { success, data, message } = await addAddress(params)
+
+    if (success) {
+      router.back()
+    } else {
+      Alert.open({
+        content: message
+      })
+    }
+    // addAddress
   }
 
   return (
@@ -63,14 +78,14 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
                 {/* full name */}
-                <Field label="Full Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.fullName}>
-                  <InputGroup w="100%" bg={!!errors.fullName ? "#ffe0e0" : ""}>
+                <Field label="Full Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.full_name}>
+                  <InputGroup w="100%" bg={!!errors.full_name ? "#ffe0e0" : ""}>
                     <Input
-                      {...register("fullName", {
+                      {...register("full_name", {
                         required: "Full Name is required"
                       })}
                       flex="1"
-                      name="fullName"
+                      name="full_name"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -78,14 +93,14 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                       }}
                     />
                   </InputGroup>
-                  {errors.fullName && (
+                  {errors.full_name && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.fullName.message}
+                      {errors.full_name.message}
                     </Text>
                   )}
                 </Field>
                 {/* country */}
-                <Field label="Pronouns" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.country}>
+                <Field label="Country" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.country}>
                   <InputGroup w="100%" bg={!!errors.country ? "#ffe0e0" : ""}>
                     <Input
                       {...register("country", {
@@ -115,6 +130,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                       })}
                       flex="1"
                       name="street_address_1"
+                      placeholder="Street Address"
                       _focusVisible={{
                         borderColor: "#404040",
                         boxShadow: "none",
@@ -125,6 +141,27 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   {errors.street_address_1 && (
                     <Text color="red.500" fontSize="0.75rem">
                       {errors.street_address_1.message}
+                    </Text>
+                  )}
+                </Field>
+                {/* address */}
+                <Field label="Address Line 2" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_2}>
+                  <InputGroup w="100%" bg={!!errors.street_address_2 ? "#ffe0e0" : ""}>
+                    <Input
+                      {...register("street_address_2", {})}
+                      flex="1"
+                      name="street_address_2"
+                      placeholder="Address line 2 (optional)"
+                      _focusVisible={{
+                        borderColor: "#404040",
+                        boxShadow: "none",
+                        outlineStyle: "none"
+                      }}
+                    />
+                  </InputGroup>
+                  {errors.street_address_2 && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.street_address_2.message}
                     </Text>
                   )}
                 </Field>
@@ -151,33 +188,67 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
 
+                {/* city */}
+                <Field label="State/Region" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.state}>
+                  <Flex alignItems={"center"} justifyContent={"space-between"} gap={5}>
+                    <InputGroup bg={!!errors.state ? "#ffe0e0" : ""}>
+                      <Input
+                        {...register("state", {
+                          required: "State is required"
+                        })}
+                        flex="1"
+                        name="state"
+                        _focusVisible={{
+                          borderColor: "#404040",
+                          boxShadow: "none",
+                          outlineStyle: "none"
+                        }}
+                      />
+                    </InputGroup>
+                    <InputGroup bg={!!errors.postal_code ? "#ffe0e0" : ""}>
+                      <Input
+                        {...register("postal_code", {
+                          required: "Zip code is required"
+                        })}
+                        flex="1"
+                        name="postal_code"
+                        placeholder="Zip Code"
+                        _focusVisible={{
+                          borderColor: "#404040",
+                          boxShadow: "none",
+                          outlineStyle: "none"
+                        }}
+                      />
+                    </InputGroup>
+                  </Flex>
+
+                  {errors.city && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.city.message}
+                    </Text>
+                  )}
+                  {errors.postal_code && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.postal_code.message}
+                    </Text>
+                  )}
+                </Field>
+
                 <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
-                  <PhoneInputWithCountry
-                    {...register("phone", {
-                      required: "Phone Number is required"
-                    })}
-                    control={control}
-                    rules={{ required: true }}
-                    inputComponent={CustomInput}
-                  />
-                  {/* <InputGroup w="100%" bg={!!errors.phone ? "#ffe0e0" : ""}>
-                    <Input
-                      {...register("phone", {
-                        required: "Phone Number is required"
-                      })}
-                      flex="1"
-                      name="phone"
-                      // placeholder="Type your email"
-                      _focusVisible={{
-                        borderColor: "#404040",
-                        boxShadow: "none",
-                        outlineStyle: "none"
-                      }}
-                    />
-                  </InputGroup> */}
+                  <PhoneInputWithCountry className="shipping_address_phone_number" name="phone" control={control} rules={{ required: true }} />
+
                   {errors.phone && (
                     <Text color="red.500" fontSize="0.75rem">
                       {errors.phone.message}
+                    </Text>
+                  )}
+                </Field>
+
+                <Field label="" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.is_default}>
+                  <Checkbox {...register("is_default", {})}>Set as default address</Checkbox>
+                  {errors.is_default && (
+                    <Text color="red.500" fontSize="0.75rem">
+                      {errors.is_default.message}
                     </Text>
                   )}
                 </Field>
@@ -187,7 +258,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
 
           <VStack pb="4rem" w="100%">
             <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
-              <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} onClick={handleSave}>
+              <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} type="submit">
                 Save
               </Button>
             </Box>
