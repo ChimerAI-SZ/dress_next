@@ -55,7 +55,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ date, imageList, se
 const SubTitle = styled.div`
   color: #737373;
   font-weight: 400;
-  font-size: 1.2rem;
+  font-size: 1rem;
   padding-bottom: 0.5rem;
 `
 

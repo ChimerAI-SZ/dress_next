@@ -4,7 +4,8 @@ import React, { useEffect, useState, useReducer } from "react"
 import { Container, Box, For, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
 import { Radio, RadioGroup } from "@components/ui/radio"
 import { useSearchParams } from "next/navigation"
-import { Provider } from "react-redux"
+import { Provider, useSelector } from "react-redux"
+
 import styled from "@emotion/styled"
 import { useRouter } from "next/navigation"
 
@@ -19,6 +20,7 @@ import Header from "./components/Header"
 import FavouritesDialog from "../components/AlbumDrawer"
 
 import { HistoryItem } from "@definitions/history"
+import { FavouriteItem } from "@definitions/favourites"
 import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
 import { store } from "../store"
 
@@ -29,10 +31,11 @@ interface FavouriteItemProps {
   params: { item: string }
 }
 
-const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
+const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const favouriteName = searchParams.get("name") ?? ""
+  const collectionList = useSelector((state: any) => state.collectionList.value)
 
   const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
@@ -132,19 +135,18 @@ const FavouriteItem: React.FC<FavouriteItemProps> = ({ params }) => {
         {decodeURIComponent(favouriteName)}
       </Heading>
       {/* 收藏夹说明 */}
-      <Show when={true}>
+      <Show when={collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}>
         <Box>
           <DescriptionBox>
             <Flex fontWeight={500} fontSize={"1.3rem"} p={"8pt 16pt 2pt"} alignItems={"center"} justifyContent={"flex-start"}>
               <Image w={"28pt"} h={"28pt"} src={descriptionIcon.src} alt="description-icon" />
               <span>Description</span>
             </Flex>
-            {/* todo 这里用图片当背景不太合理 */}
-            <Box px={"16pt"}>Graphic patterns are visual elements made of repeating shapes, lines, and colors, arranged deliberately to create a cohesive design.</Box>
+            <Box px={"16pt"}>{collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}</Box>
           </DescriptionBox>
         </Box>
       </Show>
-      <Box px={"1rem"} position={"relative"}>
+      <Box px={"1rem"} mt={"8pt"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
             return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
@@ -232,7 +234,7 @@ const DescriptionBox = styled.div`
 export default ({ params }: FavouriteItemProps) => {
   return (
     <Provider store={store}>
-      <FavouriteItem params={params} />
+      <Collection params={params} />
     </Provider>
   )
 }

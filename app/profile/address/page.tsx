@@ -77,8 +77,8 @@ const EditAvatar: React.FC = () => {
   }, [])
 
   return (
-    <Container className="homepage-edit-avatar-contaienr" p={"0"} zIndex={1}>
-      <Header title="Avatar" />
+    <Container className="homepage-address-contaienr" p={"0"} zIndex={1}>
+      <Header title="Shipping Address" />
       <For each={addressList}>
         {(item, index) => {
           return (
@@ -109,11 +109,6 @@ const EditAvatar: React.FC = () => {
       </For>
 
       <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
-        {/* <Link
-          href={{
-            pathname: `homepage/address/${"add"}`
-          }}
-        > */}
         <Button
           borderRadius={"40px"}
           w={"100%"}
@@ -124,7 +119,6 @@ const EditAvatar: React.FC = () => {
         >
           Add New Address
         </Button>
-        {/* </Link> */}
       </Box>
     </Container>
   )

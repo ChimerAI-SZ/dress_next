@@ -24,7 +24,9 @@ export const Alert = ({
         </StyledIcon>
       </Show>
 
-      {content}
+      {content.split("\n").map(item => (
+        <StyledContent>{item}</StyledContent>
+      ))}
     </AlertContainer>
   )
 }
@@ -47,7 +49,7 @@ Alert.open = (parameter: AlertProps) => {
 
   setTimeout(() => {
     container.remove()
-  }, parameter.duration ?? 3000)
+  }, parameter.duration ?? 2000)
 }
 
 const fadeAnime = keyframes`
@@ -69,7 +71,7 @@ const fadeAnime = keyframes`
 }
 `
 const AlertContainer = styled.div`
-  max-width: 75vw;
+  width: 70vw;
 
   padding: 12pt 16px;
 
@@ -81,6 +83,8 @@ const AlertContainer = styled.div`
   color: #fff;
   font-size: 1.2rem;
   font-weight: 400;
+
+  z-index: 8000;
 
   animation: ${fadeAnime} 2.8s;
 `
@@ -95,4 +99,8 @@ const StyledIcon = styled.div`
     width: 24pt;
     height: 24pt;
   }
+`
+const StyledContent = styled.p`
+  font-size: 1rem;
+  text-align: center;
 `

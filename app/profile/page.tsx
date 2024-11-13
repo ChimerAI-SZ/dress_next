@@ -259,7 +259,7 @@ const OperatorBox = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 24pt;
-  height: 50px;
+  height: 60px;
   border-bottom: 1px solid #f0f0f0;
 
   & > div:first-child {

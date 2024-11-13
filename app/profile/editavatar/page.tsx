@@ -8,6 +8,7 @@ import { storage } from "@utils/index"
 
 import { editProdile } from "@lib/request/profile"
 
+import { Alert } from "@components/Alert"
 import Header from "../components/Header"
 
 const avatarIndexList = new Array(20).fill(null).map((_, index) => {
@@ -36,6 +37,10 @@ const EditAvatar: React.FC = () => {
       const { success, data, message } = await editProdile(params)
 
       if (success) {
+        Alert.open({
+          content: message,
+          iconVisible: false
+        })
         router.back()
       }
     } else {

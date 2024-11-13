@@ -10,3 +10,11 @@ interface queryHistoryProps {
 export const queryHistory = (params: queryHistoryProps) => {
   return axios.post("/api/generate_image_history/get", params)
 }
+
+interface addImgToFavouriteProps {
+  collection_id: number
+  image_urls: string[]
+}
+export const addImgToFavourite = (params: addImgToFavouriteProps) => {
+  return axios.post("/api/collections/add_images", params)
+}

@@ -1,11 +1,11 @@
-'use client'
+"use client"
 
-import { useRef, useEffect } from 'react'
-import { Container, Box, Flex, Link, Image, Button, Text, useDisclosure } from '@chakra-ui/react'
-import styled from '@emotion/styled'
+import { useRef, useEffect } from "react"
+import { Container, Box, Flex, Link, Image, Button, Text, useDisclosure } from "@chakra-ui/react"
+import styled from "@emotion/styled"
 
-import Waterfall from './components/Waterfall'
-import { useRouter } from 'next/navigation'
+import Waterfall from "./components/Waterfall"
+import { useRouter } from "next/navigation"
 // import ImageGuideModal from "../components/Common/ImageGuideModal";
 
 function Dashboard() {
@@ -21,21 +21,21 @@ function Dashboard() {
 
       const handleScroll = () => {
         if (window.scrollY > 0) {
-          el.style.backgroundColor = '#fff'
+          el.style.backgroundColor = "#fff"
         } else if (window.scrollY === 0) {
-          el.style.backgroundColor = 'transparent'
+          el.style.backgroundColor = "transparent"
         }
       }
-      window.addEventListener('scroll', handleScroll)
+      window.addEventListener("scroll", handleScroll)
 
       return () => {
-        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener("scroll", handleScroll)
       }
     }
   }, [headerRef.current])
 
   return (
-    <Container p={0} position={'relative'}>
+    <Container p={0} position={"relative"}>
       <BackgroundBox>
         <Image src="/assets/images/mainPage/bg.png" alt="bg-img" />
       </BackgroundBox>
@@ -46,20 +46,18 @@ function Dashboard() {
           as="header"
           justify="space-between"
           align="center"
-          h={'8vh'}
-          px={'1rem'}
-          mb={'3rem'}
+          h={"8vh"}
+          px={"1rem"}
+          mb={"3rem"}
           position="sticky"
           top={0}
           bg="white"
           zIndex="100"
           mt="-0.2rem"
-          background={'transparent'}
-          transition={'background-color 0.3s'}
+          background={"transparent"}
+          transition={"background-color 0.3s"}
         >
-          <Text fontSize="1.3rem" fontWeight="bold" letterSpacing="0.1rem" fontFamily="Arial" textAlign="center">
-            CREAMODA
-          </Text>
+          <Image w={"150px"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
 
           <Flex gap="0.5rem">
             {/* 收藏 */}
@@ -80,16 +78,16 @@ function Dashboard() {
         {/* Upload Button */}
         <StartBtnBox>
           <Button
-            width={'90vw'}
+            width={"90vw"}
             colorScheme="blackAlpha"
-            border={'3px solid #f2d9da'}
+            border={"3px solid #f2d9da"}
             bgColor="#EE3939"
             color="white"
             py="1.75rem"
             fontSize="1.3rem"
             letterSpacing="0.02rem"
             onClick={() => {
-              router.push('/upload')
+              router.push("/upload")
             }}
             mt={1}
             mb={4}
