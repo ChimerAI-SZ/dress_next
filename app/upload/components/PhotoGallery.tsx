@@ -21,7 +21,6 @@ import Delete from "@img/upload/delete.svg";
 import { TypesClothingProps } from "@definitions/update";
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
-import Loading from "@components/Loading/index";
 const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
