@@ -11,6 +11,7 @@ import {
   Button,
   Spinner,
 } from "@chakra-ui/react";
+import ReactLoading from "react-loading";
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -20,6 +21,7 @@ import Delete from "@img/upload/delete.svg";
 import { TypesClothingProps } from "@definitions/update";
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
+import Loading from "@components/Loading/index";
 const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
@@ -31,7 +33,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   const [urlList, setUrlList] = useState<
     { image_url: string; tags: string; selected?: boolean }[]
   >([]);
-  const itemsPerPage = activeIndex === 0 ? 5 : 6;
+  const itemsPerPage = activeIndex === 0 ? 7 : 8;
   const totalPages = Math.ceil(total / itemsPerPage);
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -50,8 +52,8 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   };
   const fetchData = async (index?: number) => {
     const [err, res] = await errorCaptureRes(fetchHomePage, {
-      limit: index === 0 ? 5 : 6,
-      offset: (index || 0) * (index === 0 ? 5 : 6),
+      limit: index === 0 ? 7 : 8,
+      offset: (index || 0) * (index === 0 ? 7 : 8),
       library: flied ? "fabric" : "print",
     });
     if (res?.success) {
@@ -95,7 +97,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       <Box h={"11rem"} overflow={"hidden"}>
         <Swiper
           onSlideChange={(swiper) => {
-            if (Math.ceil(urlList.length / 6) <= swiper.activeIndex) {
+            if (Math.ceil(urlList.length / 8) <= swiper.activeIndex) {
               fetchData(swiper.activeIndex);
             }
             setActiveIndex(swiper.activeIndex);
@@ -104,7 +106,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
           {[...Array(totalPages)].map((_, pageIndex) => (
             <SwiperSlide key={pageIndex}>
               <Grid
-                templateColumns="repeat(3, 1fr)"
+                templateColumns="repeat(4, 1fr)"
                 gap={2}
                 pt={"0.75rem"}
                 position={"relative"}
@@ -147,11 +149,17 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    background="#F5F5F5"
+                    background="rgba(23,23,23,0.6);"
                   >
-                    <Spinner size="xl" />
+                    <ReactLoading
+                      type={"spinningBubbles"}
+                      color={"#ffffff"}
+                      height={"1.38rem"}
+                      width={"1.38rem"}
+                    />
                   </Box>
                 )}
+
                 {urlList
                   .slice(
                     pageIndex * itemsPerPage,

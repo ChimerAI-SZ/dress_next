@@ -16,7 +16,7 @@ import UploadImage from "@img/upload/upload-image.svg";
 import ReUpload from "@img/upload/re-upload.svg";
 import ImageGuide from "./ImageGuide";
 import { TypesClothingProps } from "@definitions/update";
-
+import ReactLoading from "react-loading";
 function Page({ onParamsUpdate }: TypesClothingProps) {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } =
     useAliyunOssUpload();
@@ -90,7 +90,12 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         flexFlow="column"
       >
         {isUploading ? (
-          <Spinner size="xl" />
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"#ffffff"}
+            height={"1.38rem"}
+            width={"1.38rem"}
+          />
         ) : uploadedUrl ? (
           <Flex
             h="100%"

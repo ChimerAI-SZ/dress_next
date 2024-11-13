@@ -17,6 +17,7 @@ import ToastTest from "@components/ToastTest";
 import { errorCaptureRes, storage } from "@utils/index";
 import { fetchShoppingAdd, fetchAddImage } from "@lib/request/generate-result";
 import AllNo from "@img/generate-result/all-no.svg";
+
 function Page() {
   const userId = storage.get("user_id");
 

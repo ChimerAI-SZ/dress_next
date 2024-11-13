@@ -14,10 +14,10 @@ import { getResult } from "@lib/request/workflow";
 import { fetchUtilWait } from "@lib/request/generate";
 import { errorCaptureRes } from "@utils/index";
 import {
-  ProgressCircleRing,
-  ProgressCircleRoot,
-  ProgressCircleValueText,
-} from "@components/ui/progress-circle";
+  CircularProgressbarWithChildren,
+  buildStyles,
+} from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 function Page() {
   const searchParams = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
@@ -68,9 +68,9 @@ function Page() {
   useEffect(() => {
     if (taskIDs.length === 0 && imageList.length > 0) {
       const imageListParam = encodeURIComponent(JSON.stringify(imageList));
-      router.push(
-        `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
-      );
+      // router.push(
+      //   `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
+      // );
     }
   }, [taskIDs, imageList, router]);
 
@@ -144,30 +144,61 @@ function Page() {
       <Flex
         justifyContent={"center"}
         alignItems={"center"}
-        mt={"5.5rem"}
+        mt={"3.5rem"}
         position={"relative"}
         flexDirection={"column"}
       >
-        <Flex
-          zIndex={0}
-          bgColor={"transparent"}
-          width="8.13rem"
-          height="8.13rem"
-          background="rgba(255,255,255,0.1)"
-          boxShadow="0rem 0rem 0.31rem 0rem rgba(255,255,255,0.5), inset 0rem 0rem 0.47rem 0rem rgba(255,255,255,0.8)"
-          border="0.06rem solid #fffeff"
-          justifyContent={"center"}
-          alignItems={"center"}
-          borderRadius="full"
-        >
-          <Image
-            boxSize={"7.13rem"}
-            borderRadius="full"
-            src={params.loadOriginalImage}
-            border="0.06rem solid #fffeff"
-          ></Image>
-        </Flex>
-
+        <Box boxSize={"11rem"}>
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient
+                id="gradient"
+                x1="150%"
+                y1="50%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  style={{ stopColor: "#FF9090", stopOpacity: 1 }}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: "#FE4BA3", stopOpacity: 1 }}
+                />
+              </linearGradient>
+            </defs>
+          </svg>
+          <CircularProgressbarWithChildren
+            styles={buildStyles({
+              pathColor: "url(#gradient)", // 使用SVG渐变色
+              strokeLinecap: "round",
+              trailColor: "transparent",
+            })}
+            value={66}
+          >
+            <Flex
+              zIndex={0}
+              bgColor={"transparent"}
+              width="8.13rem"
+              height="8.13rem"
+              background="rgba(255,255,255,0.1)"
+              boxShadow="0rem 0rem 0.31rem 0rem rgba(255,255,255,0.5), inset 0rem 0rem 0.47rem 0rem rgba(255,255,255,0.8)"
+              border="0.06rem solid #fffeff"
+              justifyContent={"center"}
+              alignItems={"center"}
+              borderRadius="full"
+              m={"0.1rem"}
+            >
+              <Image
+                boxSize={"7.13rem"}
+                borderRadius="full"
+                src={params.loadOriginalImage}
+                border="0.06rem solid #fffeff"
+              ></Image>
+            </Flex>
+          </CircularProgressbarWithChildren>
+        </Box>
         <Text
           fontFamily="PingFangSC, PingFang SC"
           fontWeight="600"
