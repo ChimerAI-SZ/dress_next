@@ -20,16 +20,16 @@ import ColorRight from "@img/upload/color-right.svg";
 import { HexColorPicker } from "react-colorful";
 import { TypesClothingProps } from "@definitions/update";
 const Page = ({ onParamsUpdate }: TypesClothingProps) => {
-  const [color, setColor] = useState("#fdfdfb"); // 初始颜色
+  const [color, setColor] = useState("#FDFCFA"); // 初始颜色
   const [customColors, setCustomColors] = useState<string[]>([
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
+    "#FDFCFA",
   ]); // 自定义颜色列表
   const [colorList, setColorList] = useState([
     "#d4dab6",
@@ -151,7 +151,7 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
                     h={"1.69rem"}
                     bg={item}
                     border={
-                      item === "#ffffff" ? "0.06rem dashed  #979797" : "none"
+                      item === "#FDFCFA" ? "0.06rem dashed  #979797" : "none"
                     }
                     borderRadius={"50%"}
                     flexShrink={0}
@@ -190,7 +190,7 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
           height="1.75rem"
           borderRadius="50%"
           bg={color}
-          border={color === "#ffffff" ? "0.06rem solid #BFBFBF" : "none"}
+          border={color === "#FDFCFA" ? "0.06rem solid #BFBFBF" : "none"}
           flexShrink={0}
         ></Box>
         {colorList.map((item) => {

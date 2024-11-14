@@ -13,11 +13,22 @@ import { Field } from "@components/ui/field";
 import { useSearchParams, useRouter } from "next/navigation";
 import Back from "@img/login/back.svg";
 import { useState, useEffect } from "react";
-import { fetchResetPassword } from "@lib/request/login";
+import { fetchReset } from "@lib/request/login";
 import { errorCaptureRes } from "@utils/index";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import Right from "@img/login/right.svg";
 import { InputGroup } from "@components/ui/input-group";
+import {
+  DialogActionTrigger,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from "@components/ui/dialog";
 interface FormValues {
   email: string;
   first: string;
@@ -26,6 +37,7 @@ interface FormValues {
   password: string;
   newPassword: string;
 }
+
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,6 +47,7 @@ const Page = () => {
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isUppercaseValid, setIsUppercaseValid] = useState(false);
   const [isNumberValid, setIsNumberValid] = useState(false);
+  const [open, setOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -42,7 +55,13 @@ const Page = () => {
     setError,
     watch,
   } = useForm<FormValues>();
+
   const password = watch("password");
+  const newPassword = watch("newPassword"); // 监控新的密码输入框
+
+  // 检查密码一致性
+  const passwordsMatch = password === newPassword;
+
   useEffect(() => {
     if (seconds === 0) {
       setCanResend(true); // 倒计时结束后，允许重新发送验证码
@@ -58,20 +77,76 @@ const Page = () => {
 
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
-    const [err, res] = await errorCaptureRes(fetchResetPassword, data);
+    const [err, res] = await errorCaptureRes(fetchReset, {
+      email: params.email,
+      new_password: password,
+      verification_code: params.code,
+    });
     if (res.success) {
-      router.push(
-        `/register/verification-code?email=${data.email}&retrieve-password=true`
-      );
+      setOpen(true);
     }
   };
+
   useEffect(() => {
     setIsLengthValid(password?.length >= 8); // 检查密码长度
     setIsUppercaseValid(/[A-Z]/.test(password) && /[a-z]/.test(password)); // 检查大小写字母
     setIsNumberValid(/\d/.test(password)); // 检查是否包含数字
   }, [password]);
+
   return (
     <VStack align="stretch" minH="100vh" p={3} px={5}>
+      <DialogRoot
+        open={open}
+        placement={"center"}
+        motionPreset="slide-in-bottom"
+      >
+        <DialogContent
+          width="18.44rem"
+          height="10.69rem"
+          background="#FFFFFF"
+          borderRadius="0.75rem"
+        >
+          <Flex
+            flexDirection={"column"}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <Text
+              fontFamily="PingFangSC, PingFang SC"
+              fontWeight="500"
+              fontSize="1.06rem"
+              color="#171717"
+              textAlign={"center"}
+              mt={"1.44rem"}
+            >
+              Congratulations
+            </Text>
+            <Text
+              fontFamily="PingFangSC, PingFang SC"
+              fontWeight="400"
+              fontSize="0.88rem"
+              color="#171717"
+              textAlign={"center"}
+              mt={"0.38rem"}
+              px={"1.5rem"}
+            >
+              Your password has been reset successfully.
+            </Text>
+            <Button
+              width="14.09rem"
+              height="2.44rem"
+              background="#EE3939"
+              borderRadius="1.25rem"
+              mt={"1rem"}
+              onClick={() => {
+                router.push(`/`);
+              }}
+            >
+              OK
+            </Button>
+          </Flex>
+        </DialogContent>
+      </DialogRoot>
       <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
         <Image
           src={Back.src}
@@ -139,12 +214,11 @@ const Page = () => {
                       borderRadius={"50%"}
                     ></Box>
                   )}
-
                   <Text
                     fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
-                    color={isLengthValid ? "#299E46" : "#737373"} // 动态变色
+                    color={isLengthValid ? "#299E46" : "#737373"}
                   >
                     At least 8 characters
                   </Text>
@@ -163,7 +237,7 @@ const Page = () => {
                     fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
-                    color={isUppercaseValid ? "#299E46" : "#737373"} // 动态变色
+                    color={isUppercaseValid ? "#299E46" : "#737373"}
                   >
                     Both upper and lower case letters
                   </Text>
@@ -182,7 +256,7 @@ const Page = () => {
                     fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
-                    color={isNumberValid ? "#299E46" : "#737373"} // 动态变色
+                    color={isNumberValid ? "#299E46" : "#737373"}
                   >
                     At least 1 number
                   </Text>
@@ -200,11 +274,9 @@ const Page = () => {
                 <InputGroup w="100%" bg={!!errors.newPassword ? "#ffe0e0" : ""}>
                   <Input
                     {...register("newPassword", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters",
-                      },
+                      required: "Please retype your new password",
+                      validate: (value) =>
+                        value === password || "Passwords must match", // 验证密码是否一致
                     })}
                     flex="1"
                     name="newPassword"
@@ -216,9 +288,9 @@ const Page = () => {
                     }}
                   />
                 </InputGroup>
-                {errors.password && (
+                {errors.newPassword && (
                   <Text color="red.500" fontSize="0.75rem">
-                    {errors.password.message}
+                    {errors.newPassword.message}
                   </Text>
                 )}
               </Field>
@@ -235,6 +307,7 @@ const Page = () => {
                       isLengthValid &&
                       isUppercaseValid &&
                       isNumberValid &&
+                      passwordsMatch && // 添加一致性检查
                       Object.keys(errors).length === 0
                     )
                   }

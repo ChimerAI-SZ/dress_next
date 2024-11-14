@@ -92,7 +92,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         {isUploading ? (
           <ReactLoading
             type={"spinningBubbles"}
-            color={"#ffffff"}
+            color={"#747474"}
             height={"3.38rem"}
             width={"3.38rem"}
           />

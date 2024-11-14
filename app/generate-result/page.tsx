@@ -82,6 +82,19 @@ function Page() {
       );
     }
   }, [likeList]);
+  const downloadImage = (url: string) => {
+    if (!url) {
+      console.error("Invalid image URL");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = url.split("/").pop() || "download"; // 提取文件名，如果没有文件名则使用 'download'
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <Box h="100vh" position={"relative"} pt={4} px="1rem">
       <Header show noTitle cb={cb}></Header>
@@ -320,6 +333,11 @@ function Page() {
                 backdropFilter="blur(50px)"
                 alignItems={"center"}
                 justifyContent={"center"}
+                onClick={() => {
+                  likeList.forEach((item) => {
+                    downloadImage(item);
+                  });
+                }}
               >
                 <Image boxSize={"2.25rem"} src={Download.src}></Image>
               </Flex>

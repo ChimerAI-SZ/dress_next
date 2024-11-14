@@ -7,10 +7,9 @@ import { Application } from "@splinetool/runtime";
 import Header from "@components/Header";
 import PrintGeneration from "@img/upload/print-generation.svg";
 import Bg from "@img/generate/bg.png";
-import Waterfall from "../components/Waterfall";
+import Waterfall from "./components/Waterfall";
 import { useSearchParams, useRouter } from "next/navigation";
 import { workflow } from "./workflow/workflow";
-import { getResult } from "@lib/request/workflow";
 import { getQuery } from "@lib/request/generate";
 import { fetchUtilWait } from "@lib/request/generate";
 import { errorCaptureRes } from "@utils/index";
@@ -32,6 +31,10 @@ function Page() {
   const hasRunRef = useRef(false);
 
   const fetchData = async () => {
+    if (info.total_messages < 3) {
+      // 不请求
+      return;
+    }
     const [err, res] = await errorCaptureRes(fetchUtilWait);
     if (res?.success) {
       setInfo((pre) => ({
@@ -103,12 +106,16 @@ function Page() {
   const getImage = async (taskID: string) => {
     try {
       const resultData: any = await getQuery({ taskID });
-      const { result, success } = resultData || {};
+      const { result, success, message } = resultData || {};
+
       if (success) {
         setImageList((pre) => [...pre, result.res]);
         setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
       } else {
         console.log(`Task ${taskID} still in progress`);
+      }
+      if (message !== "Task is running") {
+        setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
       }
     } catch (err) {
       setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
@@ -160,7 +167,7 @@ function Page() {
       <Flex
         justifyContent={"center"}
         alignItems={"center"}
-        mt={"3.5rem"}
+        mt={"3.2rem"}
         position={"relative"}
         flexDirection={"column"}
       >
@@ -220,11 +227,11 @@ function Page() {
           fontWeight="600"
           fontSize="1.25rem"
           color="#404040"
-          mt={"2.69rem"}
+          mt={"1.5rem"}
         >
           {info?.total_messages
             ? `Estimated wait ${info?.wait_time ?? "--"} mins`
-            : ""}
+            : "37%"}
         </Text>
         <Text
           font-family="PingFangSC, PingFang SC"
