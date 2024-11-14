@@ -69,9 +69,9 @@ function Page() {
   useEffect(() => {
     if (taskIDs.length === 0 && imageList.length > 0) {
       const imageListParam = encodeURIComponent(JSON.stringify(imageList));
-      // router.push(
-      //   `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
-      // );
+      router.push(
+        `/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`
+      );
     }
   }, [taskIDs, imageList, router]);
 
