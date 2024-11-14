@@ -1,17 +1,17 @@
-import { Group, Flex, Image, Text, Input } from "@chakra-ui/react";
+import { Group, Flex, Image, Text } from "@chakra-ui/react";
 import { Button } from "@components/ui/button";
 import {
   DialogContent,
   DialogRoot,
-  DialogTrigger,
 } from "@components/ui/dialog";
 
-import { useState } from "react";
-import {
-  NativeSelectField,
-  NativeSelectRoot,
-} from "@components/ui/native-select";
+
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+
 import Phone from "@img/phone.svg";
+
+import './index.css'
 
 interface DialogComponentProps {
   isOpen: boolean;
@@ -67,24 +67,11 @@ const Component: React.FC<DialogComponentProps> = ({
             background=" #F5F5F5"
             borderRadius="0.5rem"
           >
-            <NativeSelectRoot
-              w={"6.8rem"}
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="400"
-              fontSize="0.88rem"
-              color="#171717"
-            >
-              <NativeSelectField border={"none"}>
-                <option value="1">+86</option>
-              </NativeSelectField>
-            </NativeSelectRoot>
-            <Input
+            <PhoneInput
+              className="shipping_address_phone_number" 
+              placeholder="Enter phone number"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              bg="#f5f5f5"
-              fontSize="1rem"
-              fontWeight="normal"
-              border={"none"}
+              onChange={(value)=>{console.log(value)}}
             />
           </Group>
         </Flex>

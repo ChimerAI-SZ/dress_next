@@ -19,6 +19,7 @@ import Header from "../../components/Header"
 import "react-phone-number-input/style.css"
 import "./index.css"
 
+
 interface FormValues {
   full_name: string
   country: string
@@ -36,15 +37,12 @@ interface EditAddressProps {
 
 const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
   const router = useRouter()
-  const [isAddingAddress, setIsAddingAddress] = useState(params.addressId === "add")
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-    setError,
-    watch
   } = useForm<FormValues>()
 
   // 表单最终提交逻辑
@@ -70,7 +68,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
 
   return (
     <Container className="homepage-edit-address-contaienr" p={"0"} zIndex={1}>
-      <Header title={isAddingAddress ? "Add New Address" : "Edit Address"} />
+      <Header title={params.addressId === "add" ? "Add New Address" : "Edit Address"} />
 
       <Box p={"16pt"}>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -264,6 +262,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
             </Box>
           </VStack>
         </form>
+
       </Box>
     </Container>
   )
