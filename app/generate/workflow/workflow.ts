@@ -29,7 +29,7 @@ export const workflow = async (p: Params) => {
       : loadFabricImage;
   if (
     loadPrintingImage &&
-    backgroundColor === "#fdfdfb" &&
+    backgroundColor === "#FDFCFA" &&
     text?.trim() === "" &&
     !loadFabricImage
   ) {
