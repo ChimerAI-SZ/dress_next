@@ -157,6 +157,30 @@ function Page() {
     }
   }
 
+  const handleDownload = () => {
+    const downloadImage = (url: string) => {
+      if (!url) {
+        console.error("Invalid image URL")
+        return
+      }
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+
+    if (selectedImgList.length > 0) {
+      const imgUrls = originImgList.filter(item => selectedImgList.includes(item.history_id)).map(item => item.image_url)
+
+      imgUrls.forEach(img => {
+        downloadImage(img)
+      })
+    }
+  }
+
   const batchAddToCollection = async () => {
     Promise.all(
       selectedCollection.map(item => {
@@ -212,7 +236,7 @@ function Page() {
               <Text>Select all</Text>
             </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/download.svg"} alt="download-icon" />
+              <StyledImage selectedImgList={selectedImgList} onClick={handleDownload} src={"/assets/images/favourites/download.svg"} alt="download-icon" />
               <StyledImage selectedImgList={selectedImgList} onClick={handleCollect} src={"/assets/images/favourites/unliked.svg"} alt="liked-icon" />
               <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
             </Flex>

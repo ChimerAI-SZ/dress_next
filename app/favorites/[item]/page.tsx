@@ -123,6 +123,30 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
     setDialogVisible(false)
   }
 
+  const handleDownload = () => {
+    const downloadImage = (url: string) => {
+      if (!url) {
+        console.error("Invalid image URL")
+        return
+      }
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+
+    if (selectedImgList.length > 0) {
+      const imgUrls = originImgList.filter(item => selectedImgList.includes(item.id)).map(item => item.image_url)
+
+      imgUrls.forEach(img => {
+        downloadImage(img)
+      })
+    }
+  }
+
   useEffect(() => {
     // 查询收藏夹数据
     queryData()
@@ -174,9 +198,9 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
               <Text>Select all</Text>
             </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={downloadIcon.src} alt="download-icon" />
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" />
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={buyIcon.src} alt="buy-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={downloadIcon.src} onClick={handleDownload} alt="download-icon" />
+              {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" /> */}
+              {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={buyIcon.src} alt="buy-icon" /> */}
             </Flex>
           </Flex>
         </Box>
