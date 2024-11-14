@@ -9,4 +9,5 @@ export interface HistoryItem {
   task_id: string
   image_url: string
   created_date: string
+  [key: string]: number
 }

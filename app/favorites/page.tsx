@@ -24,7 +24,7 @@ function Page() {
     const user_id = storage.get("user_id")
 
     if (user_id) {
-      const { message, data, success } = await queryCollectionList({ user_id: +user_id })
+      const { message, data, success } = await queryCollectionList({ user_id: +user_id as number })
 
       if (success) {
         setCollectionList(data)
@@ -41,7 +41,12 @@ function Page() {
 
   return (
     <Container p={0}>
-      <Header name="Collections" />
+      <Header
+        name="Collections"
+        afterSuccess={() => {
+          queryCollectionData()
+        }}
+      />
       <FavouritesList collectionList={collectionList} />
     </Container>
   )

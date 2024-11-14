@@ -45,13 +45,13 @@ const EditProfile: React.FC = () => {
   const onSubmit = async (formData: FormValues) => {
     const user_id = storage.get("user_id")
 
-    const { success, data, message } = await editProdile({ ...formData, user_id: +(user_id ? user_id : "0") })
+    if (user_id) {
+      const { success, data, message } = await editProdile({ ...formData, user_id: +user_id as number })
 
-    if (success) {
-      router.back()
+      if (success) {
+        router.back()
+      }
     }
-
-    // router.back()
   }
 
   return (

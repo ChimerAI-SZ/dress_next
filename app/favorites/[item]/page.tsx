@@ -1,14 +1,15 @@
 "use client"
 
 import React, { useEffect, useState, useReducer } from "react"
-import { Container, Box, For, Image, Flex, Show, Button, Heading, HStack } from "@chakra-ui/react"
-import { Radio, RadioGroup } from "@components/ui/radio"
+import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 import { useSearchParams } from "next/navigation"
 import { Provider, useSelector } from "react-redux"
 
 import styled from "@emotion/styled"
 import { useRouter } from "next/navigation"
 
+import NoSelect from "@img/generate-result/no-select.svg"
+import Selected from "@img/generate-result/selected.svg"
 import buyIcon from "@img/favourites/buy.svg"
 import likedIcon from "@img/favourites/liked.svg"
 import downloadIcon from "@img/favourites/download.svg"
@@ -19,13 +20,13 @@ import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
 import FavouritesDialog from "../components/AlbumDrawer"
 
-import { HistoryItem } from "@definitions/history"
-import { FavouriteItem } from "@definitions/favourites"
+import { FavouriteItem, FavouriteItemImage } from "@definitions/favourites"
 import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
 import { store } from "../store"
+import dayjs from "dayjs"
 
 type GroupList = {
-  [key: string]: HistoryItem[]
+  [key: string]: FavouriteItemImage[]
 }
 interface FavouriteItemProps {
   params: { item: string }
@@ -42,6 +43,9 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   const [selectionMode, setSelectionMode] = useState<boolean>(false) // 用于标记是否进入多选状态
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [deleteToastVisible, setDeleteToastVisible] = useState(false)
+  const [isAllSelected, setIsAllSelected] = useState<boolean>(false)
+  // 分组前的图片列表
+  const [originImgList, setOriginImgList] = useState<FavouriteItemImage[]>([])
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
@@ -70,16 +74,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
         const groupedByDate = new Map()
 
         data.forEach((item: any) => {
-          const date = item.added_at
+          const date = dayjs(item.added_at).format("YYYY-MM-DD")
           // 如果 Map 中还没有这个日期的键，初始化一个空数组
           if (!groupedByDate.has(date)) {
             groupedByDate.set(date, [])
           }
           // 将当前对象的 url 添加到对应日期的数组中
-          groupedByDate.get(date).push(item.image_url)
+          groupedByDate.get(date).push(item)
         })
 
-        console.log(Object.fromEntries(groupedByDate))
+        setOriginImgList(data)
         setImgGroupList(Object.fromEntries(groupedByDate))
       }
 
@@ -97,11 +101,8 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       if (success) {
         router.back()
       } else {
-        // todo error hanlder
       }
-    } catch (err: any) {
-      // todo error hanlder
-    }
+    } catch (err: any) {}
   }
 
   // 选择模式下图片的选择、取消选择事件
@@ -149,7 +150,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       <Box px={"1rem"} mt={"8pt"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
-            return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
+            return <ImageGroupByData key={index} imgKey="id" date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
           }}
         </For>
       </Box>
@@ -157,11 +158,21 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       <Show when={selectionMode}>
         <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
           <Flex alignItems={"center"} justifyContent={"space-between"}>
-            <HStack>
-              <RadioGroup size="sm">
-                <Radio value="1">Select all</Radio>
-              </RadioGroup>
-            </HStack>
+            <Flex
+              gap={"0.53rem"}
+              alignItems={"center"}
+              onClick={() => {
+                if (isAllSelected) {
+                  setSelectedImgList([])
+                } else {
+                  setSelectedImgList(originImgList.map(item => item.id))
+                }
+                setIsAllSelected(!isAllSelected)
+              }}
+            >
+              <Image boxSize="16pt" src={isAllSelected ? Selected.src : NoSelect.src} border="0.06rem solid #BFBFBF" backdropFilter="blur(50px)" borderRadius={"50%"}></Image>
+              <Text>Select all</Text>
+            </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
               <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={downloadIcon.src} alt="download-icon" />
               <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" />

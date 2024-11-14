@@ -28,9 +28,9 @@ const EditAvatar: React.FC = () => {
   const handleSaveAvatar = async () => {
     const user_id = storage.get("user_id")
 
-    if (selectedAvatar) {
+    if (selectedAvatar && user_id) {
       const params = {
-        user_id: +(user_id ? user_id : "0"),
+        user_id: +user_id as number,
         avatar_url: selectedAvatar
       }
 

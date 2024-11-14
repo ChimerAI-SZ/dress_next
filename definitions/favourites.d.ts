@@ -1,3 +1,12 @@
+interface FavouriteItemImage {
+  id: number
+  collection_id: number
+  image_url: string
+  is_deleted: boolean
+  added_at: string
+  [key: string]: number
+}
+
 // 收藏夹数据类型
 export type FavouriteItem = {
   collection_id: string | number
@@ -5,18 +14,10 @@ export type FavouriteItem = {
   is_default: boolean
   is_deleted: boolean
   title: string
-  images: string[]
+  images: FavouriteItemImage[]
   description: string
   created_at: string
   total: number
-}
-
-interface FavouriteItemImage {
-  id: number
-  collection_id: number
-  image_url: string
-  is_deleted: boolean
-  added_at: string
 }
 
 export type FavouriteImage = {
@@ -28,6 +29,7 @@ export type FavouriteImage = {
 // 收藏页 header 的 props 类型
 export interface FavouritesHeaderProps {
   name?: string | null
+  afterSuccess?: () => void
 }
 
 export interface CollectionDetailHeaderProps {
@@ -43,4 +45,5 @@ export interface FavouriteDialogProps {
   collectionId?: number // 在收藏夹内部的header要传一下当前收藏夹的id
   visible: boolean
   close: () => void
+  afterSuccess?: (newCollection: any) => void
 }

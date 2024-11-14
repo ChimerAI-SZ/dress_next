@@ -1,14 +1,14 @@
-'use client'
-import React, { useState, useRef, useEffect, Suspense, useCallback } from 'react'
-import Masonry from 'react-masonry-css'
-import { Box, Flex, Spinner, useDisclosure, Image } from '@chakra-ui/react'
-import ImageOverlay from './ImageOverlay'
-import { css, Global, keyframes } from '@emotion/react'
-import styled from '@emotion/styled'
-import { fetchHomePage } from '@lib/request/page'
-import { errorCaptureRes } from '@utils/index'
+"use client"
+import React, { useState, useRef, useEffect, Suspense, useCallback } from "react"
+import Masonry from "react-masonry-css"
+import { Box, Flex, Spinner, useDisclosure, Image } from "@chakra-ui/react"
+import ImageOverlay from "./ImageOverlay"
+import { css, Global, keyframes } from "@emotion/react"
+import styled from "@emotion/styled"
+import { fetchHomePage } from "@lib/request/page"
+import { errorCaptureRes } from "@utils/index"
 
-import loadingIcon from '@img/mainPage/loading.svg'
+import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
   image_url: string
   ID: number
@@ -41,7 +41,7 @@ const Waterfall: React.FC = () => {
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>("")
   const loaderRef = useRef(null)
   const { onOpen } = useDisclosure()
   const observer = useRef<IntersectionObserver | null>(null)
@@ -59,10 +59,10 @@ const Waterfall: React.FC = () => {
       const [err, res] = await errorCaptureRes(fetchHomePage, {
         limit: 10,
         offset: page * 10,
-        library: 'top_sales'
+        library: "top_sales"
       })
 
-      if (res) {
+      if (res.success) {
         const newImages = res?.data
         console.log(newImages)
         setImageList(prev => [...prev, ...newImages])
@@ -90,7 +90,7 @@ const Waterfall: React.FC = () => {
             fetchData() // 当最后一张图片进入视口时加载更多
           }
         },
-        { rootMargin: '100px', threshold: 0.2 }
+        { rootMargin: "100px", threshold: 0.2 }
       )
 
       if (node) observer.current.observe(node)
@@ -118,10 +118,10 @@ const Waterfall: React.FC = () => {
       let refreshStatus = false
 
       const pullCallback = () => {
-        console.log('callback')
+        console.log("callback")
         fetchData(() => {
-          app.style['transition'] = 'transform 0.4s'
-          app.style['transform'] = 'translate(0, 0px)'
+          app.style["transition"] = "transform 0.4s"
+          app.style["transform"] = "translate(0, 0px)"
         })
       }
 
@@ -132,11 +132,11 @@ const Waterfall: React.FC = () => {
         if (top_distance >= 0) {
           // 下拉效果
           if (moveLen > 0 && moveLen < 50) {
-            app.style['transform'] = 'translate(0, ' + moveLen + 'px)'
+            app.style["transform"] = "translate(0, " + moveLen + "px)"
           } else if (moveLen >= 50 && moveLen < 100) {
             // 到刷新标志，下拉阻尼增大
             const _moveLen = 50 + (moveLen - 50) * 0.6
-            app.style['transform'] = 'translate(0, ' + _moveLen + 'px)'
+            app.style["transform"] = "translate(0, " + _moveLen + "px)"
           }
 
           // 下拉触发
@@ -149,7 +149,7 @@ const Waterfall: React.FC = () => {
       }
       const touchstart = (e: any) => {
         startP = e.touches[0].pageY
-        app.style['transition'] = 'transform 0s'
+        app.style["transition"] = "transform 0s"
       }
       const touchmove = (e: any) => {
         moveLen = e.touches[0].pageY - startP
@@ -168,14 +168,14 @@ const Waterfall: React.FC = () => {
         }
       }
 
-      app.addEventListener('touchstart', touchstart)
-      app.addEventListener('touchmove', touchmove)
-      app.addEventListener('touchend', touchend)
+      app.addEventListener("touchstart", touchstart)
+      app.addEventListener("touchmove", touchmove)
+      app.addEventListener("touchend", touchend)
 
       return () => {
-        app.removeEventListener('touchstart', touchstart)
-        app.removeEventListener('touchmove', touchmove)
-        app.removeEventListener('touchend', touchend)
+        app.removeEventListener("touchstart", touchstart)
+        app.removeEventListener("touchmove", touchmove)
+        app.removeEventListener("touchend", touchend)
       }
     }
   }, [containerRef.current])
@@ -183,8 +183,8 @@ const Waterfall: React.FC = () => {
   return (
     <>
       <Global styles={masonryStyles} />
-      <Box ref={containerRef} position={'relative'}>
-        <Box className="main-page-hidden-loading-icon" position={'absolute'} top={'-40pt'} left={'50%'} transform={'translateX(-50%)'}>
+      <Box ref={containerRef} position={"relative"}>
+        <Box className="main-page-hidden-loading-icon" position={"absolute"} top={"-40pt"} left={"50%"} transform={"translateX(-50%)"}>
           <StyledLoading src={loadingIcon.src} alt="loading-icon" boxSize="24pt" />
         </Box>
         <Masonry breakpointCols={breakpointColumnsObj} className="my-masonry-grid" columnClassName="my-masonry-grid_column">

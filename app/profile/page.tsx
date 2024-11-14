@@ -69,22 +69,24 @@ function Profile() {
 
   const queryData = async () => {
     const user_id = storage.get("user_id")
-    const params = {
-      user_id: +(user_id ? user_id : "0")
-    }
-    const { success, data, message } = await queryProfileData(params)
-
-    if (success) {
-      const newProfileData = {
-        ...profileData,
-        ...data
+    if (user_id) {
+      const params = {
+        user_id: +user_id as number
       }
+      const { success, data, message } = await queryProfileData(params)
 
-      setProfileData(newProfileData)
+      if (success) {
+        const newProfileData = {
+          ...profileData,
+          ...data
+        }
 
-      dispatch(setData(newProfileData))
-    } else {
-      // todo error handler
+        setProfileData(newProfileData)
+
+        dispatch(setData(newProfileData))
+      } else {
+        // todo error handler
+      }
     }
   }
 

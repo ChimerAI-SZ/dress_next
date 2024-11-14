@@ -23,7 +23,7 @@ interface FormValues {
   description: string
 }
 
-const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visible, close }) => {
+const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visible, close, afterSuccess }) => {
   const collectionList = useSelector((state: any) => state.collectionList.value)
 
   const {
@@ -39,13 +39,12 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
 
   // 表单最终提交逻辑
   const onSubmit = async (formData: FormValues) => {
-    console.log("Registration data:", formData)
     const user_id = storage.get("user_id")
 
     if (user_id) {
       if (type === "add") {
         const params = {
-          user_id: +(user_id ? user_id : 0),
+          user_id: +user_id as number,
           title: formData.title,
           description: formData.description ?? ""
         }
@@ -53,10 +52,11 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
 
         if (success) {
           close && close()
+          afterSuccess && afterSuccess(data)
         }
       } else {
         const params = {
-          user_id: +(user_id ? user_id : 0),
+          user_id: +user_id as number,
           title: formData.title,
           description: formData.description ?? "",
           collection_id: collectionId ?? 0
@@ -65,6 +65,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
 
         if (success) {
           close && close()
+          afterSuccess && afterSuccess(data)
         }
       }
     }
