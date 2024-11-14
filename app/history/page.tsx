@@ -1,28 +1,28 @@
-"use client"
-import { useEffect, useState, useReducer } from "react"
-import dayjs from "dayjs"
-import styled from "@emotion/styled"
+'use client'
+import { useEffect, useState, useReducer } from 'react'
+import dayjs from 'dayjs'
+import styled from '@emotion/styled'
 
-import { Container, Box, For, Image, Flex, Show, Text } from "@chakra-ui/react"
+import { Container, Box, For, Image, Flex, Show, Text } from '@chakra-ui/react'
 
-import ImageGroupByData from "@components/ImageGroupByDate"
+import ImageGroupByData from '@components/ImageGroupByDate'
 
-import NoSelect from "@img/generate-result/no-select.svg"
-import Selected from "@img/generate-result/selected.svg"
-import ModalRight from "@img/generate-result/modal-right.svg"
-import ModalBack from "@img/generate-result/modal-back.svg"
+import NoSelect from '@img/generate-result/no-select.svg'
+import Selected from '@img/generate-result/selected.svg'
+import ModalRight from '@img/generate-result/modal-right.svg'
+import ModalBack from '@img/generate-result/modal-back.svg'
 
-import Header from "./components/Header"
-import { Toaster, toaster } from "@components/Toaster"
-import { Alert } from "@components/Alert"
+import Header from './components/Header'
+import { Toaster, toaster } from '@components/Toaster'
+import { Alert } from '@components/Alert'
 
-import { FavouriteItem } from "@definitions/favourites"
-import { HistoryItem } from "@definitions/history"
-import { storage } from "@utils/index"
+import { FavouriteItem } from '@definitions/favourites'
+import { HistoryItem } from '@definitions/history'
+import { storage } from '@utils/index'
 
 // 接口 - 收藏夹列表
-import { queryCollectionList } from "@lib/request/favourites"
-import { queryHistory, addImgToFavourite } from "@lib/request/history"
+import { queryCollectionList } from '@lib/request/favourites'
+import { queryHistory, addImgToFavourite } from '@lib/request/history'
 
 type GroupList = {
   [key: string]: HistoryItem[]
@@ -71,26 +71,26 @@ function Page() {
   const queryData = async () => {
     try {
       // const res = await featchHistoryData("123")
-      const user_id = storage.get("user_id")
+      const user_id = storage.get('user_id')
 
-      const params = { user_id: +(user_id ? user_id : "0"), start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"), end_date: dayjs().format("YYYY-MM-DD") }
-      // const { message, data, success } = await queryHistory(params)
-      const data = [
-        {
-          history_id: 1,
-          user_id: 3,
-          task_id: "task_456",
-          image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/AIMODA_small.svg",
-          created_date: "2024-11-12T11:12:05.873813316+08:00"
-        },
-        {
-          history_id: 2,
-          user_id: 3,
-          task_id: "task_456",
-          image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/aa4.svg",
-          created_date: "2024-11-12T11:12:05.873813316+08:00"
-        }
-      ]
+      const params = { user_id: +(user_id ? user_id : '0'), start_date: dayjs().subtract(1, 'year').format('YYYY-MM-DD'), end_date: dayjs().format('YYYY-MM-DD') }
+      const { message, data, success } = await queryHistory(params)
+      // const data = [
+      //   {
+      //     history_id: 1,
+      //     user_id: 3,
+      //     task_id: "task_456",
+      //     image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/AIMODA_small.svg",
+      //     created_date: "2024-11-12T11:12:05.873813316+08:00"
+      //   },
+      //   {
+      //     history_id: 2,
+      //     user_id: 3,
+      //     task_id: "task_456",
+      //     image_url: "https://aimoda-ai.oss-us-east-1.aliyuncs.com/aimoda-homepage-image/aa4.svg",
+      //     created_date: "2024-11-12T11:12:05.873813316+08:00"
+      //   }
+      // ]
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
@@ -99,7 +99,7 @@ function Page() {
         const groupedByDate = new Map()
 
         data.forEach((item: any) => {
-          const date = dayjs(item.created_date).format("YYYY-MM-DD")
+          const date = dayjs(item.created_date).format('YYYY-MM-DD')
           // 如果 Map 中还没有这个日期的键，初始化一个空数组
           if (!groupedByDate.has(date)) {
             groupedByDate.set(date, [])
@@ -117,7 +117,7 @@ function Page() {
   }
 
   const handleCollect = async () => {
-    const user_id = storage.get("user_id")
+    const user_id = storage.get('user_id')
 
     if (user_id && selectedImgList.length > 0) {
       const { message, data: collectionList, success } = await queryCollectionList({ user_id: +user_id })
@@ -133,21 +133,21 @@ function Page() {
         }
         const { message, data, success } = await addImgToFavourite(params)
 
-        if (message) {
+        if (success) {
           toaster.create({
             description: (
-              <Flex justifyContent={"space-between"} alignItems={"center"}>
-                <Flex alignItems={"center"} gap={"0.56rem"}>
-                  <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
+              <Flex justifyContent={'space-between'} alignItems={'center'}>
+                <Flex alignItems={'center'} gap={'0.56rem'}>
+                  <Image src={ModalRight.src} boxSize={'1.38rem'}></Image>
                   <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
                     Collect in Default
                   </Text>
                 </Flex>
-                <Flex alignItems={"center"} gap={"0.56rem"}>
+                <Flex alignItems={'center'} gap={'0.56rem'}>
                   <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
                     Move to
                   </Text>
-                  <Image src={ModalBack.src} boxSize={"1rem"} />
+                  <Image src={ModalBack.src} boxSize={'1rem'} />
                 </Flex>
               </Flex>
             )
@@ -174,7 +174,7 @@ function Page() {
     <Container p={0}>
       <Toaster />
       <Header selectionMode={selectionMode} handleSetSelectMode={handleSetSelectMode} />
-      <Box px={"1rem"} position={"relative"}>
+      <Box px={'1rem'} position={'relative'}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
             return <ImageGroupByData key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
@@ -183,11 +183,11 @@ function Page() {
       </Box>
 
       <Show when={selectionMode}>
-        <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
-          <Flex alignItems={"center"} justifyContent={"space-between"}>
+        <Box p={'8pt 16pt'} position={'fixed'} bottom={0} bgColor={'#fff'} w="100vw" borderRadius={'12px 12px 0 0'} boxShadow={'0px -1px 5px 0px rgba(214, 214, 214, 0.5);'}>
+          <Flex alignItems={'center'} justifyContent={'space-between'}>
             <Flex
-              gap={"0.53rem"}
-              alignItems={"center"}
+              gap={'0.53rem'}
+              alignItems={'center'}
               onClick={() => {
                 if (isAllSelected) {
                   setSelectedImgList([])
@@ -197,13 +197,13 @@ function Page() {
                 setIsAllSelected(!isAllSelected)
               }}
             >
-              <Image boxSize="16pt" src={isAllSelected ? Selected.src : NoSelect.src} border="0.06rem solid #BFBFBF" backdropFilter="blur(50px)" borderRadius={"50%"}></Image>
+              <Image boxSize="16pt" src={isAllSelected ? Selected.src : NoSelect.src} border="0.06rem solid #BFBFBF" backdropFilter="blur(50px)" borderRadius={'50%'}></Image>
               <Text>Select all</Text>
             </Flex>
-            <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/download.svg"} alt="download-icon" />
-              <StyledImage selectedImgList={selectedImgList} onClick={handleCollect} src={"/assets/images/favourites/unliked.svg"} alt="liked-icon" />
-              <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+            <Flex alignItems={'center'} justifyContent={'flex-start'}>
+              <StyledImage selectedImgList={selectedImgList} src={'/assets/images/favourites/download.svg'} alt="download-icon" />
+              <StyledImage selectedImgList={selectedImgList} onClick={handleCollect} src={'/assets/images/favourites/unliked.svg'} alt="liked-icon" />
+              <StyledImage selectedImgList={selectedImgList} src={'/assets/images/favourites/buy.svg'} alt="buy-icon" />
             </Flex>
           </Flex>
         </Box>
@@ -220,7 +220,7 @@ const StyledImage = styled(Image)<StyledImageProps>`
   height: 28pt;
   margin: 0 8pt;
 
-  opacity: ${props => (props.selectedImgList.length <= 0 ? "0.4" : "unset")};
+  opacity: ${props => (props.selectedImgList.length <= 0 ? '0.4' : 'unset')};
   transition: opacity 0.5s ease;
 `
 
