@@ -52,7 +52,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           fontSize="1rem"
           color="#171717"
         >
-          Print selection
+          Print generation
         </Text>
         <Image
           w="0.88rem"

@@ -60,14 +60,36 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   };
   useEffect(() => {
     if (uploadProgress === 100) {
-      setUrlList((pre) =>
-        uploadedUrl
-          ? [
-              { image_url: uploadedUrl, tags: "upload", selected: false },
-              ...pre,
-            ]
-          : pre
-      );
+      setUrlList((prevList) => {
+        if (typeof uploadedUrl === "string") {
+          // 确保 uploadedUrl 是 string 类型
+          // 检查是否有 selected: true 的项
+          const selectedIndex = prevList.findIndex(
+            (item) => item.selected === true
+          );
+
+          if (selectedIndex !== -1) {
+            // 如果找到了 selected: true 的项，替换它
+            const updatedList = [...prevList];
+            updatedList[selectedIndex] = {
+              image_url: uploadedUrl, // 现在可以安全地赋值了
+              tags: "upload",
+              selected: true, // 保持 selected 为 true
+            };
+            return updatedList;
+          } else {
+            // 如果没有 selected: true 的项，直接添加上传的 URL 到列表的开头，selected 默认为 true
+            return [
+              { image_url: uploadedUrl, tags: "upload", selected: true },
+              ...prevList,
+            ];
+          }
+        } else {
+          // 如果 uploadedUrl 不是有效的字符串，可以选择返回原始列表或其他处理方式
+          console.error("Uploaded URL is not valid");
+          return prevList;
+        }
+      });
     }
   }, [uploadProgress]);
 
@@ -93,7 +115,8 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       <Box h={"11rem"} overflow={"hidden"}>
         <Swiper
           onSlideChange={(swiper) => {
-            if (Math.ceil(urlList.length / 8) <= swiper.activeIndex) {
+            console.log(Math.floor(urlList.length / 8), swiper.activeIndex);
+            if (Math.floor(urlList.length / 8) <= swiper.activeIndex) {
               fetchData(swiper.activeIndex);
             }
             setActiveIndex(swiper.activeIndex);

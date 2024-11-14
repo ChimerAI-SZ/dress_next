@@ -29,7 +29,7 @@ function Page() {
   const [taskIDs, setTaskIDs] = useState<string[]>([]);
   const router = useRouter(); //
   const hasRunRef = useRef(false);
-
+  const [barValue, setbarValue] = useState(0);
   const fetchData = async () => {
     if (info.total_messages < 3) {
       // 不请求
@@ -111,6 +111,9 @@ function Page() {
       if (success) {
         setImageList((pre) => [...pre, result.res]);
         setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+        setbarValue((pre) =>
+          Math.ceil(pre + 16.6) >= 100 ? 100 : Math.ceil(pre + 16.6)
+        );
       } else {
         console.log(`Task ${taskID} still in progress`);
       }
@@ -198,7 +201,7 @@ function Page() {
               strokeLinecap: "round",
               trailColor: "transparent",
             })}
-            value={66}
+            value={barValue}
           >
             <Flex
               zIndex={0}
@@ -231,7 +234,7 @@ function Page() {
         >
           {info?.total_messages
             ? `Estimated wait ${info?.wait_time ?? "--"} mins`
-            : "37%"}
+            : barValue + "%"}
         </Text>
         <Text
           font-family="PingFangSC, PingFang SC"
@@ -251,8 +254,8 @@ function Page() {
           color=" #404040"
         >
           {!info?.total_messages
-            ? "people before you"
-            : "You can check results anytime in history"}
+            ? "You can check results anytime in history"
+            : "people before you"}
         </Text>
       </Flex>
       <Text
