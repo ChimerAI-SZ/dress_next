@@ -6,8 +6,11 @@ import {
   dressVariation50PCT,
   dressPrintingTryon,
   generatePrintingSparseArrange,
-  transferAAndB,
+  TransferAAndBPlus,
+  TransferAAndBVITG,
+  TransferAAndBSTANDARD,
   getResult,
+  searchImage,
 } from "@lib/request/workflow"; // B1 全维度保持80%(77s)
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
@@ -419,12 +422,30 @@ export const workflow = async (p: Params) => {
       }, 15000);
     });
   } else {
-    console.log(1, 6);
+    const ImageResult = await errorCaptureRes(
+      searchImage,
+      loadOriginalImage || ""
+    );
+    console.log();
     const results = await Promise.allSettled([
       dressVariation20PCT({ ...p, loadFabricImage: newFabricImage }),
       dressPatternVariation({ ...p, loadFabricImage: newFabricImage }),
       dressVariation50PCT({ ...p, loadFabricImage: newFabricImage }),
-      transferAAndB({ ...p, loadFabricImage: newFabricImage }),
+      TransferAAndBPlus({
+        loadAImage: loadOriginalImage,
+        loadBImage: ImageResult[1].data.similar_image_url,
+        transferWeight: 0.2,
+      }),
+      TransferAAndBVITG({
+        loadAImage: loadOriginalImage,
+        loadBImage: ImageResult[1].data.similar_image_url,
+        transferWeight: 0.2,
+      }),
+      TransferAAndBSTANDARD({
+        loadAImage: loadOriginalImage,
+        loadBImage: ImageResult[1].data.similar_image_url,
+        transferWeight: 0.2,
+      }),
     ]);
     const successfulResults = results.filter(
       (result) => result.status === "fulfilled"

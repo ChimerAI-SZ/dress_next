@@ -11,6 +11,7 @@ import Waterfall from "../components/Waterfall";
 import { useSearchParams, useRouter } from "next/navigation";
 import { workflow } from "./workflow/workflow";
 import { getResult } from "@lib/request/workflow";
+import { getQuery } from "@lib/request/generate";
 import { fetchUtilWait } from "@lib/request/generate";
 import { errorCaptureRes } from "@utils/index";
 import {
@@ -74,22 +75,37 @@ function Page() {
     }
   }, [taskIDs, imageList, router]);
 
+  // const getImage = async (taskID: string) => {
+  //   try {
+  //     const result = await getResult({ taskID });
+  //     if ("code" in result) {
+  //       console.log(result.code);
+  //       if (result.code !== 0) {
+  //         setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+  //         return;
+  //       }
+  //     }
+  //     const { progress, imageFiles } = result.data;
+  //     if (progress === 100) {
+  //       imageFiles.forEach((element: { url: any }, index: number) => {
+  //         const newUrl = `${element.url}?id=${taskID}`;
+  //         setImageList((pre) => [...pre, newUrl]);
+  //       });
+  //       setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+  //     } else {
+  //       console.log(`Task ${taskID} still in progress`);
+  //     }
+  //   } catch (err) {
+  //     setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
+  //   }
+  // };
+
   const getImage = async (taskID: string) => {
     try {
-      const result = await getResult({ taskID });
-      if ("code" in result) {
-        console.log(result.code);
-        if (result.code !== 0) {
-          setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
-          return;
-        }
-      }
-      const { progress, imageFiles } = result.data;
-      if (progress === 100) {
-        imageFiles.forEach((element: { url: any }, index: number) => {
-          const newUrl = `${element.url}?id=${taskID}`;
-          setImageList((pre) => [...pre, newUrl]);
-        });
+      const resultData: any = await getQuery({ taskID });
+      const { result, success } = resultData || {};
+      if (success) {
+        setImageList((pre) => [...pre, result.res]);
         setTaskIDs((prevIDs) => prevIDs.filter((id) => id !== taskID));
       } else {
         console.log(`Task ${taskID} still in progress`);
@@ -128,16 +144,16 @@ function Page() {
         overflow={"hidden"}
         width={"full"}
       >
-        {splineComponent || (
-          <Image
-            src={Bg.src}
-            position={"absolute"}
-            zIndex={0}
-            height="25.66rem"
-            objectFit="cover"
-            w={"full"}
-          ></Image>
-        )}
+        {splineComponent}
+        <Image
+          src={Bg.src}
+          position={"absolute"}
+          zIndex={0}
+          height="25rem"
+          objectFit="cover"
+          w={"full"}
+          top={0}
+        ></Image>
       </Box>
       <Box pt={4}></Box>
       <Header noTitle={true}></Header>
