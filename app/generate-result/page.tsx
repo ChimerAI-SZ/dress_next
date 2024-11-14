@@ -12,15 +12,20 @@ import NoSelect from "@img/generate-result/no-select.svg";
 import Selected from "@img/generate-result/selected.svg";
 import ModalRight from "@img/generate-result/modal-right.svg";
 import ModalBack from "@img/generate-result/modal-back.svg";
-import { useSearchParams } from "next/navigation";
 import ToastTest from "@components/ToastTest";
 import { errorCaptureRes, storage } from "@utils/index";
-import { fetchShoppingAdd, fetchAddImage } from "@lib/request/generate-result";
+import { useSearchParams, useRouter } from "next/navigation";
+import {
+  fetchShoppingAdd,
+  fetchAddImage,
+  collectionsList,
+} from "@lib/request/generate-result";
 import AllNo from "@img/generate-result/all-no.svg";
 import { Alert } from "@components/Alert";
 function Page() {
+  const router = useRouter(); //
   const userId = storage.get("user_id");
-
+  console.log(userId);
   const searchParams = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
   const [imageList, setImageList] = useState<string[]>(
@@ -34,10 +39,83 @@ function Page() {
   const [isOpen, setIsOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [make, setMake] = useState(0);
-  const openDialog = () => setIsOpen(true);
+  const [jionLike, setJionLike] = useState<string[]>([]);
+  const openDialog = () => {
+    if (userId === null) {
+      toaster.create({
+        description: (
+          <Flex justifyContent={"space-between"} alignItems={"center"}>
+            <Flex alignItems={"center"} gap={"0.56rem"}>
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#171717"
+              >
+                Login to have generation history
+              </Text>
+            </Flex>
+            <Flex
+              alignItems={"center"}
+              gap={"0.56rem"}
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#EE3939"
+              >
+                Log in
+              </Text>
+              <Image src={ModalBack.src} boxSize={"1rem"}></Image>
+            </Flex>
+          </Flex>
+        ),
+      });
+      return;
+    }
+
+    setIsOpen(true);
+  };
   const fetchData = async (list: string[]) => {
     if (userId === null) {
-      throw new Error("userId cannot be null");
+      toaster.create({
+        description: (
+          <Flex justifyContent={"space-between"} alignItems={"center"}>
+            <Flex alignItems={"center"} gap={"0.56rem"}>
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#171717"
+              >
+                Login to have generation history
+              </Text>
+            </Flex>
+            <Flex
+              alignItems={"center"}
+              gap={"0.56rem"}
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#EE3939"
+              >
+                Log in
+              </Text>
+              <Image src={ModalBack.src} boxSize={"1rem"}></Image>
+            </Flex>
+          </Flex>
+        ),
+      });
+      return;
     }
     const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
       user_id: +userId as number,
@@ -58,16 +136,122 @@ function Page() {
     }
   };
 
-  const AddImage = async (list: string[]) => {
+  const fetchCollectionsList = async () => {
     if (userId === null) {
-      throw new Error("userId cannot be null");
+      toaster.create({
+        description: (
+          <Flex justifyContent={"space-between"} alignItems={"center"}>
+            <Flex alignItems={"center"} gap={"0.56rem"}>
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#171717"
+              >
+                Login to have generation history
+              </Text>
+            </Flex>
+            <Flex
+              alignItems={"center"}
+              gap={"0.56rem"}
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#EE3939"
+              >
+                Log in
+              </Text>
+              <Image src={ModalBack.src} boxSize={"1rem"}></Image>
+            </Flex>
+          </Flex>
+        ),
+      });
+      return;
     }
-    const [err, res] = await errorCaptureRes(fetchAddImage, {
+    const [err, res] = await errorCaptureRes(collectionsList, {
       user_id: +userId as number,
-      img_urls: list,
     });
+    if (err) {
+      Alert.open({
+        content: "error request process!",
+      });
+    }
     if (res?.success) {
       console.log(1);
+    } else {
+      Alert.open({
+        content: res.message,
+      });
+    }
+  };
+
+  const AddImage = async (list: string[]) => {
+    if (userId === null) {
+      toaster.create({
+        description: (
+          <Flex justifyContent={"space-between"} alignItems={"center"}>
+            <Flex alignItems={"center"} gap={"0.56rem"}>
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#171717"
+              >
+                Login to have generation history
+              </Text>
+            </Flex>
+            <Flex
+              alignItems={"center"}
+              gap={"0.56rem"}
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#EE3939"
+              >
+                Log in
+              </Text>
+              <Image src={ModalBack.src} boxSize={"1rem"}></Image>
+            </Flex>
+          </Flex>
+        ),
+      });
+      return;
+    }
+    const [err, res] = await errorCaptureRes(collectionsList, {
+      user_id: +userId as number,
+    });
+    let defaultCollectionIds = [];
+    console.log(res.data);
+    if (res) {
+      // 筛选出 is_default 为 true 的 collection
+      const defaultCollection = res.data.filter(
+        (collection: { is_default: boolean }) => collection.is_default === true
+      );
+
+      // 提取 collection_id
+      defaultCollectionIds = defaultCollection.map(
+        (collection: { collection_id: any }) => collection.collection_id
+      );
+    }
+    const [err2, res2] = await errorCaptureRes(fetchAddImage, {
+      image_urls: list,
+      collection_id: defaultCollectionIds[0],
+    });
+
+    if (res2?.success) {
+      setJionLike((pre) => {
+        return [...pre, ...list];
+      });
     }
   };
 
@@ -137,7 +321,7 @@ function Page() {
               </a>
               <Image
                 boxSize={"2.25rem"}
-                src={Like.src}
+                src={jionLike.includes(selectImage) ? Liked.src : Like.src}
                 onClick={() => {
                   AddImage([selectImage]);
                   toaster.create({
@@ -364,9 +548,10 @@ function Page() {
                   boxSize={"2.25rem"}
                   src={Like.src}
                   onClick={() => {
+                    console.log(111111111, selectImage, jionLike);
                     AddImage(likeList);
                   }}
-                ></Image>
+                />
               </Flex>
               <Flex
                 width="2.5rem"
