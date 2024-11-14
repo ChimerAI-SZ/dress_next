@@ -1,17 +1,13 @@
 import { Group, Flex, Image, Text } from "@chakra-ui/react";
 import { Button } from "@components/ui/button";
-import {
-  DialogContent,
-  DialogRoot,
-} from "@components/ui/dialog";
+import { DialogContent, DialogRoot } from "@components/ui/dialog";
 
-
-import 'react-phone-number-input/style.css'
-import PhoneInput from 'react-phone-number-input'
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 
 import Phone from "@img/phone.svg";
 
-import './index.css'
+import "./index.css";
 
 interface DialogComponentProps {
   isOpen: boolean;
@@ -31,7 +27,7 @@ const Component: React.FC<DialogComponentProps> = ({
 }) => {
   return (
     <DialogRoot open={isOpen} placement="center" motionPreset="slide-in-bottom">
-      <DialogContent width="18.44rem">
+      <DialogContent width="20.44rem">
         <Flex
           background="linear-gradient( 180deg, #E7F0FF 0%, rgba(255,255,255,0) 100%)"
           alignItems={"center"}
@@ -68,10 +64,12 @@ const Component: React.FC<DialogComponentProps> = ({
             borderRadius="0.5rem"
           >
             <PhoneInput
-              className="shipping_address_phone_number" 
+              className="shipping_address_phone_number"
               placeholder="Enter phone number"
               value={phoneNumber}
-              onChange={(value)=>{console.log(value)}}
+              onChange={(value) => {
+                console.log(value);
+              }}
             />
           </Group>
         </Flex>

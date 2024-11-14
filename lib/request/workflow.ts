@@ -26,7 +26,7 @@ export const dressPatternVariation = (params: object) => {
 // B7 全维度保持50%(70s)
 export const dressVariation50PCT = (params: object) => {
   return server.post("/v1/dress_variation_50PCT", {
-    userUUID: userId,
+    userUUID: userId || "123131",
     batchSize: 1,
     ...params,
   });
@@ -68,7 +68,7 @@ export const TransferAAndBPlus = (params: object) => {
 };
 export const TransferAAndBVITG = (params: object) => {
   return server.post("/v1/Transfer_A_And_B_VIT_G", {
-    userUUID: userId,
+    userUUID: userId || "123131",
     ...params,
   });
 };
