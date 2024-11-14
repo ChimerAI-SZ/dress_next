@@ -1,25 +1,22 @@
-"use client";
 import React, {
   useState,
   useRef,
   useEffect,
   Suspense,
+  SetStateAction,
   useCallback,
 } from "react";
+import axios from "axios";
 import Masonry from "react-masonry-css";
-import { Box, Flex, Spinner, useDisclosure, Image } from "@chakra-ui/react";
-import { css, Global, keyframes } from "@emotion/react";
-import styled from "@emotion/styled";
+import { Box, Image, Flex, Spinner, Alert } from "@chakra-ui/react";
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
-
-import loadingIcon from "@img/mainPage/loading.svg";
 interface Item {
   image_url: string;
   ID: number;
   url: string;
 }
-
+import { css, Global, keyframes } from "@emotion/react";
 const masonryStyles = css`
   .my-masonry-grid {
     display: flex;
@@ -33,24 +30,17 @@ const masonryStyles = css`
   }
 `;
 
-const breakpointColumnsObj = {
-  default: 3,
-  1100: 3,
-  700: 3,
-  500: 2,
-};
-
-const Waterfall: React.FC = () => {
+const Waterfall = () => {
   const [visibleImage, setVisibleImage] = useState<string | null>(null);
+  const hasFetched = useRef(false);
   const [imageList, setImageList] = useState<Item[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const loaderRef = useRef(null);
-  const { onOpen } = useDisclosure();
+  const [selectedSrc, setSelectedSrc] = useState("");
   const observer = useRef<IntersectionObserver | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchData = useCallback(
     async (callback?: () => void) => {
@@ -59,7 +49,7 @@ const Waterfall: React.FC = () => {
       const [err, res] = await errorCaptureRes(fetchHomePage, {
         limit: 10,
         offset: page * 10,
-        library: "top_sales",
+        library: "show",
       });
 
       if (res) {
@@ -76,52 +66,87 @@ const Waterfall: React.FC = () => {
     [hasMore, page]
   );
 
-  const hasFetchedOnce = useRef(false);
+  useEffect(() => {
+    if (!hasFetched.current) {
+      fetchData(); // 只在第一次进入页面时请求
+      hasFetched.current = true; // 设置为 true，表示已经请求过
+    }
+  }, []);
 
   useEffect(() => {
-    if (!hasFetchedOnce.current) {
-      fetchData(); // 只在第一次进入页面时请求
-      hasFetchedOnce.current = true; // 设置为 true，表示已经请求过
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchData(); // 只在元素进入视口时调用 fetchData
+      }
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current); // 观察 loader 元素
     }
+
+    return () => observer.disconnect(); // 清除观察器
   }, [fetchData]);
+
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 3,
+    700: 3,
+    500: 2,
+  };
+  // 使用 useCallback 保持 observer 的稳定性
+  const lastImageRef = useCallback(
+    (node: any) => {
+      if (loading) return; // 如果正在加载，避免重复请求
+      if (observer.current) observer.current.disconnect(); // 断开之前的 observer
+
+      // 绑定新的 IntersectionObserver
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            fetchData(); // 当最后一张图片进入视口时加载更多
+          }
+        },
+        {
+          root: null, // 默认为视口
+          rootMargin: "10px", // 提前 10px 触发懒加载
+          threshold: 0.1, // 目标元素进入视口 10% 时触发
+        }
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, fetchData]
+  );
 
   return (
     <>
       <Global styles={masonryStyles} />
-      <Box ref={containerRef} position={"relative"}>
-        <Box
-          className="main-page-hidden-loading-icon"
-          position={"absolute"}
-          top={"-40pt"}
-          left={"50%"}
-          transform={"translateX(-50%)"}
-        >
-          <StyledLoading
-            src={loadingIcon.src}
-            alt="loading-icon"
-            boxSize="24pt"
-          />
-        </Box>
+      <Box>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="my-masonry-grid"
           columnClassName="my-masonry-grid_column"
         >
           {imageList.map((item, index) => (
-            <Suspense fallback={<div>Loading...</div>} key={item.ID}>
+            <Suspense
+              fallback={<div>Loading...</div>}
+              key={`${item.ID}-${index}`}
+            >
               <Image
                 src={item.image_url}
                 alt="Displayed Image"
                 width="100%"
                 style={{ display: "block" }}
                 borderRadius="4px"
+                ref={index === imageList.length - 1 ? lastImageRef : null}
+                mb="16px"
               />
             </Suspense>
           ))}
         </Masonry>
-        <Box ref={loaderRef} mt={4}>
+        <Box>
           {loading && (
-            <Flex justify="center" align="center">
+            <Flex justify="center" align="center" mt={4}>
               <Spinner size="lg" />
             </Flex>
           )}
@@ -130,17 +155,5 @@ const Waterfall: React.FC = () => {
     </>
   );
 };
-
-const spin = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-const StyledLoading = styled(Image)`
-  animation: ${spin} 2s linear infinite; /* 旋转动画持续2秒，线性变化，无限循环 */
-`;
 
 export default Waterfall;
