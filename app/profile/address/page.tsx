@@ -5,52 +5,19 @@ import { useRouter } from "next/navigation"
 import styled from "@emotion/styled"
 import { storage } from "@utils/index"
 
-import { Container, Grid, For, Image, Box, Button, Show, Flex } from "@chakra-ui/react"
+import { Container, For, Image, Box, Button, Show, Flex } from "@chakra-ui/react"
 import { RightOutlined } from "@ant-design/icons"
 
-import Link from "next/link"
 
+import { shippingAddressType } from '@definitions/profile'
 import { queryAllAddress } from "@lib/request/profile"
 
 import addressIcon from "@img/homepage/address.svg"
 
 import Header from "../components/Header"
 
-const addressList = [
-  {
-    id: "1",
-    isDefault: true,
-    name: "Agnes Vaughn",
-    phone: "+86 16298289",
-    address: "3411 Chestnut St",
-    city: "Philadelphia",
-    state: "PA19104",
-    country: "United States"
-  },
-  {
-    id: "2",
-    isDefault: false,
-    name: "Agnes Vaughn",
-    phone: "+86 16298289",
-    address: "3411 Chestnut St",
-    city: "Philadelphia",
-    state: "PA19104",
-    country: "United States"
-  },
-  {
-    id: "3",
-    isDefault: false,
-    name: "Agnes Vaughn",
-    phone: "+86 16298289",
-    address: "3411 Chestnut St",
-    city: "Philadelphia",
-    state: "PA19104",
-    country: "United States"
-  }
-]
-
 const EditAvatar: React.FC = () => {
-  const [addressList, setAddressList] = useState([])
+  const [addressList, setAddressList] = useState<shippingAddressType[]>([])
   const router = useRouter()
 
   // 新增地址或修改地址事件
@@ -65,6 +32,17 @@ const EditAvatar: React.FC = () => {
     }
     const { success, data, message } = await queryAllAddress(params)
     if (success) {
+      // 把默认数据放在最前面
+      data.sort((a:shippingAddressType, b:shippingAddressType) => {
+        if (a.is_default && !b.is_default) {
+          return -1;
+        }
+        if (!a.is_default && b.is_default) {
+          return 1;
+        }
+        return 0;
+      });
+      
       setAddressList(data)
     } else {
       //todo error hanlder
@@ -80,30 +58,31 @@ const EditAvatar: React.FC = () => {
     <Container className="homepage-address-contaienr" p={"0"} zIndex={1}>
       <Header title="Shipping Address" />
       <For each={addressList}>
-        {(item, index) => {
+        {(item: shippingAddressType, index) => {
           return (
-            // <AddressWrapper key={item.id} isDefault={item.isDefault}>
-            //   <Flex alignItems={"center"} justifyContent={"space-between"} mb={"6pt"}>
-            //     <Show when={item.isDefault} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
-            //       <DefaultMark>Default</DefaultMark>
-            //     </Show>
-            //     <RightOutlined
-            //       onClick={() => {
-            //         jump(item.id)
-            //       }}
-            //     />
-            //   </Flex>
-            //   <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
-            //     <span>{item.address},</span>
-            //     <span>{item.city},</span>
-            //     <span>{item.state},</span>
-            //     <span>{item.country}</span>
-            //   </Flex>
-            //   <Box color={"#737373"} fontWeight={"400"} fontSize={"0.9rem"}>
-            //     {item.name} | {item.phone}
-            //   </Box>
-            // </AddressWrapper>
-            <div></div>
+            <AddressWrapper key={item.address_id} isDefault={item.is_default}>
+              <Flex alignItems={"center"} justifyContent={"space-between"} mb={"6pt"}>
+                <Show when={item.is_default} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
+                  <DefaultMark>Default</DefaultMark>
+                </Show>
+                <RightOutlined
+                  onClick={() => {
+                    jump(item.address_id + '')
+                  }}
+                />
+              </Flex>
+              <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
+                <span>{item.street_address_1},</span>
+                <Show when={item.street_address_2}><span>{item.street_address_2},</span></Show>
+                <span>{item.state},</span>
+                <span>{item.city},</span>
+                <span>{item.postal_code},</span>
+                <span>{item.country}</span>
+              </Flex>
+              <Box color={"#737373"} fontWeight={"400"} fontSize={"0.9rem"}>
+                {item.full_name} | {item.phone_number}
+              </Box>
+            </AddressWrapper>
           )
         }}
       </For>

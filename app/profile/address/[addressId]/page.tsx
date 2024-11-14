@@ -1,6 +1,5 @@
 "use client"
 import React from "react"
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 
@@ -48,6 +47,10 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
   // 表单最终提交逻辑
   const onSubmit = async (formData: FormValues) => {
     console.log("submit data:", formData)
+
+    // Checkbox组件被选中时会返回‘on'
+    formData.is_default = !/false/.test(formData.is_default + '')
+
     const user_id = storage.get("user_id")
     const params = {
       user_id: +(user_id ? user_id : "0"),
@@ -63,7 +66,6 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
         content: message
       })
     }
-    // addAddress
   }
 
   return (
