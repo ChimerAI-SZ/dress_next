@@ -25,7 +25,7 @@ interface FormValues {
   street_address_1: string
   street_address_2: string
   city: string
-  phone: string
+  phone_number: string
   state: string
   postal_code: string
   is_default: boolean
@@ -234,12 +234,12 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
 
-                <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
-                  <PhoneInputWithCountry className="shipping_address_phone_number" name="phone" control={control} rules={{ required: true }} />
+                <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone_number}>
+                  <PhoneInputWithCountry className="shipping_address_phone_number" name="phone_number" control={control} rules={{ required: true }} />
 
-                  {errors.phone && (
+                  {errors.phone_number && (
                     <Text color="red.500" fontSize="0.75rem">
-                      {errors.phone.message}
+                      {errors.phone_number.message}
                     </Text>
                   )}
                 </Field>

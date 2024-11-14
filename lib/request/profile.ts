@@ -37,7 +37,7 @@ interface addAddressProps {
   street_address_1: string
   street_address_2?: string
   city: string
-  phone: string
+  phone_number: string
   state: string
   postal_code: string
   is_default: boolean
