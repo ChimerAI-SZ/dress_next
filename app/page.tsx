@@ -1,18 +1,42 @@
 "use client"
 
 import { useRef, useEffect } from "react"
-import { Container, Box, Flex, Link, Image, Button, Text, useDisclosure } from "@chakra-ui/react"
+import { Container, Box, Flex, Link, Image, Button,For } from "@chakra-ui/react"
 import styled from "@emotion/styled"
 
 import Waterfall from "./components/Waterfall"
 import { useRouter } from "next/navigation"
-// import ImageGuideModal from "../components/Common/ImageGuideModal";
+
+// header 右侧按钮
+const headerIconList= [
+  {
+    key: 'favorites',
+    link: '/favorites',
+    imgUrl: '/assets/images/mainPage/like.svg',
+  },
+  {
+    key: 'history',
+    link: '/history',
+    imgUrl: '/assets/images/mainPage/history.svg',
+  },
+  {
+    key: 'profile',
+    link: '/profile',
+    imgUrl: '/assets/images/mainPage/homepage.svg',
+  },
+]
 
 function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
   const router = useRouter()
 
   const headerRef = useRef<HTMLDivElement>(null) // 容器ref
+
+  // 页面跳转
+  const handleJump= (link: string) => {
+    // 没有登陆的话去往登陆页面
+    router.push(!localStorage.getItem('user_id') ? '/login' : link)
+  }
 
   // header 在页面滚动之后设置白色背景色
   useEffect(() => {
@@ -60,18 +84,11 @@ function Dashboard() {
           <Image w={"150px"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
 
           <Flex gap="0.5rem">
-            {/* 收藏 */}
-            <Link href="/favorites">
-              <Image src="/assets/images/mainPage/like.svg" alt="Favorites" boxSize="22pt" cursor="pointer" />
-            </Link>
-            {/* 生成历史 */}
-            <Link href="/history">
-              <Image src="/assets/images/mainPage/history.svg" alt="History" boxSize="22pt" cursor="pointer" />
-            </Link>
-            {/* 个人主页 */}
-            <Link href="/profile">
-              <Image src="/assets/images/mainPage/homepage.svg" alt="Profile" boxSize="22pt" cursor="pointer" />
-            </Link>
+            <For each={headerIconList}>
+              {(item, index: number): React.ReactNode => {
+                return  <Image onClick={() => handleJump(item.link)} key={item.key} src={item.imgUrl} alt={`${item.key}-icon`} boxSize="22pt" cursor="pointer" />
+              }}
+            </For>
           </Flex>
         </Flex>
 

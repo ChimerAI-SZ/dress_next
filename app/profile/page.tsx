@@ -89,7 +89,6 @@ function Profile() {
   }
 
   useEffect(() => {
-    // query home page data
     queryData()
   }, [])
 

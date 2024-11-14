@@ -1,10 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Container, Grid, For, Image, Box, Button, Show, Flex } from '@chakra-ui/react'
+import { Container,  For, Image, Show } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
 import styled from '@emotion/styled'
-import { RightOutlined } from '@ant-design/icons'
 
 import logoutIcon from '@img/homepage/logoutIcon.svg'
 import resetPwdIcon from '@img/homepage/resetPwdIcon.svg'
@@ -41,10 +39,6 @@ const EditAvatar: React.FC = () => {
       router.push('/retrieve-password')
     }
   }
-
-  useEffect(() => {
-    // query address list
-  }, [])
 
   return (
     <Container className="homepage-edit-avatar-contaienr" p={'0'} zIndex={1}>
