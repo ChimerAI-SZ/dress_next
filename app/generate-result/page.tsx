@@ -87,7 +87,14 @@ function Page() {
       <Header show noTitle cb={cb}></Header>
       <Toaster />
       <Flex height="28.59rem" w={"full"} justifyContent={"center"}>
-        <Box height="28.59rem" w={"21.44rem"} position={"relative"}>
+        <Box
+          height="28.59rem"
+          w={"21.44rem"}
+          position={"relative"}
+          borderRadius="0.63rem"
+          border="0.03rem solid #CACACA"
+          overflow={"hidden"}
+        >
           <Image
             h={"100%"}
             w={"21.44rem"}
@@ -183,7 +190,7 @@ function Page() {
             top={"0px"}
             left={"0px"}
           >
-            <Text color="#FFFFFF" fontSize="0.63rem" alignItems={"center"}>
+            <Text color="#FFFFFF" fontSize="0.63rem" textAlign={"center"}>
               Original
             </Text>
           </Box>

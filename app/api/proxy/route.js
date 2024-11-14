@@ -1,50 +1,37 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export async function POST(req) {
-  console.log('Received POST request at /api/proxy');
-  
+export async function GET(req) {
   try {
-    // 解析请求体
-    const body = await req.json();
-    const path = body.path;
-    
-    if (!path) {
-      throw new Error('Missing "path" in request body');
+    // 获取查询参数
+    const { searchParams } = new URL(req.url);  // req.url 为请求的完整 URL
+    const imageUrl = searchParams.get("image_url");  // 获取 image_url 参数
+    console.log(imageUrl);
+
+    // 确保获取到必要的参数
+    if (!imageUrl) {
+      return NextResponse.json({ error: "Missing required query parameters: image_url" }, { status: 400 });
     }
-    
-    // 构建目标 API URL
-    const apiUrl = `http://47.252.2.86:11118/v1/${path}`;
-    
-    // 删除 path 属性，不将其转发给远程 API
-    delete body.path;
 
-    console.log('Request body:', JSON.stringify(body)); // 打印请求体的字符串
+    // 拼接 API 请求的 URL，传递 image_url 参数
+    const apiUrl = `http://fashion.xenotech.studio/api/searchImage/?image_url=${encodeURIComponent(imageUrl)}`;
 
-    // 发送请求到远程 API
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
+    // 发送 GET 请求到目标 API
+    const response = await fetch(apiUrl, { method: "GET" });
 
-    // 如果响应失败，则抛出错误
+    // 检查响应是否成功
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${errorText}`);
+      throw new Error(`API Error: ${response.statusText}`);
     }
 
-    // 解析远程 API 返回的 JSON 数据
+    // 直接返回目标 API 的响应数据
     const data = await response.json();
+    const result = Array.isArray(data) ? data[1] : data;  // 如果是数组，取第一个元素
+    console.log("Processed API response:", result);
     
-    // 返回代理的响应
-    return NextResponse.json(data, { status: response.status });
-  
+    return NextResponse.json(result, { status: response.status });
+    
   } catch (error) {
-    console.error('Proxy error:', error.message);
-    
-    // 返回错误响应
-    return NextResponse.json(
-      { error: `Failed to proxy the request: ${error.message}` },
-      { status: 500 }
-    );
+    console.error("Proxy error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

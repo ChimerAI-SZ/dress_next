@@ -50,18 +50,17 @@ function Page() {
           <Flex
             alignItems="center"
             justifyContent="center"
-            mt={"0.56rem"}
             width="full"
             position="relative"
             cursor={"pointer"}
+            mt={"0.7rem"}
           >
             <DrawerActionTrigger asChild>
               <Image
                 src={Close.src}
-                w={"0.81rem"}
-                h={"0.81rem"}
+                boxSize="1.3rem"
                 position="absolute"
-                left="0.7rem"
+                left="1rem"
                 top="50%"
                 transform="translateY(-50%)"
               />
@@ -70,7 +69,7 @@ function Page() {
               fontSize="1.06rem"
               fontWeight="500"
               letterSpacing="0.1rem"
-              fontFamily="Arial"
+              fontFamily="PingFangSC, PingFang SC"
               textAlign="center"
               color="#171717"
             >
@@ -79,22 +78,23 @@ function Page() {
           </Flex>
           <Text
             mb={4}
-            color="gray"
-            fontFamily="Arial"
+            color="#404040"
+            fontFamily="PingFangSC, PingFang SC"
             fontSize="0.8rem"
             fontWeight="400"
             px={"0.75rem"}
+            mt={"1.06rem"}
           >
             In order to have a better generative result, please upload a full
-            display of the dress, as shown below:
+            display of the dress's, as shown below：
           </Text>
           <VStack align="stretch" h="47vh" overflowY="auto" px={"0.75rem"}>
-            <Box>
+            <Box mb={"0.5rem"}>
               <Text
                 mb={2}
                 fontFamily="PingFang SC"
-                fontSize="0.8rem"
-                fontWeight="400"
+                fontSize="1rem"
+                fontWeight="600"
               >
                 Outfit
               </Text>
@@ -108,12 +108,12 @@ function Page() {
                 />
               </Grid>
             </Box>
-            <Box>
+            <Box mb={"0.5rem"}>
               <Text
                 mb={2}
                 fontFamily="PingFang SC"
-                fontSize="0.8rem"
-                fontWeight="400"
+                fontSize="1rem"
+                fontWeight="600"
               >
                 Print
               </Text>
@@ -130,12 +130,12 @@ function Page() {
                 />
               </Grid>
             </Box>
-            <Box>
+            <Box mb={"0.5rem"}>
               <Text
                 mb={2}
                 fontFamily="PingFang SC"
-                fontSize="0.8rem"
-                fontWeight="400"
+                fontSize="1rem"
+                fontWeight="600"
               >
                 Fabric
               </Text>

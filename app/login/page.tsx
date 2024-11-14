@@ -2,24 +2,22 @@
 import {
   Button,
   Input,
-  Container,
   VStack,
   Text,
   Flex,
   Fieldset,
   Box,
-  Image,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Field } from "@components/ui/field";
 import { InputGroup } from "@components/ui/input-group";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { fetchLogin } from "@lib/request/login";
 import { errorCaptureRes, storage } from "@utils/index";
 import Bg from "@img/login/bg.png";
 import { Toaster, toaster } from "@components/Toaster";
+
 interface FormValues {
   email: string;
   first: string;
@@ -28,13 +26,13 @@ interface FormValues {
   password: string;
 }
 
-// 定义页面状态
-
 const Page = () => {
   const router = useRouter();
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isUppercaseValid, setIsUppercaseValid] = useState(false);
   const [isNumberValid, setIsNumberValid] = useState(false);
+  const [emailError, setEmailError] = useState<string>("");
+
   const {
     register,
     handleSubmit,
@@ -42,15 +40,43 @@ const Page = () => {
     setError,
     watch,
   } = useForm<FormValues>();
-  // 使用 watch 获取当前表单中的 email 值
   const email = watch("email");
   const password = watch("password");
+
   useEffect(() => {
-    setIsLengthValid(password?.length >= 8); // 检查密码长度
-    setIsUppercaseValid(/[A-Z]/.test(password) && /[a-z]/.test(password)); // 检查大小写字母
-    setIsNumberValid(/\d/.test(password)); // 检查是否包含数字
+    setIsLengthValid(password?.length >= 8);
+    setIsUppercaseValid(/[A-Z]/.test(password) && /[a-z]/.test(password));
+    setIsNumberValid(/\d/.test(password));
   }, [password]);
-  // 处理发送验证码逻辑
+
+  // 邮箱格式验证
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    // 匹配不合法字符，包括中文字符和其他符号
+    const invalidSymbolsRegex = /[^\x00-\x7F]/; // 这个正则会匹配非ASCII字符，也可以匹配中文字符
+    if (invalidSymbolsRegex.test(value)) {
+      return "Invalid email format";
+    }
+    if (!emailRegex.test(value)) {
+      return "Invalid email format";
+    }
+    return true;
+  };
+
+  // 处理输入过程中校验
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // 正则检测非法字符（包含中文符号、标点符号）
+    const invalidSymbolsRegex = /[^\x00-\x7F]/; // 匹配非ASCII字符（例如中文）
+    if (invalidSymbolsRegex.test(value)) {
+      setEmailError("Invalid email format"); // 如果包含非法字符，给出提示
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
+      setEmailError("Invalid email format"); // 邮箱格式不对时提示
+    } else {
+      setEmailError(""); // 如果没有错误，清除错误提示
+    }
+  };
+
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchLogin, data);
     if (res.success) {
@@ -65,7 +91,6 @@ const Page = () => {
     }
   };
 
-  // 表单最终提交逻辑
   const onSubmit = (data: FormValues) => {
     console.log("Registration data:", data);
     // 执行最终注册逻辑
@@ -129,10 +154,7 @@ const Page = () => {
                   <Input
                     {...register("email", {
                       required: "Email is required",
-                      pattern: {
-                        value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                        message: "Invalid email format",
-                      },
+                      validate: validateEmail,
                     })}
                     name="email"
                     type="email"
@@ -143,11 +165,12 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none",
                     }}
+                    onChange={handleEmailChange}
                   />
                 </InputGroup>
-                {errors.email && (
+                {emailError && (
                   <Text color="red.500" fontSize="0.75rem">
-                    {errors.email.message}
+                    {emailError} {/* 显示动态错误提示 */}
                   </Text>
                 )}
               </Field>

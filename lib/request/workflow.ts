@@ -1,10 +1,15 @@
 // 生成页面
-import axios from "../workflow-axios";
+import server from "../workflow-axios";
 import { errorCaptureRes, storage } from "@utils/index";
+import axios from "axios";
 const userId = storage.get("user_id");
+
+export const searchImage = (params: string) => {
+  return axios.get(`/api/proxy?image_url=${params}`);
+};
 // B1 全维度保持80%(77s)
 export const dressVariation20PCT = (params: object) => {
-  return axios.post("/v1/dress_variation_20PCT", {
+  return server.post("/v1/dress_variation_20PCT", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -12,7 +17,7 @@ export const dressVariation20PCT = (params: object) => {
 };
 // B2 版型变化(76s)
 export const dressPatternVariation = (params: object) => {
-  return axios.post("/v1/dress_pattern_variation", {
+  return server.post("/v1/dress_pattern_variation", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -20,7 +25,7 @@ export const dressPatternVariation = (params: object) => {
 };
 // B7 全维度保持50%(70s)
 export const dressVariation50PCT = (params: object) => {
-  return axios.post("/v1/dress_variation_50PCT", {
+  return server.post("/v1/dress_variation_50PCT", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -29,7 +34,7 @@ export const dressVariation50PCT = (params: object) => {
 
 // 固定/随机版型印花上身(122s)
 export const dressPrintingTryon = (params: object) => {
-  return axios.post("/v1/dress_printing_tryon", {
+  return server.post("/v1/dress_printing_tryon", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -38,7 +43,7 @@ export const dressPrintingTryon = (params: object) => {
 
 // 提示词生成印花
 export const generatePrintingFromPrompt = (params: object) => {
-  return axios.post("/v1/generate_printing_from_prompt", {
+  return server.post("/v1/generate_printing_from_prompt", {
     userUUID: userId,
     batchSize: 3,
     ...params,
@@ -47,7 +52,7 @@ export const generatePrintingFromPrompt = (params: object) => {
 
 // 提示词生成印花
 export const generatePrintingSparseArrange = (params: object) => {
-  return axios.post("/v1/generate_printing_sparse_arrange", {
+  return server.post("/v1/generate_printing_sparse_arrange", {
     userUUID: userId,
     batchSize: 3,
     ...params,
@@ -55,17 +60,28 @@ export const generatePrintingSparseArrange = (params: object) => {
 };
 
 // a and b
-export const transferAAndB = (params: object) => {
-  return axios.post("/v1/transfer_a_and_b", {
+export const TransferAAndBPlus = (params: object) => {
+  return server.post("/v1/Transfer_A_And_B_Plus", {
     userUUID: userId,
-    batchSize: 3,
+    ...params,
+  });
+};
+export const TransferAAndBVITG = (params: object) => {
+  return server.post("/v1/Transfer_A_And_B_VIT_G", {
+    userUUID: userId,
+    ...params,
+  });
+};
+export const TransferAAndBSTANDARD = (params: object) => {
+  return server.post("/v1/Transfer_A_And_B_STANDARD", {
+    userUUID: userId,
     ...params,
   });
 };
 
 // B3 印花变化(65s)
 export const dressPrintingVariation = (params: object) => {
-  return axios.post("/v1/dress_printing_variation", {
+  return server.post("/v1/dress_printing_variation", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -74,7 +90,7 @@ export const dressPrintingVariation = (params: object) => {
 
 // B6 颜色变化(43s)
 export const garmentColorVariation = (params: object) => {
-  return axios.post("/v1/garment_color_variation", {
+  return server.post("/v1/garment_color_variation", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -83,7 +99,7 @@ export const garmentColorVariation = (params: object) => {
 
 // 排列印花图案生成(69s)
 export const generateTiledPrinting = (params: object) => {
-  return axios.post("/v1/generate_tiled_printing", {
+  return server.post("/v1/generate_tiled_printing", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -91,7 +107,7 @@ export const generateTiledPrinting = (params: object) => {
 };
 // 图案元素生成(22s)
 export const generatePrintingElement = (params: object) => {
-  return axios.post("/v1/generate_printing_element", {
+  return server.post("/v1/generate_printing_element", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -99,7 +115,7 @@ export const generatePrintingElement = (params: object) => {
 };
 // 文字logo印花元素生成(20s)
 export const printingLogoVariation = (params: object) => {
-  return axios.post("/v1/printing_logo_variation", {
+  return server.post("/v1/printing_logo_variation", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -107,7 +123,7 @@ export const printingLogoVariation = (params: object) => {
 };
 // 生成中途反馈测试
 export const progressFeedbackTest = (params: object) => {
-  return axios.post("/v1/progress_feedback_test", {
+  return server.post("/v1/progress_feedback_test", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -116,7 +132,7 @@ export const progressFeedbackTest = (params: object) => {
 
 // 面料+工艺
 export const transferFabricAndWorkmanship = (params: object) => {
-  return axios.post("/v1/transfer_fabric_and_workmanship", {
+  return server.post("/v1/transfer_fabric_and_workmanship", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -124,7 +140,7 @@ export const transferFabricAndWorkmanship = (params: object) => {
 };
 // 结构+颜色
 export const transferStructureAndColor = (params: object) => {
-  return axios.post("/v1/transfer_structure_and_color", {
+  return server.post("/v1/transfer_structure_and_color", {
     userUUID: userId,
     batchSize: 1,
     ...params,
@@ -133,5 +149,5 @@ export const transferStructureAndColor = (params: object) => {
 
 // 通过taskid拿结果
 export const getResult = (params: object) => {
-  return axios.post("/v1/img2img/query", params);
+  return server.post("/v1/img2img/query", params);
 };
