@@ -17,7 +17,7 @@ export async function GET(req) {
 
     // 发送 GET 请求到目标 API
     const response = await fetch(apiUrl, { method: "GET" });
-
+console.log("response",response);
     // 检查响应是否成功
     if (!response.ok) {
       throw new Error(`API Error: ${response.statusText}`);
