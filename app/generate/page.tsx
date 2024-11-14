@@ -13,6 +13,7 @@ import { workflow } from "./workflow/workflow";
 import { getQuery } from "@lib/request/generate";
 import { fetchUtilWait } from "@lib/request/generate";
 import { errorCaptureRes } from "@utils/index";
+import { Alert } from "@components/Alert";
 import {
   CircularProgressbarWithChildren,
   buildStyles,
@@ -42,6 +43,10 @@ function Page() {
         total_messages: Math.ceil(res.total_messages / 3.5),
         wait_time: Math.ceil(res.wait_time / 60),
       }));
+    } else {
+      Alert.open({
+        content: res.message,
+      });
     }
   };
 
@@ -135,7 +140,7 @@ function Page() {
         fetchData();
         console.log("All tasks complete or no tasks left.");
       }
-    }, 15000);
+    }, 5000);
 
     return () => {
       console.log("Cleaning up interval");

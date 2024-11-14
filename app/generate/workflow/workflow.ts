@@ -9,9 +9,9 @@ import {
   TransferAAndBPlus,
   TransferAAndBVITG,
   TransferAAndBSTANDARD,
-  getResult,
   searchImage,
 } from "@lib/request/workflow"; // B1 全维度保持80%(77s)
+import { getQuery } from "@lib/request/generate";
 import { fetchHomePage } from "@lib/request/page";
 import { errorCaptureRes } from "@utils/index";
 export const workflow = async (p: Params) => {
@@ -68,6 +68,7 @@ export const workflow = async (p: Params) => {
       offset: Math.floor(Math.random() * 45),
       library: "top_sales",
     });
+
     console.log(res.data);
     const results = await Promise.allSettled([
       generatePrintingSparseArrange({
@@ -125,15 +126,17 @@ export const workflow = async (p: Params) => {
         for (let index = 0; index < midTaskIDs.length; index++) {
           const taskID = midTaskIDs[index];
           try {
-            const result = await getResult({ taskID });
-            const { progress, imageFiles } = result.data;
-            if (result && progress === 100) {
+            const resultData: any = await getQuery({ taskID });
+            const { result, success, message } = resultData || {};
+            if (success) {
               console.log(`Task ${taskID} completed`);
               midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
-              imageFiles.forEach((element: { url: any }, index: number) => {
-                const newUrl = `${element.url}?id=${taskID}`;
-                midImage.push(newUrl);
-              });
+              midImage.push(result.res);
+            } else {
+              console.log(`Task ${taskID} still in progress`);
+            }
+            if (message !== "Task is running") {
+              midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
             }
           } catch (error) {
             console.error(`Error fetching result for task ${taskID}:`, error);
@@ -245,15 +248,17 @@ export const workflow = async (p: Params) => {
         for (let index = 0; index < midTaskIDs.length; index++) {
           const taskID = midTaskIDs[index];
           try {
-            const result = await getResult({ taskID });
-            const { progress, imageFiles } = result.data;
-            if (result && progress === 100) {
+            const resultData: any = await getQuery({ taskID });
+            const { result, success, message } = resultData || {};
+            if (success) {
               console.log(`Task ${taskID} completed`);
               midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
-              imageFiles.forEach((element: { url: any }, index: number) => {
-                const newUrl = `${element.url}?id=${taskID}`;
-                midImage.push(newUrl);
-              });
+              midImage.push(result.res);
+            } else {
+              console.log(`Task ${taskID} still in progress`);
+            }
+            if (message !== "Task is running") {
+              midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
             }
           } catch (error) {
             console.error(`Error fetching result for task ${taskID}:`, error);
@@ -356,17 +361,17 @@ export const workflow = async (p: Params) => {
         for (let index = 0; index < midTaskIDs.length; index++) {
           const taskID = midTaskIDs[index];
           try {
-            const result = await getResult({ taskID });
-            const { progress, imageFiles } = result.data;
-
-            if (result && progress === 100) {
+            const resultData: any = await getQuery({ taskID });
+            const { result, success, message } = resultData || {};
+            if (success) {
               console.log(`Task ${taskID} completed`);
               midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
-
-              imageFiles.forEach((element: { url: any }) => {
-                const newUrl = `${element.url}?id=${taskID}`;
-                midImage.push(newUrl);
-              });
+              midImage.push(result.res);
+            } else {
+              console.log(`Task ${taskID} still in progress`);
+            }
+            if (message !== "Task is running") {
+              midTaskIDs = midTaskIDs.filter((id) => id !== taskID);
             }
           } catch (error) {
             console.error(`Error fetching result for task ${taskID}:`, error);

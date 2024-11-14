@@ -25,6 +25,7 @@ import {
   encryptData,
   arrayBufferToBase64,
 } from "../utils";
+import { Alert } from "@components/Alert";
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,6 +73,9 @@ const Page = () => {
     if (res) {
       setSeconds(60);
       setCanResend(false);
+      Alert.open({
+        content: "Sent Successfully!",
+      });
     }
   };
 

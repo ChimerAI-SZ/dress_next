@@ -13,6 +13,7 @@ import { PinInput } from "@components/ui/pin-input";
 import { useSearchParams, useRouter } from "next/navigation";
 import Back from "@img/login/back.svg";
 import { useState, useEffect } from "react";
+import { Alert } from "@components/Alert";
 import {
   fetchCheckEmail,
   fetchRegister,
@@ -50,6 +51,9 @@ const Page = () => {
     if (res) {
       setSeconds(60);
       setCanResend(false);
+      Alert.open({
+        content: "Sent Successfully!",
+      });
     }
   };
 

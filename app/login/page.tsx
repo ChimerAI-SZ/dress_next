@@ -17,7 +17,7 @@ import { fetchLogin } from "@lib/request/login";
 import { errorCaptureRes, storage } from "@utils/index";
 import Bg from "@img/login/bg.png";
 import { Toaster, toaster } from "@components/Toaster";
-
+import { Alert } from "@components/Alert";
 interface FormValues {
   email: string;
   first: string;
@@ -84,9 +84,8 @@ const Page = () => {
       storage.set("token", res.data.token);
       router.push("/");
     } else {
-      toaster.create({
-        title: res.message,
-        type: "error",
+      Alert.open({
+        content: res.message,
       });
     }
   };
@@ -256,11 +255,14 @@ const Page = () => {
       <Flex
         alignItems={"center"}
         justifyContent={"center"}
-        position="fixed"
-        bottom="2.25rem"
+        position="relative" // 取消固定定位
+        bottom="0"
         width={"100vw"}
         left="50%"
         transform="translateX(-50%)"
+        zIndex={0}
+        mt="auto" // 这个可以确保元素被推到页面的底部
+        mb={"1.5rem"}
       >
         <Text
           fontFamily="PingFangSC, PingFang SC"

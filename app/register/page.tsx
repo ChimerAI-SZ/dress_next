@@ -323,7 +323,7 @@ const Page = () => {
           </Fieldset.Root>
         </VStack>
 
-        <VStack pb="4rem" w="100%">
+        <VStack w="100%">
           <Button
             onClick={handleSubmit(handleSendCode)}
             width="20.44rem"
@@ -350,6 +350,38 @@ const Page = () => {
           </Button>
         </VStack>
       </form>
+      <Flex
+        alignItems={"center"}
+        justifyContent={"center"}
+        position="relative" // 取消固定定位
+        bottom="0"
+        width={"100vw"}
+        left="50%"
+        transform="translateX(-50%)"
+        zIndex={0}
+        mt="auto" // 这个可以确保元素被推到页面的底部
+        mb={"1.5rem"}
+      >
+        <Text
+          fontFamily="PingFangSC, PingFang SC"
+          fontWeight="400"
+          fontSize="0.88rem"
+          color="#404040"
+        >
+          Already have an account?
+        </Text>
+        <Text
+          fontFamily="PingFangSC, PingFang SC"
+          fontWeight="400"
+          fontSize="0.88rem"
+          color="#EE3939"
+          onClick={() => {
+            router.push("login");
+          }}
+        >
+          &ensp;Log in
+        </Text>
+      </Flex>
     </VStack>
   );
 };

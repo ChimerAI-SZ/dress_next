@@ -17,7 +17,7 @@ import ToastTest from "@components/ToastTest";
 import { errorCaptureRes, storage } from "@utils/index";
 import { fetchShoppingAdd, fetchAddImage } from "@lib/request/generate-result";
 import AllNo from "@img/generate-result/all-no.svg";
-
+import { Alert } from "@components/Alert";
 function Page() {
   const userId = storage.get("user_id");
 
@@ -44,8 +44,17 @@ function Page() {
       img_urls: list,
       phone: phoneNumber,
     });
+    if (err) {
+      Alert.open({
+        content: "error request process!",
+      });
+    }
     if (res?.success) {
       console.log(1);
+    } else {
+      Alert.open({
+        content: res.message,
+      });
     }
   };
 
