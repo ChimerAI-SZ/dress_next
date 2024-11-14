@@ -5,9 +5,10 @@ import styled from "@emotion/styled"
 import { Provider } from "react-redux"
 
 import { Container, Box, For, Image, Flex, Show, Text, CheckboxGroup, Fieldset, Button } from "@chakra-ui/react"
+import { Checkbox } from "@components/ui/checkbox"
 
 import ImageGroupByData from "@components/ImageGroupByDate"
-import FavouritesDialog from "../favorites/components/AlbumDrawer"
+import CollectionDialog from "../favorites/components/AlbumDrawer"
 
 import NoSelect from "@img/generate-result/no-select.svg"
 import Selected from "@img/generate-result/selected.svg"
@@ -18,7 +19,6 @@ import addIcon from "@img/favourites/addIcon.svg"
 import Header from "./components/Header"
 import Toast from "@components/Toast"
 import { Alert } from "@components/Alert"
-import { Checkbox } from "@components/ui/checkbox"
 
 import { FavouriteItem } from "@definitions/favourites"
 import { HistoryItem } from "@definitions/history"
@@ -42,12 +42,12 @@ function Page() {
 
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false)
-  const [dialogVisible, setDialogVisible] = useState(false) // 新增收藏夹弹窗
 
   const [collectionList, setCollectionList] = useState<any[]>([])
   const [selectedCollection, setSelectedCollection] = useState<string[]>([]) // 添加到收藏夹时选中的收藏夹
 
   // 弹窗visible
+  const [dialogVisible, setDialogVisible] = useState(false) // 新增收藏夹弹窗
   const [collectSuccessVisible, setCollectSuccessVisible] = useState(false) // 收藏成功弹窗
   const [collectionSelectorVisible, setCollectionSelectorVisible] = useState(false) // 选择收藏夹
 
@@ -114,6 +114,7 @@ function Page() {
     }
   }
 
+  // 批量收藏
   const handleCollect = async () => {
     const user_id = storage.get("user_id")
 
@@ -121,7 +122,6 @@ function Page() {
       const { message, data: collectionList, success } = await queryCollectionList({ user_id: +user_id })
 
       if (success && collectionList?.length > 0) {
-        console.log(collectionList)
         setCollectionList(collectionList)
 
         // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
@@ -322,6 +322,7 @@ function Page() {
                 fontSize="0.88rem"
                 color="#EE3939"
                 onClick={() => {
+                  // 关闭收藏成功的提示，打开选择收藏夹的底部抽屉
                   setCollectSuccessVisible(false)
                   setCollectionSelectorVisible(true)
                 }}
@@ -334,7 +335,7 @@ function Page() {
         </Toast>
       </Show>
 
-      <FavouritesDialog
+      <CollectionDialog
         type="add"
         visible={dialogVisible}
         close={() => {

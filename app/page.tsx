@@ -1,29 +1,29 @@
 "use client"
 
 import { useRef, useEffect } from "react"
-import { Container, Box, Flex, Link, Image, Button,For } from "@chakra-ui/react"
+import { Container, Box, Flex, Link, Image, Button, For } from "@chakra-ui/react"
 import styled from "@emotion/styled"
 
 import Waterfall from "./components/Waterfall"
 import { useRouter } from "next/navigation"
 
 // header 右侧按钮
-const headerIconList= [
+const headerIconList = [
   {
-    key: 'favorites',
-    link: '/favorites',
-    imgUrl: '/assets/images/mainPage/like.svg',
+    key: "favorites",
+    link: "/favorites",
+    imgUrl: "/assets/images/mainPage/like.svg"
   },
   {
-    key: 'history',
-    link: '/history',
-    imgUrl: '/assets/images/mainPage/history.svg',
+    key: "history",
+    link: "/history",
+    imgUrl: "/assets/images/mainPage/history.svg"
   },
   {
-    key: 'profile',
-    link: '/profile',
-    imgUrl: '/assets/images/mainPage/homepage.svg',
-  },
+    key: "profile",
+    link: "/profile",
+    imgUrl: "/assets/images/mainPage/homepage.svg"
+  }
 ]
 
 function Dashboard() {
@@ -33,9 +33,9 @@ function Dashboard() {
   const headerRef = useRef<HTMLDivElement>(null) // 容器ref
 
   // 页面跳转
-  const handleJump= (link: string) => {
+  const handleJump = (link: string) => {
     // 没有登陆的话去往登陆页面
-    router.push(!localStorage.getItem('user_id') ? '/login' : link)
+    router.push(!localStorage.getItem("user_id") ? "/login" : link)
   }
 
   // header 在页面滚动之后设置白色背景色
@@ -86,7 +86,7 @@ function Dashboard() {
           <Flex gap="0.5rem">
             <For each={headerIconList}>
               {(item, index: number): React.ReactNode => {
-                return  <Image onClick={() => handleJump(item.link)} key={item.key} src={item.imgUrl} alt={`${item.key}-icon`} boxSize="22pt" cursor="pointer" />
+                return <Image onClick={() => handleJump(item.link)} key={item.key} src={item.imgUrl} alt={`${item.key}-icon`} boxSize="22pt" cursor="pointer" />
               }}
             </For>
           </Flex>
@@ -169,9 +169,6 @@ const MainSection = styled.section`
   border-top-width: 1px;
 `
 const Title = styled.div`
-  font-family:
-    PingFangSC,
-    PingFang SC;
   font-weight: 600;
   font-size: 1.3rem;
   color: #171717;
@@ -179,9 +176,6 @@ const Title = styled.div`
   font-style: normal;
 `
 const SubTitle = styled.div`
-  font-family:
-    PingFangSC,
-    PingFang SC;
   font-weight: 400;
   font-size: 1rem;
   color: #666666;

@@ -1,12 +1,13 @@
 "use client"
 import React, { useState, useRef, useEffect, Suspense, useCallback } from "react"
 import Masonry from "react-masonry-css"
-import { Box, Flex, Spinner, useDisclosure, Image } from "@chakra-ui/react"
+import { Box, Flex, Spinner, useDisclosure, Image, Show, Button } from "@chakra-ui/react"
 import ImageOverlay from "./ImageOverlay"
 import { css, Global, keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
+import Toast from "@components/Toast"
 
 import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
@@ -46,6 +47,9 @@ const Waterfall: React.FC = () => {
   const { onOpen } = useDisclosure()
   const observer = useRef<IntersectionObserver | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const [viewDetail, setViewDetail] = useState(false) // 查看大图
+  const [selectedImg, setSelectedImg] = useState("") // 选中的图片
 
   const openModal = (src: string) => {
     setVisibleImage(src)
@@ -99,7 +103,9 @@ const Waterfall: React.FC = () => {
   )
 
   const handleImageClick = (src: string) => {
-    setVisibleImage(src === visibleImage ? null : src)
+    // setVisibleImage(src === visibleImage ? null : src)
+    setViewDetail(true)
+    setSelectedImg(src)
   }
 
   useEffect(() => {
@@ -210,6 +216,44 @@ const Waterfall: React.FC = () => {
           )}
         </Box>
       </Box>
+
+      <Show when={viewDetail}>
+        <Toast
+          close={() => {
+            setViewDetail(false)
+          }}
+          maskVisible={false}
+          boxStyle={{
+            width: "100vw",
+            height: "100vh",
+
+            bottom: "0",
+            left: "0",
+            right: "0",
+            top: "0",
+            transform: "unset",
+
+            padding: "12pt",
+            pt: "0",
+            display: "flex",
+            flexDirection: "column",
+            background: "unset",
+            position: "relative"
+          }}
+        >
+          <Bg
+            onClick={() => {
+              setViewDetail(false)
+            }}
+          />
+          <StyledImg src={selectedImg} />
+          <Footer>
+            <Button w={"100%"} bgColor={"#ee3939"} borderRadius={"40px"} type="submit" onClick={() => {}}>
+              Generate
+            </Button>
+          </Footer>
+        </Toast>
+      </Show>
     </>
   )
 }
@@ -226,4 +270,38 @@ const StyledLoading = styled(Image)`
   animation: ${spin} 2s linear infinite; /* 旋转动画持续2秒，线性变化，无限循环 */
 `
 
+const Bg = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+`
+const StyledImg = styled(Image)`
+  max-width: 90vw;
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 2px 17px 0px rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  border: 1px solid rgba(182, 182, 182, 0.5);
+`
+const Footer = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 8pt 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px -1px 5px 0px rgba(214, 214, 214, 0.5);
+  border-radius: 12px 12px 0px 0px;
+`
 export default Waterfall
