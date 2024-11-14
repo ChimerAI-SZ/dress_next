@@ -1,28 +1,28 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { Container, Grid, For, Image, Box, Button, Show, Flex } from "@chakra-ui/react"
-import { useRouter } from "next/navigation"
-import styled from "@emotion/styled"
-import { RightOutlined } from "@ant-design/icons"
+import { useState, useEffect } from 'react'
+import { Container, Grid, For, Image, Box, Button, Show, Flex } from '@chakra-ui/react'
+import { useRouter } from 'next/navigation'
+import styled from '@emotion/styled'
+import { RightOutlined } from '@ant-design/icons'
 
-import logoutIcon from "@img/homepage/logoutIcon.svg"
-import resetPwdIcon from "@img/homepage/resetPwdIcon.svg"
-import LinkIcon from "@img/homepage/linkIcon.svg"
+import logoutIcon from '@img/homepage/logoutIcon.svg'
+import resetPwdIcon from '@img/homepage/resetPwdIcon.svg'
+import LinkIcon from '@img/homepage/linkIcon.svg'
 
-import Header from "../components/Header"
+import Header from '../components/Header'
 
 const operatorList = [
   {
-    key: "resetPwd",
-    label: "Reset Password",
+    key: 'resetPwd',
+    label: 'Reset Password',
     icon: resetPwdIcon,
     isDanger: false,
     redirectable: true
   },
   {
-    key: "logout",
-    label: "Logout",
+    key: 'logout',
+    label: 'Logout',
     icon: logoutIcon,
     isDanger: true,
     redirectable: false
@@ -32,9 +32,14 @@ const operatorList = [
 const EditAvatar: React.FC = () => {
   const router = useRouter()
 
-  // done btn clicked
-  const handleSave = () => {
-    router.back()
+  const handleBtnClick = (key: string) => {
+    if (key === 'logout') {
+      // 登出清空 localStorage
+      localStorage.clear()
+      router.push('/')
+    } else if (key === 'resetPwd') {
+      router.push('/retrieve-password')
+    }
   }
 
   useEffect(() => {
@@ -42,15 +47,20 @@ const EditAvatar: React.FC = () => {
   }, [])
 
   return (
-    <Container className="homepage-edit-avatar-contaienr" p={"0"} zIndex={1}>
+    <Container className="homepage-edit-avatar-contaienr" p={'0'} zIndex={1}>
       <Header title="Settings" />
 
       {/* operators */}
       <OperatorWrapper className="homepage-operator-wrapper">
         <For each={operatorList}>
-          {(item, index): React.ReactNode => {
+          {(item): React.ReactNode => {
             return (
-              <OperatorBox key={item.key} onClick={() => {}}>
+              <OperatorBox
+                key={item.key}
+                onClick={() => {
+                  handleBtnClick(item.key)
+                }}
+              >
                 <div>
                   <Image src={item.icon.src} alt={`${item.key}-icon`} />
                   <OperatorLabel isDanger={item.isDanger}>{item.label}</OperatorLabel>
@@ -80,7 +90,7 @@ const OperatorBox = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 24pt;
-  height: 50px;
+  height: 60px;
   border-bottom: 1px solid #f0f0f0;
 
   & > div:first-child {
@@ -103,7 +113,7 @@ const OperatorBox = styled.div`
   }
 `
 const OperatorLabel = styled.div<OperatorLabelProps>`
-  color: ${props => (props.isDanger ? "#F50C00" : "#171717")};
+  color: ${props => (props.isDanger ? '#F50C00' : '#171717')};
 `
 
 export default EditAvatar
