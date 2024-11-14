@@ -39,6 +39,7 @@ function Page() {
   const [isOpen, setIsOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [make, setMake] = useState(0);
+  const [jionLike, setJionLike] = useState<string[]>([]);
   const openDialog = () => {
     if (userId === null) {
       toaster.create({
@@ -226,12 +227,31 @@ function Page() {
       });
       return;
     }
-    const [err, res] = await errorCaptureRes(fetchAddImage, {
+    const [err, res] = await errorCaptureRes(collectionsList, {
       user_id: +userId as number,
-      img_urls: list,
     });
-    if (res?.success) {
-      console.log(1);
+    let defaultCollectionIds = [];
+    console.log(res.data);
+    if (res) {
+      // 筛选出 is_default 为 true 的 collection
+      const defaultCollection = res.data.filter(
+        (collection: { is_default: boolean }) => collection.is_default === true
+      );
+
+      // 提取 collection_id
+      defaultCollectionIds = defaultCollection.map(
+        (collection: { collection_id: any }) => collection.collection_id
+      );
+    }
+    const [err2, res2] = await errorCaptureRes(fetchAddImage, {
+      image_urls: list,
+      collection_id: defaultCollectionIds[0],
+    });
+
+    if (res2?.success) {
+      setJionLike((pre) => {
+        return [...pre, ...list];
+      });
     }
   };
 
@@ -301,7 +321,7 @@ function Page() {
               </a>
               <Image
                 boxSize={"2.25rem"}
-                src={Like.src}
+                src={jionLike.includes(selectImage) ? Liked.src : Like.src}
                 onClick={() => {
                   AddImage([selectImage]);
                   toaster.create({
@@ -528,9 +548,10 @@ function Page() {
                   boxSize={"2.25rem"}
                   src={Like.src}
                   onClick={() => {
+                    console.log(111111111, selectImage, jionLike);
                     AddImage(likeList);
                   }}
-                ></Image>
+                />
               </Flex>
               <Flex
                 width="2.5rem"
