@@ -319,6 +319,11 @@ function Page() {
                             fontWeight="400"
                             fontSize="0.88rem"
                             color="#EE3939"
+                            onClick={() => {
+                              console.log(1111)
+                              toaster.dismiss()
+                              setCollectionSelectorVisible(true)
+                            }}
                           >
                             Move to
                           </Text>
