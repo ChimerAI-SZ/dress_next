@@ -98,12 +98,14 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   }, []);
   const handleSelectImage = (url: string) => {
     setUrlList((prevList) =>
-      prevList.map((item) =>
-        item.image_url === url
-          ? { ...item, selected: true }
-          : { ...item, selected: false }
+      prevList.map(
+        (item) =>
+          item.image_url === url
+            ? { ...item, selected: !item.selected } // 如果已经选中，则取消选中，否则选中
+            : item // 保持其他项不变
       )
     );
+
     if (flied) {
       onParamsUpdate({ loadFabricImage: url });
     } else {
