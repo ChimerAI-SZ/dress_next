@@ -4,9 +4,9 @@ import { useState, useEffect } from "react"
 import { Button, Box, Image, Flex, Text, Show, CheckboxGroup, Fieldset, For } from "@chakra-ui/react"
 import { Checkbox } from "@components/ui/checkbox"
 import { Toaster, toaster } from "@components/Toaster"
-import { Provider } from 'react-redux'
+import { Provider } from "react-redux"
 
-import { store } from '../favorites/store'
+import { store } from "../favorites/store"
 import Toast from "@components/Toast"
 import CollectionDialog from "../favorites/components/AlbumDrawer"
 
@@ -15,6 +15,7 @@ import Download from "@img/generate-result/download.png"
 import Like from "@img/generate-result/like.png"
 import Shop from "@img/generate-result/shop.png"
 import Liked from "@img/generate-result/liked.svg"
+import LikeTop from "@img/generate-result/like-top.png"
 import NoSelect from "@img/generate-result/no-select.svg"
 import Selected from "@img/generate-result/selected.svg"
 import ModalRight from "@img/generate-result/modal-right.svg"
@@ -279,7 +280,14 @@ function Page() {
       <Header show noTitle cb={cb}></Header>
       <Toaster />
       <Flex height="28.59rem" w={"full"} justifyContent={"center"}>
-        <Box height="28.59rem" w={"21.44rem"} position={"relative"} borderRadius="0.63rem" border="0.03rem solid #CACACA" overflow={"hidden"}>
+        <Box
+          height="28.59rem"
+          w={"21.44rem"}
+          position={"relative"}
+          borderRadius="0.63rem"
+          border="0.03rem solid #CACACA"
+          overflow={"hidden"}
+        >
           <Image h={"100%"} w={"21.44rem"} objectFit={"cover"} src={selectImage}></Image>
           {!active && selectImage !== originImage && (
             <Flex position={"absolute"} bottom={0} right={"0"} gap={"1rem"} pb={"0.87rem"} pr={"0.87rem"}>
@@ -288,7 +296,7 @@ function Page() {
               </a>
               <Image
                 boxSize={"2.25rem"}
-                src={jionLike.includes(selectImage) ? Liked.src : Like.src}
+                src={jionLike.includes(selectImage) ? LikeTop.src : Like.src}
                 onClick={() => {
                   AddImage([selectImage])
                   toaster.create({
@@ -296,12 +304,22 @@ function Page() {
                       <Flex justifyContent={"space-between"} alignItems={"center"}>
                         <Flex alignItems={"center"} gap={"0.56rem"}>
                           <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-                          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+                          <Text
+                            fontFamily="PingFangSC, PingFang SC"
+                            fontWeight="400"
+                            fontSize="0.88rem"
+                            color="#171717"
+                          >
                             Collect in Default
                           </Text>
                         </Flex>
                         <Flex alignItems={"center"} gap={"0.56rem"}>
-                          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
+                          <Text
+                            fontFamily="PingFangSC, PingFang SC"
+                            fontWeight="400"
+                            fontSize="0.88rem"
+                            color="#EE3939"
+                          >
                             Move to
                           </Text>
                           <Image src={ModalBack.src} boxSize={"1rem"}></Image>
@@ -403,7 +421,14 @@ function Page() {
                 ></Image>
               )}
 
-              <Image flexShrink={0} height="1rem" width="1rem" objectFit={"cover"} src={Liked.src} position={"absolute"}></Image>
+              <Image
+                flexShrink={0}
+                height="1rem"
+                width="1rem"
+                objectFit={"cover"}
+                src={Liked.src}
+                position={"absolute"}
+              ></Image>
             </Box>
           )
         })}
@@ -520,7 +545,14 @@ function Page() {
           </Button>
         )}
       </Flex>
-      <ToastTest isOpen={isOpen} phoneNumber={phoneNumber} onOpen={openDialog} onClose={closeDialog} affirmDialog={affirmDialog} setPhoneNumber={setPhoneNumber}></ToastTest>
+      <ToastTest
+        isOpen={isOpen}
+        phoneNumber={phoneNumber}
+        onOpen={openDialog}
+        onClose={closeDialog}
+        affirmDialog={affirmDialog}
+        setPhoneNumber={setPhoneNumber}
+      ></ToastTest>
 
       {/* 选择收藏夹的弹窗 */}
       <Show when={collectionSelectorVisible}>
@@ -582,7 +614,9 @@ function Page() {
               }}
             >
               <Fieldset.Content>
-                <For each={collectionList}>{(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}</For>
+                <For each={collectionList}>
+                  {(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
+                </For>
               </Fieldset.Content>
             </CheckboxGroup>
           </Fieldset.Root>
