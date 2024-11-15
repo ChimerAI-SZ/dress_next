@@ -53,7 +53,6 @@ function Page() {
 
   const [collectionList, setCollectionList] = useState<any[]>([]) // 收藏夹列表
   const [selectedCollection, setSelectedCollection] = useState<string[]>([]) // 添加到收藏夹时选中的收藏夹
-
   const openDialog = () => {
     if (userId === null) {
       toaster.create({
@@ -241,12 +240,18 @@ function Page() {
 
   // 批量添加到收藏夹
   const batchAddToCollection = async () => {
-    console.log(collectionSelectorVisible)
-    console.log(collectionList)
-    // const [err2, res2] = await errorCaptureRes(fetchAddImage, {
-    //   image_urls: list,
-    //   collection_id: defaultCollectionIds[0]
-    // })
+    const [err2, res2] = await errorCaptureRes(fetchAddImage, {
+      image_urls: [selectImage],
+      collection_id: (selectedCollection[0] as any) - 0
+    })
+    if (res2.success) {
+      setCollectionSelectorVisible(false)
+    } else {
+      setCollectionSelectorVisible(false)
+      Alert.open({
+        content: res2.message
+      })
+    }
   }
 
   useEffect(() => {
@@ -613,12 +618,17 @@ function Page() {
           <Fieldset.Root flexGrow={1} maxH={"30vh"} minH={"20vh"} overflow={"auto"}>
             <CheckboxGroup
               onValueChange={value => {
+                console.log("value", value)
                 setSelectedCollection(value)
               }}
             >
               <Fieldset.Content>
                 <For each={collectionList}>
-                  {(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
+                  {(item: FavouriteItem) => (
+                    <Checkbox value={item.collection_id + ""} key={item.collection_id}>
+                      {item.title}
+                    </Checkbox>
+                  )}
                 </For>
               </Fieldset.Content>
             </CheckboxGroup>
