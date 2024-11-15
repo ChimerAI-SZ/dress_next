@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { Button, Box, Image, Flex, Text, Show, CheckboxGroup, Fieldset, For } from "@chakra-ui/react"
 import { Checkbox } from "@components/ui/checkbox"
 import { Toaster, toaster } from "@components/Toaster"
+import { Provider } from 'react-redux'
 
+import { store } from '../favorites/store'
 import Toast from "@components/Toast"
 import CollectionDialog from "../favorites/components/AlbumDrawer"
 
@@ -653,4 +655,10 @@ function Page() {
   )
 }
 
-export default Page
+export default () => {
+  return (
+    <Provider store={store}>
+      <Page />
+    </Provider>
+  )
+}
