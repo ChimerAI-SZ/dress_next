@@ -33,10 +33,10 @@ export const workflow = async (p: Params) => {
     const results = await Promise.allSettled([
       dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
       dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url })
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[1].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[2].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[3].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[4].image_url })
     ])
     const successfulResults = results.filter(result => result.status === "fulfilled")
     const failedResults = results.filter(result => result.status === "rejected")
