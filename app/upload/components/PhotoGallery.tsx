@@ -77,21 +77,38 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     fetchData()
   }, [])
   const handleSelectImage = (url: string) => {
-    setUrlList(prevList =>
-      prevList.map(
-        item =>
-          item.image_url === url
-            ? { ...item, selected: !item.selected } // 如果已经选中，则取消选中，否则选中
-            : item // 保持其他项不变
-      )
-    )
+    setUrlList(prevList => {
+      return prevList.map(item => {
+        if (item.image_url === url) {
+          // 如果该项已经被选中，点击时取消选中
+          const updatedItem = { ...item, selected: !item.selected }
 
-    if (flied) {
-      onParamsUpdate({ loadFabricImage: url, loadPrintingImage: "" })
-    } else {
-      onParamsUpdate({ loadFabricImage: "", loadPrintingImage: url })
-    }
+          return updatedItem
+        } else {
+          // 其他项都取消选中
+          return { ...item, selected: false }
+        }
+      })
+    })
   }
+
+  // 使用 useEffect 来处理状态更新
+  useEffect(() => {
+    const selectedItem = urlList.find(item => item.selected)
+
+    if (selectedItem) {
+      // 如果某项被选中，更新参数
+      if (flied) {
+        onParamsUpdate({ loadFabricImage: selectedItem.image_url, loadPrintingImage: "" })
+      } else {
+        onParamsUpdate({ loadFabricImage: "", loadPrintingImage: selectedItem.image_url })
+      }
+    } else {
+      // 如果没有选中项，清空参数
+      onParamsUpdate({ loadFabricImage: "", loadPrintingImage: "" })
+    }
+  }, [urlList, flied]) // 监听 urlList 和 flied 的变化
+
   return (
     <Flex w="full" flexDirection={"column"}>
       <Box h={"11rem"} overflow={"hidden"}>
