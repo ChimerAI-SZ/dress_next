@@ -1,19 +1,13 @@
 "use client"
 
 import React, { useEffect, useState, useReducer } from "react"
-import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
-import { useSearchParams } from "next/navigation"
-import { Provider, useSelector } from "react-redux"
-
+import dayjs from "dayjs"
 import styled from "@emotion/styled"
+import { Provider, useSelector } from "react-redux"
+import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 
-import NoSelect from "@img/generate-result/no-select.svg"
-import Selected from "@img/generate-result/selected.svg"
-import buyIcon from "@img/favourites/buy.svg"
-import likedIcon from "@img/favourites/liked.svg"
-import downloadIcon from "@img/favourites/download.svg"
-import descriptionIcon from "@img/favourites/collectionDescription.svg"
+import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 
 import Toast from "@components/Toast"
 import ImageGroupByData from "@components/ImageGroupByDate"
@@ -22,8 +16,8 @@ import FavouritesDialog from "../components/AlbumDrawer"
 
 import { FavouriteItem, FavouriteItemImage } from "@definitions/favourites"
 import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
+
 import { store } from "../store"
-import dayjs from "dayjs"
 
 type GroupList = {
   [key: string]: FavouriteItemImage[]
@@ -35,29 +29,36 @@ interface FavouriteItemProps {
 const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const favouriteName = searchParams.get("name") ?? ""
   const collectionList = useSelector((state: any) => state.collectionList.value)
 
   const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
-  const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   const [selectionMode, setSelectionMode] = useState<boolean>(false) // 用于标记是否进入多选状态
-  const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [deleteToastVisible, setDeleteToastVisible] = useState(false)
-  const [isAllSelected, setIsAllSelected] = useState<boolean>(false)
-  // 分组前的图片列表
-  const [originImgList, setOriginImgList] = useState<FavouriteItemImage[]>([])
+  const [imgGroupList, setImgGroupList] = useState<GroupList>({})
+  const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
+  const [isAllSelected, setIsAllSelected] = useState<boolean>(false) // 全选状态
+  const [originImgList, setOriginImgList] = useState<FavouriteItemImage[]>([]) // 分组前的图片列表
+  // 收藏夹信息
+  const [description, setDescription] = useState(
+    collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description
+  )
+  const [title, setTitle] = useState(decodeURIComponent(searchParams.get("name") ?? ""))
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
+  // Header 组件中右侧按钮的点击回调事件
   const handleIconClick = (type: string): void => {
-    console.log(type)
-    if (type === "delete") {
-      setDeleteToastVisible(true)
-    } else if (type === "edit") {
-      setDialogVisible(true)
+    switch (type) {
+      case "delete":
+        setDeleteToastVisible(true)
+        break
+      case "edit":
+        setDialogVisible(true)
+        break
     }
   }
 
+  // 进入多选
   const handleSetSelectMode = (value: boolean) => {
     setSelectionMode(value)
   }
@@ -93,16 +94,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
     }
   }
 
+  // 删除收藏夹
   const handleDelete = async () => {
-    try {
-      const res = await deleteCollection({ collection_id: +params.item })
-      const { data, success } = res
+    const res = await deleteCollection({ collection_id: +params.item })
+    const { data, success } = res
 
-      if (success) {
-        router.back()
-      } else {
-      }
-    } catch (err: any) {}
+    if (success) {
+      router.back()
+    } else {
+      // todo error handler
+    }
   }
 
   // 选择模式下图片的选择、取消选择事件
@@ -123,6 +124,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
     setDialogVisible(false)
   }
 
+  // 下载图片
   const handleDownload = () => {
     const downloadImage = (url: string) => {
       if (!url) {
@@ -147,8 +149,13 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
     }
   }
 
+  // 编辑收藏夹回调
+  const onAblumEditSuccess = (newCollectionData: any) => {
+    setDescription(newCollectionData.description)
+    setTitle(newCollectionData.title)
+  }
+
   useEffect(() => {
-    // 查询收藏夹数据
     queryData()
   }, [])
 
@@ -162,10 +169,10 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       />
       {/* 收藏夹名称 */}
       <Heading p={"0 16pt"} mb={"8pt"}>
-        {decodeURIComponent(favouriteName)}
+        {title}
       </Heading>
       {/* 收藏夹说明 */}
-      <Show when={collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}>
+      <Show when={description}>
         <Box>
           <DescriptionBox>
             <Flex
@@ -175,12 +182,15 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
               alignItems={"center"}
               justifyContent={"flex-start"}
             >
-              <Image w={"28pt"} h={"28pt"} src={descriptionIcon.src} alt="description-icon" />
+              <Image
+                w={"28pt"}
+                h={"28pt"}
+                src={"assets/images/favourites/collectionDescription.svg"}
+                alt="description-icon"
+              />
               <span>Description</span>
             </Flex>
-            <Box px={"16pt"}>
-              {collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}
-            </Box>
+            <Box px={"16pt"}>{description}</Box>
           </DescriptionBox>
         </Box>
       </Show>
@@ -217,17 +227,18 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
               gap={"0.53rem"}
               alignItems={"center"}
               onClick={() => {
-                if (isAllSelected) {
-                  setSelectedImgList([])
-                } else {
-                  setSelectedImgList(originImgList.map(item => item.id))
-                }
+                setSelectedImgList(isAllSelected ? [] : originImgList.map(item => item.id))
+
                 setIsAllSelected(!isAllSelected)
               }}
             >
               <Image
                 boxSize="16pt"
-                src={isAllSelected ? Selected.src : NoSelect.src}
+                src={
+                  isAllSelected
+                    ? "/assets/images/generate-result/selected.svg"
+                    : "/assets/images/generate-result/no-select.svg"
+                }
                 border="0.06rem solid #BFBFBF"
                 backdropFilter="blur(50px)"
                 borderRadius={"50%"}
@@ -239,12 +250,12 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 w={"22pt"}
                 h={"22pt"}
                 ml={"8pt"}
-                src={downloadIcon.src}
+                src={"/assets/images/favourites/download.svg"}
                 onClick={handleDownload}
                 alt="download-icon"
               />
-              {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" /> */}
-              {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={buyIcon.src} alt="buy-icon" /> */}
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/favourites/liked.svg"} alt="liked-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
             </Flex>
           </Flex>
         </Box>
@@ -285,7 +296,13 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
         </Toast>
       </Show>
 
-      <FavouritesDialog type="edit" collectionId={+params.item} visible={dialogVisible} close={closeDialog} />
+      <FavouritesDialog
+        type="edit"
+        collectionId={+params.item}
+        visible={dialogVisible}
+        close={closeDialog}
+        onSuccess={onAblumEditSuccess}
+      />
     </Container>
   )
 }

@@ -43,7 +43,7 @@ function Page() {
     <Container p={0}>
       <Header
         name="Collections"
-        afterSuccess={() => {
+        onSuccess={() => {
           queryCollectionData()
         }}
       />
