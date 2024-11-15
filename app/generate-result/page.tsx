@@ -212,6 +212,7 @@ function Page() {
 
       // 提取 collection_id
       defaultCollectionIds = defaultCollection.map((collection: { collection_id: any }) => collection.collection_id)
+      setCollectionList(res.data)
     }
     const [err2, res2] = await errorCaptureRes(fetchAddImage, {
       image_urls: list,
@@ -240,20 +241,11 @@ function Page() {
 
   // 批量添加到收藏夹
   const batchAddToCollection = async () => {
-    // Promise.all(
-    //   selectedCollection.map(item => {
-    //     const imgUrls = originImgList
-    //       .filter(item => selectedImgList.includes(item.history_id))
-    //       .filter(subItem => "" + subItem.collection_id !== item) // 过滤掉已经在默认收藏夹中的图片
-    //       .map(item => item.image_url)
-    //     const params = {
-    //       collection_id: Number(item),
-    //       image_urls: imgUrls
-    //     }
-    //     return addImgToFavourite(params)
-    //   })
-    // ).then(() => {
-    //   setCollectionSelectorVisible(false)
+    console.log(collectionSelectorVisible)
+    console.log(collectionList)
+    // const [err2, res2] = await errorCaptureRes(fetchAddImage, {
+    //   image_urls: list,
+    //   collection_id: defaultCollectionIds[0]
     // })
   }
 
@@ -594,7 +586,13 @@ function Page() {
             >
               <Image src={"/assets/images/favourites/closeIcon.svg"} boxSize={"14pt"} />
             </Flex>
-            <Text fontSize={"1.2rem"} fontWeight={"500"}>
+            <Text
+              fontSize={"1.06rem"}
+              fontWeight={"500"}
+              font-family="PingFangSC, PingFang SC"
+              font-size="1.06rem"
+              color="#171717"
+            >
               Select Albums
             </Text>
             <Flex

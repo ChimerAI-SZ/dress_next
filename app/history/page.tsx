@@ -87,7 +87,11 @@ function Page() {
       const user_id = storage.get("user_id")
 
       if (user_id) {
-        const params = { user_id: +user_id as number, start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"), end_date: dayjs().add(1, "day").format("YYYY-MM-DD") }
+        const params = {
+          user_id: +user_id as number,
+          start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"),
+          end_date: dayjs().add(1, "day").format("YYYY-MM-DD")
+        }
         const { message, data, success } = await queryHistory(params)
 
         // 把图片根据日期进行分栏
@@ -173,7 +177,9 @@ function Page() {
     }
 
     if (selectedImgList.length > 0) {
-      const imgUrls = originImgList.filter(item => selectedImgList.includes(item.history_id)).map(item => item.image_url)
+      const imgUrls = originImgList
+        .filter(item => selectedImgList.includes(item.history_id))
+        .map(item => item.image_url)
 
       imgUrls.forEach(img => {
         downloadImage(img)
@@ -212,13 +218,31 @@ function Page() {
       <Box px={"1rem"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
-            return <ImageGroupByData imgKey="history_id" key={index} date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
+            return (
+              <ImageGroupByData
+                imgKey="history_id"
+                key={index}
+                date={date}
+                imageList={urls}
+                selectionMode={selectionMode}
+                selectedImageList={selectedImgList}
+                handleSelect={handleImgSelect}
+              />
+            )
           }}
         </For>
       </Box>
 
       <Show when={selectionMode}>
-        <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+        <Box
+          p={"8pt 16pt"}
+          position={"fixed"}
+          bottom={0}
+          bgColor={"#fff"}
+          w="100vw"
+          borderRadius={"12px 12px 0 0"}
+          boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+        >
           <Flex alignItems={"center"} justifyContent={"space-between"}>
             <Flex
               gap={"0.53rem"}
@@ -232,12 +256,28 @@ function Page() {
                 setIsAllSelected(!isAllSelected)
               }}
             >
-              <Image boxSize="16pt" src={isAllSelected ? Selected.src : NoSelect.src} border="0.06rem solid #BFBFBF" backdropFilter="blur(50px)" borderRadius={"50%"}></Image>
+              <Image
+                boxSize="16pt"
+                src={isAllSelected ? Selected.src : NoSelect.src}
+                border="0.06rem solid #BFBFBF"
+                backdropFilter="blur(50px)"
+                borderRadius={"50%"}
+              ></Image>
               <Text>Select all</Text>
             </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <StyledImage selectedImgList={selectedImgList} onClick={handleDownload} src={"/assets/images/favourites/download.svg"} alt="download-icon" />
-              <StyledImage selectedImgList={selectedImgList} onClick={handleCollect} src={"/assets/images/favourites/unliked.svg"} alt="liked-icon" />
+              <StyledImage
+                selectedImgList={selectedImgList}
+                onClick={handleDownload}
+                src={"/assets/images/favourites/download.svg"}
+                alt="download-icon"
+              />
+              <StyledImage
+                selectedImgList={selectedImgList}
+                onClick={handleCollect}
+                src={"/assets/images/favourites/unliked.svg"}
+                alt="liked-icon"
+              />
               <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
             </Flex>
           </Flex>
@@ -279,7 +319,13 @@ function Page() {
             >
               <Image src={"/assets/images/favourites/closeIcon.svg"} boxSize={"14pt"} />
             </Flex>
-            <Text fontSize={"1.2rem"} fontWeight={"500"}>
+            <Text
+              fontSize={"1.06rem"}
+              fontWeight={"500"}
+              font-family="PingFangSC, PingFang SC"
+              font-size="1.06rem"
+              color="#171717"
+            >
               Select Albums
             </Text>
             <Flex
@@ -304,7 +350,9 @@ function Page() {
               }}
             >
               <Fieldset.Content>
-                <For each={collectionList}>{(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}</For>
+                <For each={collectionList}>
+                  {(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
+                </For>
               </Fieldset.Content>
             </CheckboxGroup>
           </Fieldset.Root>

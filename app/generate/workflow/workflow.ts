@@ -24,13 +24,19 @@ export const workflow = async (p: Params) => {
   console.log(backgroundColor)
   if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "" && !loadFabricImage) {
     console.log(222)
+    const [err, res] = await errorCaptureRes(fetchHomePage, {
+      limit: 5,
+      offset: Math.floor(Math.random() * 46),
+      library: "top_sales"
+    })
+    console.log(res.data)
     const results = await Promise.allSettled([
       dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
-      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage })
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
+      dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url })
     ])
     const successfulResults = results.filter(result => result.status === "fulfilled")
     const failedResults = results.filter(result => result.status === "rejected")
