@@ -16,15 +16,22 @@ export default function Favourites({ favouriteData }: { favouriteData: Favourite
             fallback={
               <Show
                 when={Array.isArray(favouriteData.images) && favouriteData.images.length >= 1}
-                fallback={<Empty style={{ bg: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center" }} />}
+                fallback={
+                  <Empty style={{ bg: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center" }} />
+                }
               >
-                <Image w="100%" maxH={"calc(50% - 2pt)"} zIndex={1} src={favouriteData.images[0]?.image_url} />
+                <Image
+                  w="100%"
+                  maxH={"calc(50% - 2pt)"}
+                  zIndex={1}
+                  src={favouriteData.images[0]?.image_url?.split("?")[0]}
+                />
               </Show>
             }
           >
             {/* 有三张图片时分栏展示 */}
             <Box w={"calc(60% - 2pt)"} flex={"none"} borderRadius={"4pt"} overflow={"hidden"}>
-              <Image w={"100%"} h={"100%"} src={favouriteData.images[0]?.image_url} />
+              <Image w={"100%"} h={"100%"} src={favouriteData.images[0]?.image_url?.split("?")[0]} />
             </Box>
             <Box w={"calc(40% - 2pt)"} flex={"none"} position={"relative"} overflow={"hidden"}>
               <Image
@@ -36,13 +43,30 @@ export default function Favourites({ favouriteData }: { favouriteData: Favourite
                 top="0"
                 position={"absolute"}
                 zIndex={1}
-                src={favouriteData.images[1]?.image_url}
+                src={favouriteData.images[1]?.image_url?.split("?")[0]}
               />
-              <Image w="100%" maxH={"calc(50% - 2pt)"} borderRadius={"4pt"} overflow={"hidden"} top={"50%"} position={"absolute"} zIndex={1} src={favouriteData.images[2]?.image_url} />
+              <Image
+                w="100%"
+                maxH={"calc(50% - 2pt)"}
+                borderRadius={"4pt"}
+                overflow={"hidden"}
+                top={"50%"}
+                position={"absolute"}
+                zIndex={1}
+                src={favouriteData.images[2]?.image_url?.split("?")[0]}
+              />
             </Box>
           </Show>
         </Flex>
-        <Box mt={"8pt"} w={"100%"} color="#171717" fontSize={"1rem"} overflow={"hidden"} whiteSpace={"nowrap"} textOverflow={"ellipsis"}>
+        <Box
+          mt={"8pt"}
+          w={"100%"}
+          color="#171717"
+          fontSize={"1rem"}
+          overflow={"hidden"}
+          whiteSpace={"nowrap"}
+          textOverflow={"ellipsis"}
+        >
           {favouriteData.title}
         </Box>
         <Box h={"22px"} w={"100%"} color="#171717" fontSize={"0.8rem"} fontWeight={"400"}>

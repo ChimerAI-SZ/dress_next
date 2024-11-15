@@ -17,7 +17,14 @@ interface ImageGroupByDataProps {
   handleSelect: (img: number) => void
 }
 
-const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ imgKey, date, imageList, selectionMode, selectedImageList, handleSelect }): React.ReactNode => {
+const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
+  imgKey,
+  date,
+  imageList,
+  selectionMode,
+  selectedImageList,
+  handleSelect
+}): React.ReactNode => {
   return (
     <Box mb={"1rem"}>
       <SubTitle>{dayjs().isSame(date, "day") ? "Today" : dayjs(date).format("MMMM DD, YYYY")}</SubTitle>
@@ -45,7 +52,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({ imgKey, date, image
                   </Box>
                 </Show>
               </Show>
-              <Image key={item[imgKey] + " " + index + "img"} src={item.image_url} />
+              <Image key={item[imgKey] + " " + index + "img"} src={item.image_url?.split("?")[0]} />
             </GridItem>
           )}
         </For>
