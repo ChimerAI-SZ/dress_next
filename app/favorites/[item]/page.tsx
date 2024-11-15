@@ -131,7 +131,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       }
 
       const link = document.createElement("a")
-      link.href = url
+      link.href = url?.split("?")[0]
       link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
       document.body.appendChild(link)
       link.click()
@@ -154,7 +154,12 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   return (
     <Container px={"0"} className="favourite-item-container">
-      <Header handleIconClick={handleIconClick} collectionId={params.item} selectMode={selectionMode} handleSetSelectMode={handleSetSelectMode} />
+      <Header
+        handleIconClick={handleIconClick}
+        collectionId={params.item}
+        selectMode={selectionMode}
+        handleSetSelectMode={handleSetSelectMode}
+      />
       {/* 收藏夹名称 */}
       <Heading p={"0 16pt"} mb={"8pt"}>
         {decodeURIComponent(favouriteName)}
@@ -163,24 +168,50 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       <Show when={collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}>
         <Box>
           <DescriptionBox>
-            <Flex fontWeight={500} fontSize={"1.3rem"} p={"8pt 16pt 2pt"} alignItems={"center"} justifyContent={"flex-start"}>
+            <Flex
+              fontWeight={500}
+              fontSize={"1.3rem"}
+              p={"8pt 16pt 2pt"}
+              alignItems={"center"}
+              justifyContent={"flex-start"}
+            >
               <Image w={"28pt"} h={"28pt"} src={descriptionIcon.src} alt="description-icon" />
               <span>Description</span>
             </Flex>
-            <Box px={"16pt"}>{collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}</Box>
+            <Box px={"16pt"}>
+              {collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description}
+            </Box>
           </DescriptionBox>
         </Box>
       </Show>
       <Box px={"1rem"} mt={"8pt"} position={"relative"}>
         <For each={Object.entries(imgGroupList)}>
           {([date, urls], index: number): React.ReactNode => {
-            return <ImageGroupByData key={index} imgKey="id" date={date} imageList={urls} selectionMode={selectionMode} selectedImageList={selectedImgList} handleSelect={handleImgSelect} />
+            return (
+              <ImageGroupByData
+                key={index}
+                imgKey="id"
+                date={date}
+                imageList={urls}
+                selectionMode={selectionMode}
+                selectedImageList={selectedImgList}
+                handleSelect={handleImgSelect}
+              />
+            )
           }}
         </For>
       </Box>
 
       <Show when={selectionMode}>
-        <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+        <Box
+          p={"8pt 16pt"}
+          position={"fixed"}
+          bottom={0}
+          bgColor={"#fff"}
+          w="100vw"
+          borderRadius={"12px 12px 0 0"}
+          boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+        >
           <Flex alignItems={"center"} justifyContent={"space-between"}>
             <Flex
               gap={"0.53rem"}
@@ -194,11 +225,24 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 setIsAllSelected(!isAllSelected)
               }}
             >
-              <Image boxSize="16pt" src={isAllSelected ? Selected.src : NoSelect.src} border="0.06rem solid #BFBFBF" backdropFilter="blur(50px)" borderRadius={"50%"}></Image>
+              <Image
+                boxSize="16pt"
+                src={isAllSelected ? Selected.src : NoSelect.src}
+                border="0.06rem solid #BFBFBF"
+                backdropFilter="blur(50px)"
+                borderRadius={"50%"}
+              ></Image>
               <Text>Select all</Text>
             </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={downloadIcon.src} onClick={handleDownload} alt="download-icon" />
+              <Image
+                w={"22pt"}
+                h={"22pt"}
+                ml={"8pt"}
+                src={downloadIcon.src}
+                onClick={handleDownload}
+                alt="download-icon"
+              />
               {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={likedIcon.src} alt="liked-icon" /> */}
               {/* <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={buyIcon.src} alt="buy-icon" /> */}
             </Flex>

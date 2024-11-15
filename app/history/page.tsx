@@ -169,7 +169,7 @@ function Page() {
       }
 
       const link = document.createElement("a")
-      link.href = url
+      link.href = url?.split("?")[0]
       link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
       document.body.appendChild(link)
       link.click()
