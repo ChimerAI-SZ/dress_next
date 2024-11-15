@@ -1,28 +1,28 @@
-"use client";
-import { useState } from "react";
-import { Container, Text, Flex, Box, Button } from "@chakra-ui/react";
-import Header from "../../components/Header";
-import TypesClothing from "./components/TypesClothing";
-import UploadImage from "./components/UploadImage";
-import PrintSelect from "./components/PrintSelect";
-import Fabric from "./components/Fabric";
-import Link from "next/link";
-import { Params } from "@definitions/update";
+"use client"
+import { useState } from "react"
+import { Container, Text, Flex, Box, Button } from "@chakra-ui/react"
+import Header from "../../components/Header"
+import TypesClothing from "./components/TypesClothing"
+import UploadImage from "./components/UploadImage"
+import PrintSelect from "./components/PrintSelect"
+import Fabric from "./components/Fabric"
+import Link from "next/link"
+import { Params } from "@definitions/update"
 function Page() {
   const [params, setParams] = useState<Params>({
     loadOriginalImage: undefined,
     loadPrintingImage: undefined,
     backgroundColor: undefined,
     text: undefined,
-    loadFabricImage: undefined,
-  });
+    loadFabricImage: undefined
+  })
   // 通过回调函数传递数据
   const handleParamsUpdate = (newParams: Params) => {
     setParams((prev: Params) => ({
       ...prev,
-      ...newParams,
-    }));
-  };
+      ...newParams
+    }))
+  }
   return (
     <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
       <Header></Header>
@@ -34,13 +34,7 @@ function Page() {
           height="0.06rem"
           bg="linear-gradient( 90deg,#f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
         />
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontWeight="400"
-          fontSize="0.81rem"
-          color=" #737373"
-          mx={"0.75rem"}
-        >
+        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.81rem" color=" #737373" mx={"0.75rem"}>
           Advanced design
         </Text>
         <Box
@@ -71,16 +65,10 @@ function Page() {
           <Link
             href={{
               pathname: "/generate",
-              query: params,
+              query: params
             }}
           >
-            <Button
-              colorScheme="teal"
-              width="20.38rem"
-              height="2.5rem"
-              background="#EE3939"
-              borderRadius="1.25rem"
-            >
+            <Button colorScheme="teal" width="20.38rem" height="2.5rem" background="#EE3939" borderRadius="1.25rem">
               Generate
             </Button>
           </Link>
@@ -97,7 +85,7 @@ function Page() {
         )}
       </Flex>
     </Container>
-  );
+  )
 }
 
-export default Page;
+export default Page
