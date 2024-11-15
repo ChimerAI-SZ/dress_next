@@ -115,55 +115,8 @@ function Page() {
       img_urls: list,
       phone: phoneNumber
     })
-    if (err) {
-      Alert.open({
-        content: "error request process!"
-      })
-    }
-    if (res?.success) {
-      console.log(1)
-    } else {
-      Alert.open({
-        content: res.message
-      })
-    }
-  }
+    console.log(err, "err")
 
-  const fetchCollectionsList = async () => {
-    if (userId === null) {
-      toaster.create({
-        description: (
-          <Flex justifyContent={"space-between"} alignItems={"center"}>
-            <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
-                Login to have generation history
-              </Text>
-            </Flex>
-            <Flex
-              alignItems={"center"}
-              gap={"0.56rem"}
-              onClick={() => {
-                router.push("/login")
-              }}
-            >
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
-                Log in
-              </Text>
-              <Image src={ModalBack.src} boxSize={"1rem"}></Image>
-            </Flex>
-          </Flex>
-        )
-      })
-      return
-    }
-    const [err, res] = await errorCaptureRes(collectionsList, {
-      user_id: +userId as number
-    })
-    if (err) {
-      Alert.open({
-        content: "error request process!"
-      })
-    }
     if (res?.success) {
       console.log(1)
     } else {
