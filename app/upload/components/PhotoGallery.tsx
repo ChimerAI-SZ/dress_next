@@ -99,13 +99,16 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     if (selectedItem) {
       // 如果某项被选中，更新参数
       if (flied) {
-        onParamsUpdate({ loadFabricImage: selectedItem.image_url, loadPrintingImage: "" })
+        onParamsUpdate({ loadFabricImage: selectedItem.image_url })
       } else {
-        onParamsUpdate({ loadFabricImage: "", loadPrintingImage: selectedItem.image_url })
+        onParamsUpdate({ loadPrintingImage: selectedItem.image_url })
       }
     } else {
-      // 如果没有选中项，清空参数
-      onParamsUpdate({ loadFabricImage: "", loadPrintingImage: "" })
+      if (flied) {
+        onParamsUpdate({ loadFabricImage: "" })
+      } else {
+        onParamsUpdate({ loadPrintingImage: "" })
+      }
     }
   }, [urlList, flied]) // 监听 urlList 和 flied 的变化
 
