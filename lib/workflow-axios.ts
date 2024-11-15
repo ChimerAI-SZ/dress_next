@@ -3,32 +3,28 @@ import axios, {
   AxiosResponse,
   CancelTokenSource,
   InternalAxiosRequestConfig,
-  AxiosRequestHeaders,
-} from "axios";
-import { exitLogin, storage } from "@utils/index";
+  AxiosRequestHeaders
+} from "axios"
+import { exitLogin, storage } from "@utils/index"
 
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
-  cancelToken?: CancelTokenSource["token"];
-  headers: AxiosRequestHeaders;
-  data?: any;
+  cancelToken?: CancelTokenSource["token"]
+  headers: AxiosRequestHeaders
+  data?: any
 }
 
 declare global {
   interface Window {
     $message?: {
-      destroy: () => void;
-      error: (options: {
-        content: string;
-        duration: number;
-        onClose: () => void;
-      }) => void;
-    };
+      destroy: () => void
+      error: (options: { content: string; duration: number; onClose: () => void }) => void
+    }
   }
 }
 const instance = axios.create({
-  baseURL: "https://create.creamoda.ai:11118",
-  timeout: 30000,
-});
+  baseURL: "https://www.creamoda.ai:11118",
+  timeout: 30000
+})
 
 // 用于存储 pending 的请求（处理多条相同请求）
 // const pendingRequest = new Map<string, CancelTokenSource>();
@@ -60,25 +56,24 @@ const instance = axios.create({
 // };
 
 instance.interceptors.request.use(
-  (config) => {
-    const extendedConfig = config as ExtendedAxiosRequestConfig;
+  config => {
+    const extendedConfig = config as ExtendedAxiosRequestConfig
     // removePendingRequest(extendedConfig); // 在一个 ajax 发送前执行一下取消操作
     // addPendingRequest(extendedConfig);
 
-    const TOKEN = storage.get("token");
+    const TOKEN = storage.get("token")
     if (TOKEN) {
-      extendedConfig.headers = extendedConfig.headers || {};
-      extendedConfig.headers["Content-Type"] =
-        extendedConfig.headers["Content-Type"] || "application/json";
-      extendedConfig.headers.Authorization = TOKEN;
+      extendedConfig.headers = extendedConfig.headers || {}
+      extendedConfig.headers["Content-Type"] = extendedConfig.headers["Content-Type"] || "application/json"
+      extendedConfig.headers.Authorization = TOKEN
     }
 
-    return extendedConfig;
+    return extendedConfig
   },
-  (error) => {
-    return Promise.reject(error);
+  error => {
+    return Promise.reject(error)
   }
-);
+)
 
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -87,18 +82,18 @@ instance.interceptors.response.use(
     if (response.status === 401) {
       // exitLogin();
     }
-    return response.data;
+    return response.data
   },
-  (error) => {
-    const { status } = error?.response || {};
+  error => {
+    const { status } = error?.response || {}
     if (status === 500) {
-      window.$message?.destroy();
-      console.error(status);
+      window.$message?.destroy()
+      console.error(status)
     } else if (status === 401) {
       // exitLogin();
     }
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
-export default instance;
+export default instance
