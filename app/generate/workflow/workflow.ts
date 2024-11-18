@@ -22,7 +22,7 @@ export const workflow = async (p: Params) => {
       ? "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg"
       : loadFabricImage
   console.log(backgroundColor)
-  if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "" && !loadFabricImage) {
+  if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "") {
     console.log(222)
     const [err, res] = await errorCaptureRes(fetchHomePage, {
       limit: 5,
