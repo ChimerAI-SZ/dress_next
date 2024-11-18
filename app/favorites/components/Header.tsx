@@ -11,7 +11,7 @@ import addIcon from "@img/favourites/addIcon.svg"
 
 import { FavouritesHeaderProps } from "@definitions/favourites"
 
-const Header: React.FC<FavouritesHeaderProps> = ({ name, afterSuccess }) => {
+const Header: React.FC<FavouritesHeaderProps> = ({ name, onSuccess }) => {
   const pathname = usePathname()
   const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
 
@@ -48,7 +48,7 @@ const Header: React.FC<FavouritesHeaderProps> = ({ name, afterSuccess }) => {
         >
           <Image src={addIcon.src} h={"14pt"} w={"14pt"} alt="add icon" />
         </Box>
-        <FavouritesDialog type="add" visible={dialogVisible} close={closeDialog} afterSuccess={afterSuccess} />
+        <FavouritesDialog type="add" visible={dialogVisible} close={closeDialog} onSuccess={onSuccess} />
       </Flex>
     </Container>
   )

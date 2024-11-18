@@ -8,7 +8,16 @@ import { useSelector } from "react-redux"
 
 import { Button, Fieldset, Input, Text, Textarea, Box, VStack } from "@chakra-ui/react"
 import { InputGroup } from "@components/ui/input-group"
-import { DrawerBackdrop, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, DrawerRoot, DrawerTitle, DrawerTrigger } from "@components/ui/drawer"
+import {
+  DrawerBackdrop,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger
+} from "@components/ui/drawer"
 import { Field } from "@components/ui/field"
 import { CloseOutlined } from "@ant-design/icons"
 
@@ -23,7 +32,7 @@ interface FormValues {
   description: string
 }
 
-const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visible, close, afterSuccess }) => {
+const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visible, close, onSuccess }) => {
   const collectionList = useSelector((state: any) => state.collectionList.value)
 
   const {
@@ -33,7 +42,9 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
   } = useForm<FormValues>({
     defaultValues: {
       title: collectionId ? (collectionList.find((item: any) => item.collection_id === collectionId)?.title ?? "") : "",
-      description: collectionId ? (collectionList.find((item: any) => item.collection_id === collectionId)?.description ?? "") : ""
+      description: collectionId
+        ? (collectionList.find((item: any) => item.collection_id === collectionId)?.description ?? "")
+        : ""
     }
   })
 
@@ -52,7 +63,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
 
         if (success) {
           close && close()
-          afterSuccess && afterSuccess(data)
+          onSuccess && onSuccess(data)
         }
       } else {
         const params = {
@@ -61,11 +72,11 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
           description: formData.description ?? "",
           collection_id: collectionId ?? 0
         }
-        const { message, data, success } = await upadteCollection(params)
+        const { success } = await upadteCollection(params)
 
         if (success) {
           close && close()
-          afterSuccess && afterSuccess(data)
+          onSuccess && onSuccess(formData)
         }
       }
     }
@@ -114,7 +125,13 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
                     )}
                   </Field>
                   {/* Description */}
-                  <Field label="Description" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.description}>
+                  <Field
+                    label="Description"
+                    fontFamily="Arial"
+                    fontSize="0.75rem"
+                    fontWeight="400"
+                    invalid={!!errors.description}
+                  >
                     <InputGroup w="100%" bg={!!errors.description ? "#ffe0e0" : ""}>
                       <Textarea
                         {...register("description", {})}

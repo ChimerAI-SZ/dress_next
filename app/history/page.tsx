@@ -413,7 +413,7 @@ function Page() {
         close={() => {
           setDialogVisible(false)
         }}
-        afterSuccess={(newCollection: any) => {
+        onSuccess={(newCollection: any) => {
           collectionList.push(newCollection)
           setCollectionList(collectionList)
 
