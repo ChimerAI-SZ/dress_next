@@ -1,93 +1,83 @@
-"use client";
-import {
-  Button,
-  Input,
-  Container,
-  VStack,
-  Text,
-  Flex,
-  Fieldset,
-  Box,
-  Image,
-} from "@chakra-ui/react";
-import { useEffect } from "react";
-import { Field } from "@components/ui/field";
-import { InputGroup } from "@components/ui/input-group";
-import { useForm } from "react-hook-form";
-import Right from "@img/login/right.svg";
-import Lock from "@img/login/.svg";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { fetchVerification } from "@lib/request/login";
-import { errorCaptureRes } from "@utils/index";
-import Bg from "@img/login/bg.png";
-import {
-  loadPublicKey,
-  importPublicKey,
-  encryptData,
-  arrayBufferToBase64,
-} from "./utils";
+"use client"
+import { Button, Input, Container, VStack, Text, Flex, Fieldset, Box, Image } from "@chakra-ui/react"
+import { useEffect } from "react"
+import { Field } from "@components/ui/field"
+import { InputGroup } from "@components/ui/input-group"
+import { useForm } from "react-hook-form"
+import Right from "@img/login/right.svg"
+import Lock from "@img/login/.svg"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { fetchVerification } from "@lib/request/login"
+import { errorCaptureRes } from "@utils/index"
+import Bg from "@img/login/bg.png"
+import { loadPublicKey, importPublicKey, encryptData, arrayBufferToBase64 } from "./utils"
+import { Alert } from "@components/Alert"
 interface FormValues {
-  email: string;
-  first: string;
-  last: string;
-  code: string;
-  password: string;
+  email: string
+  first: string
+  last: string
+  code: string
+  password: string
 }
 
 // 定义页面状态
 const Page = () => {
-  const router = useRouter();
-  const [isLengthValid, setIsLengthValid] = useState(false);
-  const [isUppercaseValid, setIsUppercaseValid] = useState(false);
-  const [isNumberValid, setIsNumberValid] = useState(false);
+  const router = useRouter()
+  const [isLengthValid, setIsLengthValid] = useState(false)
+  const [isUppercaseValid, setIsUppercaseValid] = useState(false)
+  const [isNumberValid, setIsNumberValid] = useState(false)
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
-    watch,
-  } = useForm<FormValues>();
+    watch
+  } = useForm<FormValues>()
   // 使用 watch 获取当前表单中的 email 值
-  const email = watch("email");
-  const password = watch("password");
+  const email = watch("email")
+  const password = watch("password")
   useEffect(() => {
-    setIsLengthValid(password?.length >= 8); // 检查密码长度
-    setIsUppercaseValid(/[A-Z]/.test(password) && /[a-z]/.test(password)); // 检查大小写字母
-    setIsNumberValid(/\d/.test(password)); // 检查是否包含数字
-  }, [password]);
+    setIsLengthValid(password?.length >= 8) // 检查密码长度
+    setIsUppercaseValid(/[A-Z]/.test(password) && /[a-z]/.test(password)) // 检查大小写字母
+    setIsNumberValid(/\d/.test(password)) // 检查是否包含数字
+  }, [password])
   const getEncryption = async () => {
     try {
-      const pem = await loadPublicKey("/public_key.pem");
-      const publicKey = await importPublicKey(pem);
+      const pem = await loadPublicKey("/public_key.pem")
+      const publicKey = await importPublicKey(pem)
 
-      const data = { email: email, timestamp: Math.floor(Date.now() / 1000) };
+      const data = { email: email, timestamp: Math.floor(Date.now() / 1000) }
 
-      const encryptedData = await encryptData(publicKey, data);
+      const encryptedData = await encryptData(publicKey, data)
 
-      return arrayBufferToBase64(encryptedData);
+      return arrayBufferToBase64(encryptedData)
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error:", error)
     }
-  };
+  }
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
-    const encryptedBase64 = await getEncryption();
+    const encryptedBase64 = await getEncryption()
     // const emailRegistered = await checkEmailRegistered(data.email);
     const [err, res] = await errorCaptureRes(fetchVerification, {
-      signature: encryptedBase64,
-    });
-    if (res) {
-      const queryString = new URLSearchParams(data as any).toString();
-      router.push(`/register/verification-code?${queryString}`);
+      signature: encryptedBase64
+    })
+    if (res.success) {
+      const queryString = new URLSearchParams(data as any).toString()
+      router.push(`/register/verification-code?${queryString}`)
+    } else {
+      Alert.open({
+        content: `${res.message}`
+      })
     }
-  };
+  }
 
   // 表单最终提交逻辑
   const onSubmit = (data: FormValues) => {
-    console.log("Registration data:", data);
+    console.log("Registration data:", data)
     // 执行最终注册逻辑
-  };
+  }
 
   return (
     <VStack align="stretch" minH="100vh" position={"relative"}>
@@ -101,31 +91,13 @@ const Page = () => {
         p={3}
         px={5}
       >
-        <Text
-          fontSize="2.75rem"
-          fontWeight="600"
-          color="#EE3939"
-          fontFamily="PingFangSC, PingFang SC"
-          mt={"3.25rem"}
-        >
+        <Text fontSize="2.75rem" fontWeight="600" color="#EE3939" fontFamily="PingFangSC, PingFang SC" mt={"3.25rem"}>
           Hello
         </Text>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="2.75rem"
-          fontWeight="600"
-          color="#171717"
-          mt={"-0.9rem"}
-        >
+        <Text fontFamily="PingFangSC, PingFang SC" fontSize="2.75rem" fontWeight="600" color="#171717" mt={"-0.9rem"}>
           there!
         </Text>
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontSize="0.81rem"
-          fontWeight="400"
-          color="#737373"
-          mt={"0.64rem"}
-        >
+        <Text fontFamily="PingFangSC, PingFang SC" fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0.64rem"}>
           Sign up before you generate crazy ideas!
         </Text>
       </Box>
@@ -134,17 +106,11 @@ const Page = () => {
           <Fieldset.Root w="100%">
             <Fieldset.Content w="100%">
               {/* 用户名输入框 */}
-              <Field
-                label="First name"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                invalid={!!errors.first}
-              >
+              <Field label="First name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first}>
                 <InputGroup w="100%" bg={!!errors.first ? "#ffe0e0" : ""}>
                   <Input
                     {...register("first", {
-                      required: "first name is required",
+                      required: "first name is required"
                     })}
                     flex="1"
                     name="first"
@@ -152,7 +118,7 @@ const Page = () => {
                     _focusVisible={{
                       borderColor: "#404040",
                       boxShadow: "none",
-                      outlineStyle: "none",
+                      outlineStyle: "none"
                     }}
                   />
                 </InputGroup>
@@ -174,7 +140,7 @@ const Page = () => {
                 <InputGroup w="100%" bg={!!errors.last ? "#ffe0e0" : ""}>
                   <Input
                     {...register("last", {
-                      required: "last name is required",
+                      required: "last name is required"
                     })}
                     flex="1"
                     name="last"
@@ -182,7 +148,7 @@ const Page = () => {
                     _focusVisible={{
                       borderColor: "#404040",
                       boxShadow: "none",
-                      outlineStyle: "none",
+                      outlineStyle: "none"
                     }}
                   />
                 </InputGroup>
@@ -208,8 +174,8 @@ const Page = () => {
                       required: "Email is required",
                       pattern: {
                         value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                        message: "Invalid email format",
-                      },
+                        message: "Invalid email format"
+                      }
                     })}
                     maxW="md"
                     name="email"
@@ -217,7 +183,7 @@ const Page = () => {
                     _focusVisible={{
                       borderColor: "#404040",
                       boxShadow: "none",
-                      outlineStyle: "none",
+                      outlineStyle: "none"
                     }}
                   />
                 </InputGroup>
@@ -242,8 +208,8 @@ const Page = () => {
                       required: "Password is required",
                       minLength: {
                         value: 6,
-                        message: "Password must be at least 6 characters",
-                      },
+                        message: "Password must be at least 6 characters"
+                      }
                     })}
                     flex="1"
                     name="password"
@@ -251,7 +217,7 @@ const Page = () => {
                     _focusVisible={{
                       borderColor: "#404040",
                       boxShadow: "none",
-                      outlineStyle: "none",
+                      outlineStyle: "none"
                     }}
                   />
                 </InputGroup>
@@ -264,11 +230,7 @@ const Page = () => {
                   {isLengthValid ? (
                     <Image src={Right.src} boxSize="0.44rem"></Image>
                   ) : (
-                    <Box
-                      boxSize={"0.19rem"}
-                      bg={"#737373"}
-                      borderRadius={"50%"}
-                    ></Box>
+                    <Box boxSize={"0.19rem"} bg={"#737373"} borderRadius={"50%"}></Box>
                   )}
 
                   <Text
@@ -284,11 +246,7 @@ const Page = () => {
                   {isUppercaseValid ? (
                     <Image src={Right.src} boxSize="0.44rem"></Image>
                   ) : (
-                    <Box
-                      boxSize={"0.19rem"}
-                      bg={"#737373"}
-                      borderRadius={"50%"}
-                    ></Box>
+                    <Box boxSize={"0.19rem"} bg={"#737373"} borderRadius={"50%"}></Box>
                   )}
                   <Text
                     fontFamily="PingFangSC, PingFang SC"
@@ -303,11 +261,7 @@ const Page = () => {
                   {isNumberValid ? (
                     <Image src={Right.src} boxSize="0.44rem"></Image>
                   ) : (
-                    <Box
-                      boxSize={"0.19rem"}
-                      bg={"#737373"}
-                      borderRadius={"50%"}
-                    ></Box>
+                    <Box boxSize={"0.19rem"} bg={"#737373"} borderRadius={"50%"}></Box>
                   )}
                   <Text
                     fontFamily="PingFangSC, PingFang SC"
@@ -330,21 +284,9 @@ const Page = () => {
             height="2.75rem"
             background={"#EE3939"}
             borderRadius="1.38rem"
-            disabled={
-              !(
-                isLengthValid &&
-                isUppercaseValid &&
-                isNumberValid &&
-                Object.keys(errors).length === 0
-              )
-            }
+            disabled={!(isLengthValid && isUppercaseValid && isNumberValid && Object.keys(errors).length === 0)}
           >
-            <Text
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="600"
-              fontSize="1.06rem"
-              color="#FFFFFF"
-            >
+            <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
               Create an Account
             </Text>
           </Button>
@@ -362,12 +304,7 @@ const Page = () => {
         mt="auto" // 这个可以确保元素被推到页面的底部
         mb={"1.5rem"}
       >
-        <Text
-          fontFamily="PingFangSC, PingFang SC"
-          fontWeight="400"
-          fontSize="0.88rem"
-          color="#404040"
-        >
+        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#404040">
           Already have an account?
         </Text>
         <Text
@@ -376,14 +313,14 @@ const Page = () => {
           fontSize="0.88rem"
           color="#EE3939"
           onClick={() => {
-            router.push("login");
+            router.push("login")
           }}
         >
           &ensp;Log in
         </Text>
       </Flex>
     </VStack>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page
