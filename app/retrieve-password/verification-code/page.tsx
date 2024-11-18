@@ -1,73 +1,57 @@
-"use client";
-import {
-  Button,
-  Input,
-  Container,
-  VStack,
-  Text,
-  Image,
-  Flex,
-  Box,
-} from "@chakra-ui/react";
-import { PinInput } from "@components/ui/pin-input";
-import { useSearchParams, useRouter } from "next/navigation";
-import Back from "@img/login/back.svg";
-import { useState, useEffect } from "react";
-import { Alert } from "@components/Alert";
-import {
-  fetchCheckEmail,
-  fetchRegister,
-  fetchReset,
-  fetchResetPassword,
-} from "@lib/request/login";
-import { errorCaptureRes } from "@utils/index";
+"use client"
+import { Button, Input, Container, VStack, Text, Image, Flex, Box } from "@chakra-ui/react"
+import { PinInput } from "@components/ui/pin-input"
+import { useSearchParams, useRouter } from "next/navigation"
+import Back from "@img/login/back.svg"
+import { useState, useEffect } from "react"
+import { Alert } from "@components/Alert"
+import { fetchCheckEmail, fetchRegister, fetchReset, fetchResetPassword } from "@lib/request/login"
+import { errorCaptureRes } from "@utils/index"
 
 const Page = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const params = Object.fromEntries(searchParams.entries());
-  const [seconds, setSeconds] = useState(60); // 初始倒计时秒数
-  const [canResend, setCanResend] = useState(false); // 控制是否可以重新发送验证码
-  const [code, setCode] = useState("");
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const params = Object.fromEntries(searchParams.entries())
+  const [seconds, setSeconds] = useState(60) // 初始倒计时秒数
+  const [canResend, setCanResend] = useState(false) // 控制是否可以重新发送验证码
+  const [code, setCode] = useState("")
   useEffect(() => {
     if (seconds === 0) {
-      setCanResend(true); // 倒计时结束后，允许重新发送验证码
-      return;
+      setCanResend(true) // 倒计时结束后，允许重新发送验证码
+      return
     }
 
     const timer = setInterval(() => {
-      setSeconds((prev) => prev - 1);
-    }, 1000);
+      setSeconds(prev => prev - 1)
+    }, 1000)
 
-    return () => clearInterval(timer);
-  }, [seconds]);
+    return () => clearInterval(timer)
+  }, [seconds])
 
   // 处理发送验证码逻辑
   const handleSendCode = async () => {
     // const emailRegistered = await checkEmailRegistered(data.email);
     const [err, res] = await errorCaptureRes(fetchResetPassword, {
-      email: params.email,
-    });
+      email: params.email
+    })
     if (res) {
-      setSeconds(60);
-      setCanResend(false);
+      setSeconds(60)
+      setCanResend(false)
       Alert.open({
-        content: "Sent Successfully!",
-      });
+        content: "Sent Successfully!"
+      })
     }
-  };
+  }
 
   const vertify = async () => {
     const [err, res] = await errorCaptureRes(fetchCheckEmail, {
       ...params,
-      verification_code: code,
-    });
+      verification_code: code
+    })
     if (res.success) {
-      router.push(
-        `/retrieve-password/new-password?email=${params.email}&code=${code}`
-      );
+      router.push(`/retrieve-password/new-password?email=${params.email}&code=${code}`)
     }
-  };
+  }
   return (
     <VStack align="stretch" minH="100vh" p={3} px={5}>
       <Flex h={"2.75rem"} w={"full"} alignItems={"center"}>
@@ -76,7 +60,7 @@ const Page = () => {
           w={"1.38rem"}
           h={"1.38rem"}
           onClick={() => {
-            router.back();
+            router.back()
           }}
         ></Image>
       </Flex>
@@ -88,7 +72,7 @@ const Page = () => {
         mt={"0.1rem"}
         pl={"0.25rem"}
       >
-        Vertify Email
+        Verify Email
       </Text>
       <Text
         fontFamily="PingFangSC, PingFang SC"
@@ -123,15 +107,15 @@ const Page = () => {
       <PinInput
         placeholder=""
         mt={"0.5rem"}
-        onValueComplete={(e) => {
-          setCode(e.valueAsString);
+        onValueComplete={e => {
+          setCode(e.valueAsString)
         }}
         css={{
           _focusVisible: {
             borderColor: "#ef4444",
             boxShadow: "none",
-            outlineStyle: "none",
-          },
+            outlineStyle: "none"
+          }
         }}
       ></PinInput>
       <Text
@@ -151,25 +135,14 @@ const Page = () => {
         )}
       </Text>
       <VStack pb="4rem" w="100%" mt={"1.2rem"}>
-        <Button
-          width="20.44rem"
-          height="2.75rem"
-          background={"#EE3939"}
-          borderRadius="1.38rem"
-          onClick={vertify}
-        >
-          <Text
-            fontFamily="PingFangSC, PingFang SC"
-            fontWeight="600"
-            fontSize="1.06rem"
-            color="#FFFFFF"
-          >
-            Vertify
+        <Button width="20.44rem" height="2.75rem" background={"#EE3939"} borderRadius="1.38rem" onClick={vertify}>
+          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
+            Verify
           </Text>
         </Button>
       </VStack>
     </VStack>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

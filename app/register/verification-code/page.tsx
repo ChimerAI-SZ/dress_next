@@ -108,7 +108,7 @@ const Page = () => {
         mt={"0.1rem"}
         pl={"0.25rem"}
       >
-        Vertify Email
+        Verify Email
       </Text>
       <Text
         fontFamily="PingFangSC, PingFang SC"
@@ -173,7 +173,7 @@ const Page = () => {
       <VStack pb="4rem" w="100%" mt={"1.2rem"}>
         <Button width="20.44rem" height="2.75rem" background={"#EE3939"} borderRadius="1.38rem" onClick={vertify}>
           <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
-            Vertify
+            Verify
           </Text>
         </Button>
       </VStack>
