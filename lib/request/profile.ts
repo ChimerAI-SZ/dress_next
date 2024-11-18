@@ -30,7 +30,9 @@ export const queryAllAddress = (params: queryAllAddressProps) => {
   return axios.post("/api/addresses/list", params)
 }
 
-interface addAddressProps {
+// 新增地址
+export interface addAddressProps {
+  address_id?: number
   user_id: number
   full_name: string
   country: string
@@ -44,4 +46,22 @@ interface addAddressProps {
 }
 export const addAddress = (params: addAddressProps) => {
   return axios.post("/api/addresses/add", params)
+}
+
+// 编辑地址
+export interface editAddressProps {
+  address_id: number
+  user_id: number
+  full_name: string
+  country: string
+  street_address_1: string
+  street_address_2?: string
+  city: string
+  phone_number: string
+  state: string
+  postal_code: string
+  is_default: boolean
+}
+export const editAddress = (params: editAddressProps) => {
+  return axios.post("/api/addresses/update", params)
 }

@@ -12,6 +12,7 @@ import { storage } from "@utils/index"
 import { store } from "./store"
 
 import Header from "./components/Header"
+import { Alert } from "@components/Alert"
 
 import homepageBg from "@img/homepage/homepageBg.png" // 顶部彩色背景图
 import editAvatar from "@img/homepage/editAvatar.png" // 编辑头像icon
@@ -21,7 +22,7 @@ import settingIcon from "@img/homepage/setting.svg"
 import LinkIcon from "@img/homepage/linkIcon.svg"
 
 import { queryProfileData } from "@lib/request/profile"
-import { profileDataType } from "@definitions/profile"
+import { errorCaptureRes } from "@utils/index"
 import { setData } from "./profileSlice"
 
 const operatorList = [
@@ -73,19 +74,21 @@ function Profile() {
       const params = {
         user_id: +user_id as number
       }
-      const { success, data, message } = await queryProfileData(params)
+      const [err, res] = await errorCaptureRes(queryProfileData, params)
 
-      if (success) {
+      if (res.success) {
         const newProfileData = {
           ...profileData,
-          ...data
+          ...res.data
         }
 
         setProfileData(newProfileData)
 
         dispatch(setData(newProfileData))
       } else {
-        // todo error handler
+        Alert.open({
+          content: err.message
+        })
       }
     }
   }

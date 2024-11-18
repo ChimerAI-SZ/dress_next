@@ -9,13 +9,12 @@ import { Provider, useSelector } from "react-redux"
 import { Container, VStack, Fieldset, Textarea, Box, Button, Input, Text } from "@chakra-ui/react"
 import { InputGroup } from "@components/ui/input-group"
 import { Field } from "@components/ui/field"
+import { Alert } from "@components/Alert"
+import Header from "../components/Header"
 
 import { store } from "../store"
-import { storage } from "@utils/index"
-
+import { storage, errorCaptureRes } from "@utils/index"
 import { editProdile } from "@lib/request/profile"
-
-import Header from "../components/Header"
 
 interface FormValues {
   first_name: string
@@ -46,10 +45,17 @@ const EditProfile: React.FC = () => {
     const user_id = storage.get("user_id")
 
     if (user_id) {
-      const { success, data, message } = await editProdile({ ...formData, user_id: +user_id as number })
+      const [err, res] = await errorCaptureRes(editProdile, {
+        ...formData,
+        user_id: +user_id as number
+      })
 
-      if (success) {
+      if (res.success) {
         router.back()
+      } else {
+        Alert.open({
+          content: err.message
+        })
       }
     }
   }
@@ -65,7 +71,13 @@ const EditProfile: React.FC = () => {
               <Fieldset.Content w="100%">
                 <SubTitle>Display Information</SubTitle>
                 {/* first name */}
-                <Field label="First Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first_name}>
+                <Field
+                  label="First Name"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.first_name}
+                >
                   <InputGroup w="100%" bg={!!errors.first_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("first_name", {
@@ -87,7 +99,13 @@ const EditProfile: React.FC = () => {
                   )}
                 </Field>
                 {/* last name */}
-                <Field label="Last Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.last_name}>
+                <Field
+                  label="Last Name"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.last_name}
+                >
                   <InputGroup w="100%" bg={!!errors.last_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("last_name", {
@@ -109,7 +127,13 @@ const EditProfile: React.FC = () => {
                   )}
                 </Field>
                 {/* Pronouns */}
-                <Field label="Pronouns" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.pronouns}>
+                <Field
+                  label="Pronouns"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.pronouns}
+                >
                   <InputGroup w="100%" bg={!!errors.pronouns ? "#ffe0e0" : ""}>
                     <Input
                       {...register("pronouns", {})}
@@ -174,7 +198,13 @@ const EditProfile: React.FC = () => {
                     </Text>
                   )}
                 </Field>
-                <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
+                <Field
+                  label="Phone Number"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.phone}
+                >
                   <InputGroup w="100%" bg={!!errors.phone ? "#ffe0e0" : ""}>
                     <Input
                       {...register("phone", {})}
@@ -198,7 +228,15 @@ const EditProfile: React.FC = () => {
           </VStack>
 
           <VStack pb="4rem" w="100%">
-            <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+            <Box
+              p={"8pt 16pt 24pt"}
+              position={"fixed"}
+              bottom={0}
+              bgColor={"#fff"}
+              w="100vw"
+              borderRadius={"12px 12px 0 0"}
+              boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+            >
               <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} type="submit">
                 Save
               </Button>

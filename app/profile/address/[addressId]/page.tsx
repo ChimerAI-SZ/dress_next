@@ -12,7 +12,8 @@ import { Field } from "@components/ui/field"
 import { Alert } from "@components/Alert"
 
 import { storage } from "@utils/index"
-import { addAddress } from "@lib/request/profile"
+import { addAddress, editAddress } from "@lib/request/profile"
+import { errorCaptureRes } from "@utils/index"
 import { shippingAddressType } from "@definitions/profile"
 
 import Header from "../../components/Header"
@@ -44,7 +45,9 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
     formState: { errors },
     control
   } = useForm<FormValues>({
-    defaultValues: JSON.parse(localStorage.getItem("addressList") ?? "[]").find((item: shippingAddressType) => item.address_id + "" === params.addressId)
+    defaultValues: JSON.parse(localStorage.getItem("addressList") ?? "[]").find(
+      (item: shippingAddressType) => item.address_id + "" === params.addressId
+    )
   })
 
   // 表单最终提交逻辑
@@ -56,19 +59,33 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
 
     const user_id = storage.get("user_id")
     if (user_id) {
-      const params = {
-        user_id: +user_id as number,
-        ...formData
-      }
-
-      const { success, data, message } = await addAddress(params)
-
-      if (success) {
-        router.back()
-      } else {
-        Alert.open({
-          content: message
+      if (params.addressId === "add") {
+        const [err, res] = await errorCaptureRes(addAddress, {
+          user_id: +user_id as number,
+          ...formData
         })
+
+        if (res.success) {
+          router.back()
+        } else {
+          Alert.open({
+            content: err.message
+          })
+        }
+      } else {
+        const [err, res] = await errorCaptureRes(editAddress, {
+          user_id: +user_id as number,
+          address_id: +params.addressId as number,
+          ...formData
+        })
+
+        if (res.success) {
+          router.back()
+        } else {
+          Alert.open({
+            content: err.message
+          })
+        }
       }
     }
   }
@@ -83,7 +100,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
                 {/* full name */}
-                <Field label="Full Name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.full_name}>
+                <Field
+                  label="Full Name"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.full_name}
+                >
                   <InputGroup w="100%" bg={!!errors.full_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("full_name", {
@@ -105,7 +128,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* country */}
-                <Field label="Country" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.country}>
+                <Field
+                  label="Country"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.country}
+                >
                   <InputGroup w="100%" bg={!!errors.country ? "#ffe0e0" : ""}>
                     <Input
                       {...register("country", {
@@ -127,7 +156,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* address */}
-                <Field label="Address" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_1}>
+                <Field
+                  label="Address"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.street_address_1}
+                >
                   <InputGroup w="100%" bg={!!errors.street_address_1 ? "#ffe0e0" : ""}>
                     <Input
                       {...register("street_address_1", {
@@ -150,7 +185,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* address */}
-                <Field label="Address Line 2" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_2}>
+                <Field
+                  label="Address Line 2"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.street_address_2}
+                >
                   <InputGroup w="100%" bg={!!errors.street_address_2 ? "#ffe0e0" : ""}>
                     <Input
                       {...register("street_address_2", {})}
@@ -194,7 +235,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                 </Field>
 
                 {/* city */}
-                <Field label="State/Region" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.state}>
+                <Field
+                  label="State/Region"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.state}
+                >
                   <Flex alignItems={"center"} justifyContent={"space-between"} gap={5}>
                     <InputGroup bg={!!errors.state ? "#ffe0e0" : ""}>
                       <Input
@@ -239,8 +286,19 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
 
-                <Field label="Phone Number" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone_number}>
-                  <PhoneInputWithCountry className="shipping_address_phone_number" name="phone_number" control={control} rules={{ required: true }} />
+                <Field
+                  label="Phone Number"
+                  fontFamily="Arial"
+                  fontSize="0.75rem"
+                  fontWeight="400"
+                  invalid={!!errors.phone_number}
+                >
+                  <PhoneInputWithCountry
+                    className="shipping_address_phone_number"
+                    name="phone_number"
+                    control={control}
+                    rules={{ required: true }}
+                  />
 
                   {errors.phone_number && (
                     <Text color="red.500" fontSize="0.75rem">
@@ -269,7 +327,15 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           </VStack>
 
           <VStack pb="4rem" w="100%">
-            <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+            <Box
+              p={"8pt 16pt 24pt"}
+              position={"fixed"}
+              bottom={0}
+              bgColor={"#fff"}
+              w="100vw"
+              borderRadius={"12px 12px 0 0"}
+              boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+            >
               <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} type="submit">
                 Save
               </Button>
