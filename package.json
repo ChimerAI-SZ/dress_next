@@ -21,6 +21,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "add": "^2.0.6",
+    "ahooks": "^3.8.1",
     "ali-oss": "^6.21.0",
     "axios": "^1.7.7",
     "css-loader": "^7.1.2",

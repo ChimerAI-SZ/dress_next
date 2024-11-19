@@ -2,6 +2,7 @@
 import { useEffect, useState, useReducer } from "react"
 import dayjs from "dayjs"
 import styled from "@emotion/styled"
+import { useDebounceFn } from "ahooks"
 import { Provider } from "react-redux"
 
 import { Container, Box, For, Image, Flex, Show, Text, CheckboxGroup, Fieldset, Button } from "@chakra-ui/react"
@@ -119,47 +120,50 @@ function Page() {
   }
 
   // 批量收藏
-  const handleCollect = async () => {
-    const user_id = storage.get("user_id")
+  const { run: handleCollect } = useDebounceFn(
+    async () => {
+      const user_id = storage.get("user_id")
 
-    if (user_id && selectedImgList.length > 0) {
-      const { message, data: collectionList, success } = await queryCollectionList({ user_id: +user_id })
+      if (user_id && selectedImgList.length > 0) {
+        const { message, data: collectionList, success } = await queryCollectionList({ user_id: +user_id })
 
-      if (success && collectionList?.length > 0) {
-        setCollectionList(collectionList)
+        if (success && collectionList?.length > 0) {
+          setCollectionList(collectionList)
 
-        // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
-        const defalutCollection = collectionList.find((item: FavouriteItem) => item.is_default) ?? collectionList[0]
-        const imgUrls = originImgList
-          .filter(item => selectedImgList.includes(item.history_id))
-          .filter(item => item.collection_id !== defalutCollection.collection_id) // 过滤掉已经在默认收藏夹中的图片
-          .map(item => item.image_url)
-        const params = {
-          collection_id: defalutCollection.collection_id,
-          image_urls: imgUrls
-        }
+          // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
+          const defalutCollection = collectionList.find((item: FavouriteItem) => item.is_default) ?? collectionList[0]
+          const imgUrls = originImgList
+            .filter(item => selectedImgList.includes(item.history_id))
+            .filter(item => item.collection_id !== defalutCollection.collection_id) // 过滤掉已经在默认收藏夹中的图片
+            .map(item => item.image_url)
+          const params = {
+            collection_id: defalutCollection.collection_id,
+            image_urls: imgUrls
+          }
 
-        if (imgUrls.length > 0) {
-          const { message, data, success } = await addImgToFavourite(params)
+          if (imgUrls.length > 0) {
+            const { message, data, success } = await addImgToFavourite(params)
 
-          if (success) {
-            setCollectSuccessVisible(true)
+            if (success) {
+              setCollectSuccessVisible(true)
+            } else {
+              Alert.open({
+                content: message
+              })
+            }
           } else {
-            Alert.open({
-              content: message
-            })
+            // 如果都已经在了的话
+            setCollectSuccessVisible(true)
           }
         } else {
-          // 如果都已经在了的话
-          setCollectSuccessVisible(true)
+          Alert.open({
+            content: message
+          })
         }
-      } else {
-        Alert.open({
-          content: message
-        })
       }
-    }
-  }
+    },
+    { wait: 500 }
+  )
 
   const handleDownload = () => {
     const downloadImage = (url: string) => {
@@ -374,7 +378,7 @@ function Page() {
           boxStyle={{
             boxShadow: "0px 2px 8px 0px rgba(17,17,17,0.12)",
             borderRadius: "8px",
-            width: "70vw",
+            width: "75vw",
             bottom: "10vh",
             top: "unset",
             padding: "12pt"
@@ -383,7 +387,7 @@ function Page() {
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
               <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" lineHeight={"1.38rem"} color="#171717">
                 Collect in Default
               </Text>
             </Flex>
@@ -434,10 +438,6 @@ const StyledImage = styled(Image)<StyledImageProps>`
 
   opacity: ${props => (props.selectedImgList.length <= 0 ? "0.4" : "unset")};
   transition: opacity 0.5s ease;
-`
-
-const CollectionSelector = styled.div`
-  position
 `
 
 export default () => {
