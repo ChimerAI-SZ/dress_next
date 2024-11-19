@@ -45,7 +45,7 @@ const useAliyunOssUpload = (): UseAliyunOssUploadReturn => {
       })
 
       // 构建文件的URL
-      const uploadedUrl = `https://${process.env.NEXT_PUBLIC_OSS_BUCKET}.${process.env.NEXT_PUBLIC_OSS_REGION}.aliyuncs.com/${result.name}/format,jpg`
+      const uploadedUrl = `https://${process.env.NEXT_PUBLIC_OSS_BUCKET}.${process.env.NEXT_PUBLIC_OSS_REGION}.aliyuncs.com/${result.name}?x-oss-process=image/format,jpg`
 
       setUploadState({
         isUploading: false,
