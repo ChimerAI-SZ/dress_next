@@ -18,3 +18,12 @@ interface addImgToFavouriteProps {
 export const addImgToFavourite = (params: addImgToFavouriteProps) => {
   return axios.post("/api/collections/add_images", params)
 }
+
+// 移除收藏
+interface removeImgFromCollectionProps {
+  collection_id: number
+  image_urls: string[]
+}
+export const removeImgFromCollection = (params: removeImgFromCollectionProps) => {
+  return axios.post("/api/collections/remove_images", params)
+}

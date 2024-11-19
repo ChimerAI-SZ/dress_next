@@ -14,7 +14,7 @@ interface ImageGroupByDataProps {
   imageList: HistoryItem[] | FavouriteItemImage[]
   selectionMode: boolean // 多选态
   selectedImageList: number[]
-  handleSelect: (img: number) => void
+  handleSelect: (img: number) => void // 图片点击事件
 }
 
 const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
@@ -32,6 +32,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
         <For each={imageList as HistoryItem[]}>
           {(item: HistoryItem, index: number) => (
             <GridItem
+              className="image-group-by-date"
               key={item[imgKey] + "" + index}
               position={"relative"}
               onClick={() => {

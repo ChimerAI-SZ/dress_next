@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import { Container, Box, For, Image, Flex, Show, Text, CheckboxGroup, Fieldset, Button } from "@chakra-ui/react"
 import { Checkbox } from "@components/ui/checkbox"
 
+import ImageViewer from "@components/ImageViewer"
 import ImageGroupByData from "@components/ImageGroupByDate"
 import CollectionDialog from "../favorites/components/AlbumDrawer"
 
@@ -23,12 +24,12 @@ import { Alert } from "@components/Alert"
 
 import { FavouriteItem } from "@definitions/favourites"
 import { HistoryItem } from "@definitions/history"
-import { storage } from "@utils/index"
+import { storage, errorCaptureRes } from "@utils/index"
 import { store } from "../favorites/store"
 
 // 接口 - 收藏夹列表
 import { queryCollectionList } from "@lib/request/favourites"
-import { queryHistory, addImgToFavourite } from "@lib/request/history"
+import { queryHistory, addImgToFavourite, removeImgFromCollection } from "@lib/request/history"
 
 type GroupList = {
   [key: string]: HistoryItem[]
@@ -42,6 +43,7 @@ function Page() {
   const [originImgList, setOriginImgList] = useState<HistoryItem[]>([])
 
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
+  const [selectedImg, setSelectedImg] = useState<HistoryItem | null>(null) // 非多选的时候查看图片大图的url
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false)
 
   const [collectionList, setCollectionList] = useState<any[]>([])
@@ -51,6 +53,7 @@ function Page() {
   const [dialogVisible, setDialogVisible] = useState(false) // 新增收藏夹弹窗
   const [collectSuccessVisible, setCollectSuccessVisible] = useState(false) // 收藏成功弹窗
   const [collectionSelectorVisible, setCollectionSelectorVisible] = useState(false) // 选择收藏夹
+  const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
@@ -66,17 +69,25 @@ function Page() {
   // 选择模式下图片的选择、取消选择事件
   // 通过已选图片列表中是否有这个图片来判断是选择还是取消选择
   const handleImgSelect = (img: number) => {
-    if (selectedImgList.includes(img)) {
-      setSelectedImgList(selectedImgList.filter(item => item !== img))
-    } else {
-      selectedImgList.push(img)
+    // 多选态
+    if (selectionMode) {
+      if (selectedImgList.includes(img)) {
+        setSelectedImgList(selectedImgList.filter(item => item !== img))
+      } else {
+        selectedImgList.push(img)
 
-      // 如果已经全选了，就要把全选标记上
-      if (selectedImgList.length === originImgList.length) {
-        setIsAllSelected(true)
+        // 如果已经全选了，就要把全选标记上
+        if (selectedImgList.length === originImgList.length) {
+          setIsAllSelected(true)
+        }
+
+        setSelectedImgList(selectedImgList)
       }
-
-      setSelectedImgList(selectedImgList)
+    }
+    // 不处于多选态时查看图片的大图
+    else {
+      setSelectedImg(originImgList.find(item => item.history_id === img) ?? null)
+      setViewDetail(true)
     }
 
     forceUpdate()
@@ -112,6 +123,11 @@ function Page() {
 
           setOriginImgList(data)
           setImgGroupList(Object.fromEntries(groupedByDate))
+
+          // 重置一下选中的图片的数据
+          if (selectedImg) {
+            setSelectedImg(data.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
+          }
         }
       }
     } catch (err: any) {
@@ -165,7 +181,8 @@ function Page() {
     { wait: 500 }
   )
 
-  const handleDownload = () => {
+  // 下载
+  const handleDownload = (defaultUrls?: string[]) => {
     const downloadImage = (url: string) => {
       if (!url) {
         console.error("Invalid image URL")
@@ -180,14 +197,40 @@ function Page() {
       document.body.removeChild(link)
     }
 
-    if (selectedImgList.length > 0) {
-      const imgUrls = originImgList
-        .filter(item => selectedImgList.includes(item.history_id))
-        .map(item => item.image_url)
-
-      imgUrls.forEach(img => {
+    // 传参进来说明不是多选模式的批量下载
+    if (Array.isArray(defaultUrls) && defaultUrls.length > 0) {
+      defaultUrls.forEach(img => {
         downloadImage(img)
       })
+    } else {
+      if (selectedImgList.length > 0) {
+        const imgUrls = originImgList
+          .filter(item => selectedImgList.includes(item.history_id))
+          .map(item => item.image_url)
+
+        imgUrls.forEach(img => {
+          downloadImage(img)
+        })
+      }
+    }
+  }
+
+  // 取消收藏
+  // defaultImages 需要同在一个收藏夹里
+  const hanldeRemoveFromCollection = async (defaultImages?: HistoryItem[]) => {
+    if (defaultImages) {
+      const imgurls = defaultImages.map(img => img.image_url)
+      const collection_id = defaultImages[0].collection_id
+
+      const [err, res] = await errorCaptureRes(removeImgFromCollection, { image_urls: imgurls, collection_id })
+
+      if (res.success) {
+        queryData()
+      } else {
+        Alert.open({
+          content: err.message
+        })
+      }
     }
   }
 
@@ -266,13 +309,15 @@ function Page() {
                 border="0.06rem solid #BFBFBF"
                 backdropFilter="blur(50px)"
                 borderRadius={"50%"}
-              ></Image>
+              />
               <Text>Select all</Text>
             </Flex>
             <Flex alignItems={"center"} justifyContent={"flex-start"}>
               <StyledImage
                 selectedImgList={selectedImgList}
-                onClick={handleDownload}
+                onClick={() => {
+                  handleDownload()
+                }}
                 src={"/assets/images/favourites/download.svg"}
                 alt="download-icon"
               />
@@ -424,6 +469,48 @@ function Page() {
           setCollectionSelectorVisible(true)
         }}
       />
+
+      <Show when={viewDetail && selectedImg}>
+        <ImageViewer
+          imgUrl={selectedImg?.image_url ?? ""}
+          close={() => {
+            setViewDetail(false)
+          }}
+          footer={
+            <Flex alignItems={"center"} justifyContent={"flex-end"} mx={"1rem"} width={"100%"}>
+              <Image
+                boxSize={"2.2rem"}
+                mx={"0.5rem"}
+                onClick={() => {
+                  handleDownload([selectedImg?.image_url ?? ""])
+                }}
+                src={"/assets/images/favourites/download.svg"}
+                alt="download-icon"
+              />
+              <Image
+                boxSize={"2.2rem"}
+                mx={"0.5rem"}
+                onClick={() => {
+                  if (selectedImg) {
+                    // 如果没有被收藏
+                    if (/^0$/.test(selectedImg?.collection_id + "")) {
+                      // todo 收藏
+                    } else {
+                      hanldeRemoveFromCollection([selectedImg])
+                    }
+                  }
+                }}
+                src={`/assets/images/favourites/${/^0$/.test(selectedImg?.collection_id + "") ? "unliked" : "liked"}.svg`}
+                alt="liked-icon"
+              />
+              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <Button ml={"0.5rem"} bgColor={"#ee3939"} borderRadius={"40px"}>
+                Further Generate
+              </Button>
+            </Flex>
+          }
+        />
+      </Show>
     </Container>
   )
 }
