@@ -100,13 +100,13 @@ const Page = () => {
         p={3}
         px={5}
       >
-        <Text fontSize="2.75rem" fontWeight="600" color="#EE3939" fontFamily="PingFangSC, PingFang SC" mt={"3.25rem"}>
+        <Text fontSize="2.75rem" fontWeight="600" color="#EE3939" mt={"3.25rem"}>
           Welcome
         </Text>
-        <Text fontFamily="PingFangSC, PingFang SC" fontSize="2.75rem" fontWeight="600" color="#171717" mt={"-0.9rem"}>
+        <Text fontSize="2.75rem" fontWeight="600" color="#171717" mt={"-0.9rem"}>
           back!
         </Text>
-        <Text fontFamily="PingFangSC, PingFang SC" fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0.64rem"}>
+        <Text fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0.64rem"}>
           Please login before you like a design!
         </Text>
         <Toaster />
@@ -116,14 +116,7 @@ const Page = () => {
           <Fieldset.Root w="100%">
             <Fieldset.Content w="100%">
               {/* 邮箱输入框 */}
-              <Field
-                label="Email"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                w="100%"
-                invalid={!!errors.email}
-              >
+              <Field label="Email" fontSize="0.75rem" fontWeight="400" w="100%" invalid={!!errors.email}>
                 <InputGroup w="100%" bg={!!errors.email ? "#ffe0e0" : ""}>
                   <Input
                     {...register("email", {
@@ -149,14 +142,7 @@ const Page = () => {
                 )}
               </Field>
               {/* 密码输入框 */}
-              <Field
-                label="Password"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                invalid={!!errors.password}
-                mt={"1rem"}
-              >
+              <Field label="Password" fontSize="0.75rem" fontWeight="400" invalid={!!errors.password} mt={"1rem"}>
                 <InputGroup w="100%" bg={!!errors.password ? "#ffe0e0" : ""}>
                   <PasswordInput
                     {...register("password", {
@@ -185,7 +171,6 @@ const Page = () => {
               </Field>
             </Fieldset.Content>
             <Text
-              fontFamily="PingFangSC, PingFang SC"
               fontWeight="400"
               fontSize="0.88rem"
               color="#737373"
@@ -209,7 +194,7 @@ const Page = () => {
             borderRadius="1.38rem"
             disabled={!(isLengthValid && isUppercaseValid && isNumberValid && Object.keys(errors).length === 0)}
           >
-            <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
+            <Text fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
               Log in
             </Text>
           </Button>
@@ -227,11 +212,10 @@ const Page = () => {
         mt="auto" // 这个可以确保元素被推到页面的底部
         mb={"1.5rem"}
       >
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#404040">
+        <Text fontWeight="400" fontSize="0.88rem" color="#404040">
           Don’t have an account?
         </Text>
         <Text
-          fontFamily="PingFangSC, PingFang SC"
           fontWeight="400"
           fontSize="0.88rem"
           color="#EE3939"

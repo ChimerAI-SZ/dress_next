@@ -383,13 +383,12 @@ function Page() {
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
               <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                 Collect in Default
               </Text>
             </Flex>
             <Flex alignItems={"center"} gap={"0.56rem"}>
               <Text
-                fontFamily="PingFangSC, PingFang SC"
                 fontWeight="400"
                 fontSize="0.88rem"
                 color="#EE3939"

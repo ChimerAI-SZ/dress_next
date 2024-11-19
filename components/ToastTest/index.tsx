@@ -36,7 +36,7 @@ const Component: React.FC<DialogComponentProps> = ({
           flexDirection={"column"}
         >
           <Image src={Phone.src} boxSize={"2.53rem"} mt={"1.06rem"}></Image>
-          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="500" fontSize="1.06rem" color="#171717" mt={"0.09rem"}>
+          <Text fontWeight="500" fontSize="1.06rem" color="#171717" mt={"0.09rem"}>
             Get in Touch
           </Text>
           <Text font-weight="400" font-size="0.88rem" color="171717" mt={"0.38rem"} textAlign={"center"} px={"1.5rem"}>

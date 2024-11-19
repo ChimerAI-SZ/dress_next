@@ -91,13 +91,13 @@ const Page = () => {
         p={3}
         px={5}
       >
-        <Text fontSize="2.75rem" fontWeight="600" color="#EE3939" fontFamily="PingFangSC, PingFang SC" mt={"3.25rem"}>
+        <Text fontSize="2.75rem" fontWeight="600" color="#EE3939" mt={"3.25rem"}>
           Hello
         </Text>
-        <Text fontFamily="PingFangSC, PingFang SC" fontSize="2.75rem" fontWeight="600" color="#171717" mt={"-0.9rem"}>
+        <Text fontSize="2.75rem" fontWeight="600" color="#171717" mt={"-0.9rem"}>
           there!
         </Text>
-        <Text fontFamily="PingFangSC, PingFang SC" fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0.64rem"}>
+        <Text fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0.64rem"}>
           Sign up before you generate crazy ideas!
         </Text>
       </Box>
@@ -106,7 +106,7 @@ const Page = () => {
           <Fieldset.Root w="100%">
             <Fieldset.Content w="100%">
               {/* 用户名输入框 */}
-              <Field label="First name" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first}>
+              <Field label="First name" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first}>
                 <InputGroup w="100%" bg={!!errors.first ? "#ffe0e0" : ""}>
                   <Input
                     {...register("first", {
@@ -129,14 +129,7 @@ const Page = () => {
                 )}
               </Field>
               {/* 用户名输入框 */}
-              <Field
-                label="Last name"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                invalid={!!errors.last}
-                mt={"1.0rem"}
-              >
+              <Field label="Last name" fontSize="0.75rem" fontWeight="400" invalid={!!errors.last} mt={"1.0rem"}>
                 <InputGroup w="100%" bg={!!errors.last ? "#ffe0e0" : ""}>
                   <Input
                     {...register("last", {
@@ -159,15 +152,7 @@ const Page = () => {
                 )}
               </Field>
               {/* 邮箱输入框 */}
-              <Field
-                label="Email"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                w="100%"
-                invalid={!!errors.email}
-                mt={"1.0rem"}
-              >
+              <Field label="Email" fontSize="0.75rem" fontWeight="400" w="100%" invalid={!!errors.email} mt={"1.0rem"}>
                 <InputGroup w="100%" bg={!!errors.email ? "#ffe0e0" : ""}>
                   <Input
                     {...register("email", {
@@ -194,14 +179,7 @@ const Page = () => {
                 )}
               </Field>
               {/* 密码输入框 */}
-              <Field
-                label="Password"
-                fontFamily="Arial"
-                fontSize="0.75rem"
-                fontWeight="400"
-                invalid={!!errors.password}
-                mt={"1.0rem"}
-              >
+              <Field label="Password" fontSize="0.75rem" fontWeight="400" invalid={!!errors.password} mt={"1.0rem"}>
                 <InputGroup w="100%" bg={!!errors.password ? "#ffe0e0" : ""}>
                   <Input
                     {...register("password", {
@@ -234,7 +212,6 @@ const Page = () => {
                   )}
 
                   <Text
-                    fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
                     color={isLengthValid ? "#299E46" : "#737373"} // 动态变色
@@ -249,7 +226,6 @@ const Page = () => {
                     <Box boxSize={"0.19rem"} bg={"#737373"} borderRadius={"50%"}></Box>
                   )}
                   <Text
-                    fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
                     color={isUppercaseValid ? "#299E46" : "#737373"} // 动态变色
@@ -264,7 +240,6 @@ const Page = () => {
                     <Box boxSize={"0.19rem"} bg={"#737373"} borderRadius={"50%"}></Box>
                   )}
                   <Text
-                    fontFamily="PingFangSC, PingFang SC"
                     fontWeight="400"
                     fontSize="0.81rem"
                     color={isNumberValid ? "#299E46" : "#737373"} // 动态变色
@@ -286,7 +261,7 @@ const Page = () => {
             borderRadius="1.38rem"
             disabled={!(isLengthValid && isUppercaseValid && isNumberValid && Object.keys(errors).length === 0)}
           >
-            <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
+            <Text fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
               Create an Account
             </Text>
           </Button>
@@ -304,11 +279,10 @@ const Page = () => {
         mt="auto" // 这个可以确保元素被推到页面的底部
         mb={"1.5rem"}
       >
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#404040">
+        <Text fontWeight="400" fontSize="0.88rem" color="#404040">
           Already have an account?
         </Text>
         <Text
-          fontFamily="PingFangSC, PingFang SC"
           fontWeight="400"
           fontSize="0.88rem"
           color="#EE3939"

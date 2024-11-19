@@ -64,44 +64,16 @@ const Page = () => {
           }}
         ></Image>
       </Flex>
-      <Text
-        fontSize="1.38rem"
-        fontWeight="600"
-        color="#171717"
-        fontFamily="PingFangSC, PingFang SC"
-        mt={"0.1rem"}
-        pl={"0.25rem"}
-      >
+      <Text fontSize="1.38rem" fontWeight="600" color="#171717" mt={"0.1rem"} pl={"0.25rem"}>
         Verify Email
       </Text>
-      <Text
-        fontFamily="PingFangSC, PingFang SC"
-        fontSize="0.88rem"
-        fontWeight="400"
-        color="#737373"
-        mt={"0.19rem"}
-        pl={"0.25rem"}
-      >
+      <Text fontSize="0.88rem" fontWeight="400" color="#737373" mt={"0.19rem"} pl={"0.25rem"}>
         Please check your mail. We've sent a code to:
       </Text>
-      <Text
-        fontFamily="PingFangSC, PingFang SC"
-        fontSize="0.88rem"
-        fontWeight="700"
-        color="#000"
-        mt={"-0.2rem"}
-        pl={"0.25rem"}
-      >
+      <Text fontSize="0.88rem" fontWeight="700" color="#000" mt={"-0.2rem"} pl={"0.25rem"}>
         {params.email}
       </Text>
-      <Text
-        fontFamily="PingFangSC, PingFang SC"
-        fontSize="0.81rem"
-        fontWeight="400"
-        color="#737373"
-        mt={"2.1rem"}
-        pl={"0.25rem"}
-      >
+      <Text fontSize="0.81rem" fontWeight="400" color="#737373" mt={"2.1rem"} pl={"0.25rem"}>
         Please enter verification code below:
       </Text>
       <PinInput
@@ -118,14 +90,7 @@ const Page = () => {
           }
         }}
       ></PinInput>
-      <Text
-        fontFamily="PingFangSC, PingFang SC"
-        fontSize="0.81rem"
-        fontWeight="400"
-        color="#737373"
-        mt={"0rem"}
-        pl={"0.25rem"}
-      >
+      <Text fontSize="0.81rem" fontWeight="400" color="#737373" mt={"0rem"} pl={"0.25rem"}>
         {canResend ? (
           <Text color="#EE3939" onClick={handleSendCode}>
             Resend code
@@ -136,7 +101,7 @@ const Page = () => {
       </Text>
       <VStack pb="4rem" w="100%" mt={"1.2rem"}>
         <Button width="20.44rem" height="2.75rem" background={"#EE3939"} borderRadius="1.38rem" onClick={vertify}>
-          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
+          <Text fontWeight="600" fontSize="1.06rem" color="#FFFFFF">
             Verify
           </Text>
         </Button>

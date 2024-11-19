@@ -141,13 +141,35 @@ function Page() {
 
   return (
     <Box h="100vh" position={"relative"}>
-      <Box position={"absolute"} height="25rem" zIndex={0} borderRadius={"0rem  0rem  1.13rem  1.13rem"} pointerEvents="none" overflow={"hidden"} width={"full"}>
+      <Box
+        position={"absolute"}
+        height="25rem"
+        zIndex={0}
+        borderRadius={"0rem  0rem  1.13rem  1.13rem"}
+        pointerEvents="none"
+        overflow={"hidden"}
+        width={"full"}
+      >
         {splineComponent}
-        <Image src={Bg.src} position={"absolute"} zIndex={0} height="25rem" objectFit="cover" w={"full"} top={0}></Image>
+        <Image
+          src={Bg.src}
+          position={"absolute"}
+          zIndex={0}
+          height="25rem"
+          objectFit="cover"
+          w={"full"}
+          top={0}
+        ></Image>
       </Box>
       <Box pt={4}></Box>
       <Header noTitle={true}></Header>
-      <Flex justifyContent={"center"} alignItems={"center"} mt={"3.2rem"} position={"relative"} flexDirection={"column"}>
+      <Flex
+        justifyContent={"center"}
+        alignItems={"center"}
+        mt={"3.2rem"}
+        position={"relative"}
+        flexDirection={"column"}
+      >
         <Box boxSize={"11rem"}>
           <svg width="0" height="0">
             <defs>
@@ -178,11 +200,16 @@ function Page() {
               borderRadius="full"
               m={"0.1rem"}
             >
-              <Image boxSize={"7.13rem"} borderRadius="full" src={params.loadOriginalImage} border="0.06rem solid #fffeff"></Image>
+              <Image
+                boxSize={"7.13rem"}
+                borderRadius="full"
+                src={params.loadOriginalImage}
+                border="0.06rem solid #fffeff"
+              ></Image>
             </Flex>
           </CircularProgressbarWithChildren>
         </Box>
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.25rem" color="#404040" mt={"1.5rem"}>
+        <Text fontWeight="600" fontSize="1.25rem" color="#404040" mt={"1.5rem"}>
           {info?.total_messages ? `Estimated wait ${info?.wait_time ?? "--"} mins` : barValue + "%"}
         </Text>
         <Text font-weight="400" font-size="0.88rem" color=" #404040" mt={"0.44rem"}>
@@ -192,11 +219,11 @@ function Page() {
           {!info?.total_messages ? "You can check results anytime in history" : "people before you"}
         </Text>
       </Flex>
-      <Text fontFamily="PingFangSC, PingFang SC" fontWeight="500" fontSize="1rem" color="#171717" mt={"4.5rem"} px={"1rem"}>
+      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"4.5rem"} px={"1rem"}>
         While you wait
       </Text>
       <Flex px={"1rem"}>
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="500" fontSize="1rem" color="#171717">
+        <Text fontWeight="500" fontSize="1rem" color="#171717">
           Check out our amazing creations!
         </Text>
         <Image src={PrintGeneration.src} w={"0.88rem"} h="0.88rem" ml={"0.3rem"}></Image>

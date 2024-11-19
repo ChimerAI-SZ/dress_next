@@ -34,7 +34,7 @@ function Page() {
           height="0.06rem"
           bg="linear-gradient( 90deg,#f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
         />
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.81rem" color=" #737373" mx={"0.75rem"}>
+        <Text fontWeight="400" fontSize="0.81rem" color=" #737373" mx={"0.75rem"}>
           Advanced design
         </Text>
         <Box
