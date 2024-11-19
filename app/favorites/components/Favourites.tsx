@@ -20,12 +20,7 @@ export default function Favourites({ favouriteData }: { favouriteData: Favourite
                   <Empty style={{ bg: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center" }} />
                 }
               >
-                <Image
-                  w="100%"
-                  maxH={"calc(50% - 2pt)"}
-                  zIndex={1}
-                  src={favouriteData.images[0]?.image_url?.split("?")[0]}
-                />
+                <Image w="100%" maxH={"100%"} zIndex={1} src={favouriteData.images[0]?.image_url?.split("?")[0]} />
               </Show>
             }
           >

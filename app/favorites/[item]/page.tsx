@@ -175,22 +175,20 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       <Show when={description}>
         <Box>
           <DescriptionBox>
-            <Flex
-              fontWeight={500}
-              fontSize={"1.3rem"}
-              p={"8pt 16pt 2pt"}
-              alignItems={"center"}
-              justifyContent={"flex-start"}
-            >
+            <Flex fontWeight={500} fontSize={"1.3rem"} alignItems={"center"} justifyContent={"flex-start"}>
               <Image
-                w={"28pt"}
-                h={"28pt"}
-                src={"assets/images/favourites/collectionDescription.svg"}
+                boxSize={"2rem"}
+                mr={"0.5rem"}
+                src={"/assets/images/favourites/collectionDescription.svg"}
                 alt="description-icon"
               />
-              <span>Description</span>
+              <Text display={"inline-block"} mt={"0.5rem"} fontWeight={500} fontSize={"1.1rem"}>
+                Description
+              </Text>
             </Flex>
-            <Box px={"16pt"}>{description}</Box>
+            <Box px={"0.8rem"} mt={"0.5rem"}>
+              {description}
+            </Box>
           </DescriptionBox>
         </Box>
       </Show>
