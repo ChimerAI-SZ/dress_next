@@ -7,6 +7,7 @@ import styled from "@emotion/styled"
 import { storage } from "@utils/index"
 
 import { editProdile } from "@lib/request/profile"
+import { errorCaptureRes } from "@utils/index"
 
 import { Alert } from "@components/Alert"
 import Header from "../components/Header"
@@ -34,17 +35,19 @@ const EditAvatar: React.FC = () => {
         avatar_url: selectedAvatar
       }
 
-      const { success, data, message } = await editProdile(params)
+      const [err, res] = await errorCaptureRes(editProdile, params)
 
-      if (success) {
+      if (res.success) {
         Alert.open({
-          content: message,
+          content: res.message,
           iconVisible: false
         })
         router.back()
+      } else {
+        Alert.open({
+          content: err.message
+        })
       }
-    } else {
-      //TODO - 没有选择头像时的交互
     }
   }
 
@@ -75,7 +78,15 @@ const EditAvatar: React.FC = () => {
         </For>
       </Grid>
 
-      <Box p={"8pt 16pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+      <Box
+        p={"8pt 16pt"}
+        position={"fixed"}
+        bottom={0}
+        bgColor={"#fff"}
+        w="100vw"
+        borderRadius={"12px 12px 0 0"}
+        boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+      >
         <Button borderRadius={"40px"} w={"100%"} bgColor={"#EE3939"} onClick={handleSaveAvatar}>
           Done
         </Button>

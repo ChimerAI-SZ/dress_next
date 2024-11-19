@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ title = "" }) => {
             router.back()
           }}
         />
-        <Heading position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
+        <Heading whiteSpace={"nowrap"} position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
           {title}
         </Heading>
         {/* 布局占位容器 */}

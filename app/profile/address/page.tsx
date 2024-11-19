@@ -10,10 +10,12 @@ import { RightOutlined } from "@ant-design/icons"
 
 import { shippingAddressType } from "@definitions/profile"
 import { queryAllAddress } from "@lib/request/profile"
+import { errorCaptureRes } from "@utils/index"
 
 import addressIcon from "@img/homepage/address.svg"
 
 import Header from "../components/Header"
+import { Alert } from "@components/Alert"
 
 const EditAvatar: React.FC = () => {
   const [addressList, setAddressList] = useState<shippingAddressType[]>([])
@@ -30,10 +32,10 @@ const EditAvatar: React.FC = () => {
       const params = {
         user_id: +user_id as number
       }
-      const { success, data, message } = await queryAllAddress(params)
-      if (success) {
+      const [err, res] = await errorCaptureRes(queryAllAddress, params)
+      if (res.success) {
         // 把默认数据放在最前面
-        data.sort((a: shippingAddressType, b: shippingAddressType) => {
+        res.data.sort((a: shippingAddressType, b: shippingAddressType) => {
           if (a.is_default && !b.is_default) {
             return -1
           }
@@ -43,11 +45,13 @@ const EditAvatar: React.FC = () => {
           return 0
         })
 
-        setAddressList(data)
+        setAddressList(res.data)
 
-        localStorage.setItem("addressList", JSON.stringify(data))
+        localStorage.setItem("addressList", JSON.stringify(res.data))
       } else {
-        //todo error hanlder
+        Alert.open({
+          content: err.message
+        })
       }
     }
   }
@@ -71,12 +75,23 @@ const EditAvatar: React.FC = () => {
               }}
             >
               <Flex alignItems={"center"} justifyContent={"space-between"} mb={"6pt"}>
-                <Show when={item.is_default} fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}>
+                <Show
+                  when={item.is_default}
+                  fallback={<Image w="20px" h="20px" src={addressIcon.src} alt="address-icon" />}
+                >
                   <DefaultMark>Default</DefaultMark>
                 </Show>
                 <RightOutlined />
               </Flex>
-              <Flex flexFlow={"row wrap"} alignItems={"center"} justifyContent={"flex-start"} color={"#171717"} fontWeight={500} fontSize={"1rem"} mb={"6pt"}>
+              <Flex
+                flexFlow={"row wrap"}
+                alignItems={"center"}
+                justifyContent={"flex-start"}
+                color={"#171717"}
+                fontWeight={500}
+                fontSize={"1rem"}
+                mb={"6pt"}
+              >
                 <span>{item.street_address_1},</span>
                 <Show when={item.street_address_2}>
                   <span>{item.street_address_2},</span>
@@ -94,7 +109,15 @@ const EditAvatar: React.FC = () => {
         }}
       </For>
 
-      <Box p={"8pt 16pt 24pt"} position={"fixed"} bottom={0} bgColor={"#fff"} w="100vw" borderRadius={"12px 12px 0 0"} boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}>
+      <Box
+        p={"8pt 16pt 24pt"}
+        position={"fixed"}
+        bottom={0}
+        bgColor={"#fff"}
+        w="100vw"
+        borderRadius={"12px 12px 0 0"}
+        boxShadow={"0px -1px 5px 0px rgba(214, 214, 214, 0.5);"}
+      >
         <Button
           borderRadius={"40px"}
           w={"100%"}

@@ -29,7 +29,7 @@ const Header: React.FC<FavouritesHeaderProps> = ({ name, onSuccess }) => {
           {/* <Image w="24px" h="24px" src={closeIcon.src} alt="" /> */}
           <LeftOutlined style={{ width: "22pt", height: "22pt" }} />
         </Link>
-        <Heading position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
+        <Heading whiteSpace={"nowrap"} position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
           {name}
         </Heading>
         {/* 新增 icon 与编辑/删除的menu多选 icon */}
