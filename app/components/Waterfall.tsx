@@ -12,7 +12,7 @@ import { errorCaptureRes } from "@utils/index"
 import ImageOverlay from "./ImageOverlay"
 import Toast from "@components/Toast"
 import ImageViewer from "@components/ImageViewer"
-
+import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
   image_url: string
@@ -41,8 +41,10 @@ const breakpointColumnsObj = {
 }
 
 import { useSearchParams, useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
 const Waterfall: React.FC = () => {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [visibleImage, setVisibleImage] = useState<string | null>(null)
   const [imageList, setImageList] = useState<Item[]>([])
   const [page, setPage] = useState(0)
@@ -247,9 +249,8 @@ const Waterfall: React.FC = () => {
               type="submit"
               mx="1.53rem"
               onClick={() => {
-                router.push(
-                  `/generate?loadOriginalImage=${selectedImg}&loadPrintingImage=&backgroundColor=%23FDFCFA&text=&loadFabricImage=`
-                )
+                dispatch(setParams({ loadOriginalImage: selectedImg }))
+                router.replace(`/generate`)
               }}
             >
               Generate
@@ -273,4 +274,38 @@ const StyledLoading = styled(Image)`
   animation: ${spin} 2s linear infinite; /* 旋转动画持续2秒，线性变化，无限循环 */
 `
 
+const Bg = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+`
+const StyledImg = styled(Image)`
+  max-width: 90vw;
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 2px 17px 0px rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  border: 1px solid rgba(182, 182, 182, 0.5);
+`
+const Footer = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 8pt 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px -1px 5px 0px rgba(214, 214, 214, 0.5);
+  border-radius: 12px 12px 0px 0px;
+`
 export default Waterfall

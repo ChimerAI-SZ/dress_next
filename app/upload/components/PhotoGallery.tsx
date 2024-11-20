@@ -11,12 +11,11 @@ import { TypesClothingProps } from "@definitions/update"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
-  const [page, setPage] = useState(0)
   const [total, setTotal] = useState(0)
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
   const uniqueId = useId()
   const [activeIndex, setActiveIndex] = useState(0)
-
+  const [makr, setMakr] = useState(false)
   const [urlList, setUrlList] = useState<{ image_url: string; tags: string; selected?: boolean }[]>([])
   const itemsPerPage = activeIndex === 0 ? 7 : 8
   const totalPages = Math.ceil(total / itemsPerPage)
@@ -117,11 +116,14 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       <Box h={"11rem"} overflow={"hidden"}>
         <Swiper
           onSlideChange={swiper => {
-            console.log(Math.floor(urlList.length / 8), swiper.activeIndex)
+            setActiveIndex(swiper.activeIndex)
+            if (makr) {
+              return
+            }
+            setMakr(total - (swiper.activeIndex || 0) * (swiper.activeIndex === 0 ? 7 : 8) < 8)
             if (Math.floor(urlList.length / 8) <= swiper.activeIndex) {
               fetchData(swiper.activeIndex)
             }
-            setActiveIndex(swiper.activeIndex)
           }}
         >
           {[...Array(totalPages)].map((_, pageIndex) => (

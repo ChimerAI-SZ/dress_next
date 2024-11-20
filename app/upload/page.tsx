@@ -8,7 +8,11 @@ import PrintSelect from "./components/PrintSelect"
 import Fabric from "./components/Fabric"
 import Link from "next/link"
 import { Params } from "@definitions/update"
+import { useRouter } from "next/navigation"
+import { setWorkInfo, setParams as setStoreParams, setTaskId, setWork } from "@store/features/workSlice"
+import { useDispatch, useSelector } from "react-redux"
 function Page() {
+  const dispatch = useDispatch()
   const [params, setParams] = useState<Params>({
     loadOriginalImage: undefined,
     loadPrintingImage: undefined,
@@ -16,6 +20,7 @@ function Page() {
     text: undefined,
     loadFabricImage: undefined
   })
+  const router = useRouter()
   // 通过回调函数传递数据
   const handleParamsUpdate = (newParams: Params) => {
     setParams((prev: Params) => ({
@@ -62,16 +67,19 @@ function Page() {
         boxShadow="0rem -0.06rem 0.31rem 0rem rgba(214,214,214,0.5)"
       >
         {params?.loadOriginalImage ? (
-          <Link
-            href={{
-              pathname: "/generate",
-              query: params
+          <Button
+            onClick={() => {
+              dispatch(setStoreParams(params))
+              router.replace("/generate")
             }}
+            colorScheme="teal"
+            width="20.38rem"
+            height="2.5rem"
+            background="#EE3939"
+            borderRadius="1.25rem"
           >
-            <Button colorScheme="teal" width="20.38rem" height="2.5rem" background="#EE3939" borderRadius="1.25rem">
-              Generate
-            </Button>
-          </Link>
+            Generate
+          </Button>
         ) : (
           <Button
             colorScheme="teal"

@@ -4,22 +4,25 @@ import { Container, Flex, Link, IconButton, Text, Image, Show } from "@chakra-ui
 import ArrowLeft from "@img/login/back.svg"
 import SelectMore from "@img/generate-result/select-more.svg"
 import Active from "@img/generate-result/active.svg"
+import { useRouter } from "next/navigation"
 function Page({ show, noTitle, cb }: { show?: boolean; noTitle?: boolean; cb?: (e: boolean) => void }) {
   const [active, setActive] = useState(false)
+  const router = useRouter()
   return (
     <Flex alignItems="center" justifyContent="center" mb={4} width="full" position="relative">
-      <Link href="/">
-        <IconButton
-          variant="ghost"
-          aria-label="Back"
-          position="absolute"
-          left="0"
-          top="50%"
-          transform="translateY(-50%)"
-        >
-          <Image src={ArrowLeft.src} w={"1.38rem"} h={"1.38rem"} />
-        </IconButton>
-      </Link>
+      <IconButton
+        onClick={() => {
+          router.push("/")
+        }}
+        variant="ghost"
+        aria-label="Back"
+        position="absolute"
+        left="0"
+        top="50%"
+        transform="translateY(-50%)"
+      >
+        <Image src={ArrowLeft.src} w={"1.38rem"} h={"1.38rem"} />
+      </IconButton>
 
       <Show
         when={!noTitle}

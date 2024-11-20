@@ -30,7 +30,8 @@
       "@components/*": ["./components/*"],
       "@lib/*": ["./lib/*"],
       "@hooks/*": ["./hooks/*"],
-      "@utils/*": ["./utils/*"]
+      "@utils/*": ["./utils/*"],
+      "@store/*": ["./store/*"]
     },
     
   },
