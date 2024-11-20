@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useEffect } from "react"
-import { Container, Box, Flex, Link, Image, Button, For } from "@chakra-ui/react"
+import { Box, Flex, Link, Image, Button, For } from "@chakra-ui/react"
 import styled from "@emotion/styled"
 
 import Waterfall from "./components/Waterfall"
@@ -30,7 +30,8 @@ function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
   const router = useRouter()
 
-  const headerRef = useRef<HTMLDivElement>(null) // 容器ref
+  const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null) // header ref
 
   // 页面跳转
   const handleJump = (link: string) => {
@@ -40,26 +41,26 @@ function Dashboard() {
 
   // header 在页面滚动之后设置白色背景色
   useEffect(() => {
-    if (headerRef.current) {
+    if (headerRef.current && containerRef.current) {
       const el = headerRef.current
 
       const handleScroll = () => {
-        if (window.scrollY > 0) {
+        if ((containerRef.current?.scrollTop ?? 0) > 0) {
           el.style.backgroundColor = "#fff"
-        } else if (window.scrollY === 0) {
+        } else if ((containerRef.current?.scrollTop ?? 0) === 0) {
           el.style.backgroundColor = "transparent"
         }
       }
-      window.addEventListener("scroll", handleScroll)
+      containerRef.current.addEventListener("scroll", handleScroll)
 
       return () => {
-        window.removeEventListener("scroll", handleScroll)
+        containerRef.current?.removeEventListener("scroll", handleScroll)
       }
     }
-  }, [headerRef.current])
+  }, [headerRef.current, containerRef.current])
 
   return (
-    <Container p={0} position={"relative"}>
+    <Container ref={containerRef}>
       <BackgroundBox>
         <Image src="/assets/images/mainPage/bg.png" alt="bg-img" />
       </BackgroundBox>
@@ -86,7 +87,16 @@ function Dashboard() {
           <Flex gap="0.5rem">
             <For each={headerIconList}>
               {(item, index: number): React.ReactNode => {
-                return <Image onClick={() => handleJump(item.link)} key={item.key} src={item.imgUrl} alt={`${item.key}-icon`} boxSize="22pt" cursor="pointer" />
+                return (
+                  <Image
+                    onClick={() => handleJump(item.link)}
+                    key={item.key}
+                    src={item.imgUrl}
+                    alt={`${item.key}-icon`}
+                    boxSize="22pt"
+                    cursor="pointer"
+                  />
+                )
               }}
             </For>
           </Flex>
@@ -136,6 +146,15 @@ function Dashboard() {
     </Container>
   )
 }
+
+const Container = styled.div`
+  position: relative;
+  height: 100vh;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 const BackgroundBox = styled.div`
   position: absolute;
