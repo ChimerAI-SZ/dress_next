@@ -184,19 +184,21 @@ const Page = () => {
                 )}
               </Field>
             </Fieldset.Content>
-            <Text
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="400"
-              fontSize="0.88rem"
-              color="#737373"
-              textAlign={"right"}
-              cursor={"pointer"}
-              onClick={() => {
-                router.push("/retrieve-password")
-              }}
-            >
-              Forgot password？
-            </Text>
+            <Flex justifyContent={"flex-end"}>
+              <Text
+                fontFamily="PingFangSC, PingFang SC"
+                fontWeight="400"
+                fontSize="0.88rem"
+                color="#737373"
+                textAlign={"right"}
+                cursor={"pointer"}
+                onClick={() => {
+                  router.push("/retrieve-password")
+                }}
+              >
+                Forgot password？
+              </Text>
+            </Flex>
           </Fieldset.Root>
         </VStack>
 

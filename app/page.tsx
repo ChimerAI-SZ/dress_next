@@ -1,12 +1,15 @@
 "use client"
 
-import { useRef, useEffect } from "react"
-import { Container, Box, Flex, Link, Image, Button, For } from "@chakra-ui/react"
+import { useRef, useEffect, useState } from "react"
+import { Container, Box, Flex, Link, Image, Button, For, Text } from "@chakra-ui/react"
 import styled from "@emotion/styled"
 
 import Waterfall from "./components/Waterfall"
 import { useRouter } from "next/navigation"
-
+import { useDispatch, useSelector } from "react-redux"
+import { getQuery } from "@lib/request/generate"
+import { fetchUtilWait } from "@lib/request/generate"
+import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 // header 右侧按钮
 const headerIconList = [
   {
@@ -28,10 +31,14 @@ const headerIconList = [
 
 function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
+  const [barValue, setBarValue] = useState(0)
+
   const router = useRouter()
-
+  const dispatch = useDispatch()
+  const { workInfo, work, taskId, params, generateImage } = useSelector((state: any) => state.work)
+  console.log("home", workInfo, work, taskId, params, generateImage)
   const headerRef = useRef<HTMLDivElement>(null) // 容器ref
-
+  const [imageList, setImageList] = useState<string[]>([])
   // 页面跳转
   const handleJump = (link: string) => {
     // 没有登陆的话去往登陆页面
@@ -57,6 +64,70 @@ function Dashboard() {
       }
     }
   }, [headerRef.current])
+
+  const getImage = async (taskID: string) => {
+    try {
+      const resultData: any = await getQuery({ taskID })
+      const { result, success, message } = resultData || {}
+
+      if (success) {
+        setImageList(pre => [...pre, result.res])
+        const newImage = result.res
+        const updatedImageList = generateImage.some((item: string) => item === newImage)
+          ? generateImage
+          : [...generateImage, newImage]
+
+        dispatch(setGenerateImage(updatedImageList)) // 直接传递更新后的列表
+        dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
+        setBarValue(pre => (Math.ceil(pre + 16.6) >= 100 ? 100 : Math.ceil(pre + 16.6)))
+      } else {
+        console.log(`Task ${taskID} still in progress`)
+      }
+      if (message !== "Task is running") {
+        dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
+      }
+    } catch (err) {
+      dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
+    }
+  }
+  console.log(taskId)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (taskId.length > 0) {
+        taskId.forEach((taskID: string) => {
+          getImage(taskID)
+        })
+      } else {
+        console.log("All tasks complete or no tasks left.")
+      }
+    }, 5000)
+
+    return () => {
+      console.log("Cleaning up interval")
+      clearInterval(interval)
+    }
+  }, [taskId])
+
+  useEffect(() => {
+    if (barValue > 0) {
+      console.log(1)
+    } else {
+    }
+
+    console.log("barValue:", barValue)
+
+    // 清除之前的 Toast
+    return () => {}
+  }, [barValue])
+
+  useEffect(() => {
+    if (taskId.length === 0 && imageList.length > 0) {
+      console.log("generateImage", generateImage)
+
+      const imageListParam = encodeURIComponent(JSON.stringify(imageList))
+      // router.replace(`/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`)
+    }
+  }, [taskId, imageList, router])
 
   return (
     <Container p={0} position={"relative"}>
@@ -86,7 +157,16 @@ function Dashboard() {
           <Flex gap="0.5rem">
             <For each={headerIconList}>
               {(item, index: number): React.ReactNode => {
-                return <Image onClick={() => handleJump(item.link)} key={item.key} src={item.imgUrl} alt={`${item.key}-icon`} boxSize="22pt" cursor="pointer" />
+                return (
+                  <Image
+                    onClick={() => handleJump(item.link)}
+                    key={item.key}
+                    src={item.imgUrl}
+                    alt={`${item.key}-icon`}
+                    boxSize="22pt"
+                    cursor="pointer"
+                  />
+                )
               }}
             </For>
           </Flex>
@@ -133,6 +213,25 @@ function Dashboard() {
           {/* <ImageGuideModal isOpen={isOpen} onClose={onClose} /> */}
         </MainSection>
       </Box>
+      {/* <Flex
+        position={"sticky"}
+        boxShadow="0rem 0.13rem 0.5rem 0rem rgba(17,17,17,0.12)"
+        bottom={"2rem"}
+        left={"50%"}
+        width={"11.53rem"}
+        h={"2.5rem"}
+        background="#FFFFFF"
+        transform={"translateX(-50%)"}
+        borderRadius="0.5rem"
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Box>1</Box>
+        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+          Generating 26%
+        </Text>
+        <Image></Image>
+      </Flex> */}
     </Container>
   )
 }
