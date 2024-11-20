@@ -6,7 +6,6 @@ import styled from "@emotion/styled"
 import { Provider, useSelector } from "react-redux"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
-import { saveAs } from "file-saver"
 
 import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 
