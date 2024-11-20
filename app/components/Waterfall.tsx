@@ -249,9 +249,8 @@ const Waterfall: React.FC = () => {
               type="submit"
               mx="1.53rem"
               onClick={() => {
-                router.push(
-                  `/generate?loadOriginalImage=${selectedImg}&loadPrintingImage=&backgroundColor=%23FDFCFA&text=&loadFabricImage=`
-                )
+                dispatch(setParams({ loadOriginalImage: selectedImg }))
+                router.replace(`/generate`)
               }}
             >
               Generate
