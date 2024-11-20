@@ -27,6 +27,7 @@ const Page = () => {
   const [isLengthValid, setIsLengthValid] = useState(false)
   const [isUppercaseValid, setIsUppercaseValid] = useState(false)
   const [isNumberValid, setIsNumberValid] = useState(false)
+  const [loading, setLoading] = useState(false)
   const {
     register,
     handleSubmit,
@@ -58,6 +59,10 @@ const Page = () => {
   }
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
     const encryptedBase64 = await getEncryption()
     // const emailRegistered = await checkEmailRegistered(data.email);
     const [err, res] = await errorCaptureRes(fetchVerification, {
@@ -71,6 +76,7 @@ const Page = () => {
         content: `${res.message}`
       })
     }
+    setLoading(false)
   }
 
   // 表单最终提交逻辑
