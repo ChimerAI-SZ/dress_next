@@ -102,7 +102,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
               <Fieldset.Root w="100%">
                 <Fieldset.Content w="100%">
                   {/* Titile */}
-                  <Field label="Title" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.title}>
+                  <Field label="Title" fontSize="0.75rem" fontWeight="400" invalid={!!errors.title}>
                     <InputGroup w="100%" bg={!!errors.title ? "#ffe0e0" : ""}>
                       <Input
                         {...register("title", {
@@ -125,13 +125,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
                     )}
                   </Field>
                   {/* Description */}
-                  <Field
-                    label="Description"
-                    fontFamily="Arial"
-                    fontSize="0.75rem"
-                    fontWeight="400"
-                    invalid={!!errors.description}
-                  >
+                  <Field label="Description" fontSize="0.75rem" fontWeight="400" invalid={!!errors.description}>
                     <InputGroup w="100%" bg={!!errors.description ? "#ffe0e0" : ""}>
                       <Textarea
                         {...register("description", {})}

@@ -59,7 +59,7 @@ function Page() {
         description: (
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                 Login to have generation history
               </Text>
             </Flex>
@@ -70,7 +70,7 @@ function Page() {
                 router.push("/login")
               }}
             >
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
+              <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
                 Log in
               </Text>
               <Image src={ModalBack.src} boxSize={"1rem"}></Image>
@@ -89,7 +89,7 @@ function Page() {
         description: (
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                 Login to have generation history
               </Text>
             </Flex>
@@ -100,7 +100,7 @@ function Page() {
                 router.push("/login")
               }}
             >
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
+              <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
                 Log in
               </Text>
               <Image src={ModalBack.src} boxSize={"1rem"}></Image>
@@ -132,7 +132,7 @@ function Page() {
         description: (
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                 Login to have generation history
               </Text>
             </Flex>
@@ -143,7 +143,7 @@ function Page() {
                 router.push("/login")
               }}
             >
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#EE3939">
+              <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
                 Log in
               </Text>
               <Image src={ModalBack.src} boxSize={"1rem"}></Image>
@@ -254,18 +254,12 @@ function Page() {
                       <Flex justifyContent={"space-between"} alignItems={"center"}>
                         <Flex alignItems={"center"} gap={"0.56rem"}>
                           <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-                          <Text
-                            fontFamily="PingFangSC, PingFang SC"
-                            fontWeight="400"
-                            fontSize="0.88rem"
-                            color="#171717"
-                          >
+                          <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                             Collect in Default
                           </Text>
                         </Flex>
                         <Flex alignItems={"center"} gap={"0.56rem"}>
                           <Text
-                            fontFamily="PingFangSC, PingFang SC"
                             fontWeight="400"
                             fontSize="0.88rem"
                             color="#EE3939"
@@ -613,13 +607,12 @@ function Page() {
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex alignItems={"center"} gap={"0.56rem"}>
               <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-              <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+              <Text fontWeight="400" fontSize="0.88rem" color="#171717">
                 Collect in Default
               </Text>
             </Flex>
             <Flex alignItems={"center"} gap={"0.56rem"}>
               <Text
-                fontFamily="PingFangSC, PingFang SC"
                 fontWeight="400"
                 fontSize="0.88rem"
                 color="#EE3939"

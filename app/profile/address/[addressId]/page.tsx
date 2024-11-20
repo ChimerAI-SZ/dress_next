@@ -100,13 +100,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
             <Fieldset.Root w="100%">
               <Fieldset.Content w="100%">
                 {/* full name */}
-                <Field
-                  label="Full Name"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.full_name}
-                >
+                <Field label="Full Name" fontSize="0.75rem" fontWeight="400" invalid={!!errors.full_name}>
                   <InputGroup w="100%" bg={!!errors.full_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("full_name", {
@@ -128,13 +122,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* country */}
-                <Field
-                  label="Country"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.country}
-                >
+                <Field label="Country" fontSize="0.75rem" fontWeight="400" invalid={!!errors.country}>
                   <InputGroup w="100%" bg={!!errors.country ? "#ffe0e0" : ""}>
                     <Input
                       {...register("country", {
@@ -156,13 +144,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* address */}
-                <Field
-                  label="Address"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.street_address_1}
-                >
+                <Field label="Address" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_1}>
                   <InputGroup w="100%" bg={!!errors.street_address_1 ? "#ffe0e0" : ""}>
                     <Input
                       {...register("street_address_1", {
@@ -185,13 +167,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* address */}
-                <Field
-                  label="Address Line 2"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.street_address_2}
-                >
+                <Field label="Address Line 2" fontSize="0.75rem" fontWeight="400" invalid={!!errors.street_address_2}>
                   <InputGroup w="100%" bg={!!errors.street_address_2 ? "#ffe0e0" : ""}>
                     <Input
                       {...register("street_address_2", {})}
@@ -212,7 +188,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
                 {/* city */}
-                <Field label="City" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.city}>
+                <Field label="City" fontSize="0.75rem" fontWeight="400" invalid={!!errors.city}>
                   <InputGroup w="100%" bg={!!errors.city ? "#ffe0e0" : ""}>
                     <Input
                       {...register("city", {
@@ -235,13 +211,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                 </Field>
 
                 {/* city */}
-                <Field
-                  label="State/Region"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.state}
-                >
+                <Field label="State/Region" fontSize="0.75rem" fontWeight="400" invalid={!!errors.state}>
                   <Flex alignItems={"center"} justifyContent={"space-between"} gap={5}>
                     <InputGroup bg={!!errors.state ? "#ffe0e0" : ""}>
                       <Input
@@ -286,13 +256,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
 
-                <Field
-                  label="Phone Number"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.phone_number}
-                >
+                <Field label="Phone Number" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone_number}>
                   <PhoneInputWithCountry
                     className="shipping_address_phone_number"
                     name="phone_number"
@@ -307,7 +271,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                   )}
                 </Field>
 
-                <Field label="" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.is_default}>
+                <Field label="" fontSize="0.75rem" fontWeight="400" invalid={!!errors.is_default}>
                   <Checkbox
                     {...register("is_default", {})}
                     onChange={e => {

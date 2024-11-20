@@ -31,7 +31,6 @@ function Page({ show, noTitle, cb }: { show?: boolean; noTitle?: boolean; cb?: (
             fontSize="1.1rem"
             fontWeight="bold"
             letterSpacing="0rem"
-            fontFamily="PingFangSC, PingFang SC"
             textAlign="center"
             color={noTitle ? "transparent" : "#171717"}
           >

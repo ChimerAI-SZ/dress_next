@@ -265,7 +265,7 @@ function Page() {
             </Flex>
           </CircularProgressbarWithChildren>
         </Box>
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="600" fontSize="1.25rem" color="#404040" mt={"1.5rem"}>
+        <Text fontWeight="600" fontSize="1.25rem" color="#404040" mt={"1.5rem"}>
           {info?.total_messages ? `Estimated wait ${info?.wait_time ?? "--"} mins` : barValue + "%"}
         </Text>
         <Text font-weight="400" font-size="0.88rem" color=" #404040" mt={"0.44rem"}>
@@ -275,18 +275,11 @@ function Page() {
           {!info?.total_messages ? "You can check results anytime in history" : "people before you"}
         </Text>
       </Flex>
-      <Text
-        fontFamily="PingFangSC, PingFang SC"
-        fontWeight="500"
-        fontSize="1rem"
-        color="#171717"
-        mt={"4.5rem"}
-        px={"1rem"}
-      >
+      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"4.5rem"} px={"1rem"}>
         While you wait
       </Text>
       <Flex px={"1rem"}>
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="500" fontSize="1rem" color="#171717">
+        <Text fontWeight="500" fontSize="1rem" color="#171717">
           Check out our amazing creations!
         </Text>
         <Image src={PrintGeneration.src} w={"0.88rem"} h="0.88rem" ml={"0.3rem"}></Image>

@@ -71,13 +71,7 @@ const EditProfile: React.FC = () => {
               <Fieldset.Content w="100%">
                 <SubTitle>Display Information</SubTitle>
                 {/* first name */}
-                <Field
-                  label="First Name"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.first_name}
-                >
+                <Field label="First Name" fontSize="0.75rem" fontWeight="400" invalid={!!errors.first_name}>
                   <InputGroup w="100%" bg={!!errors.first_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("first_name", {
@@ -99,13 +93,7 @@ const EditProfile: React.FC = () => {
                   )}
                 </Field>
                 {/* last name */}
-                <Field
-                  label="Last Name"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.last_name}
-                >
+                <Field label="Last Name" fontSize="0.75rem" fontWeight="400" invalid={!!errors.last_name}>
                   <InputGroup w="100%" bg={!!errors.last_name ? "#ffe0e0" : ""}>
                     <Input
                       {...register("last_name", {
@@ -127,13 +115,7 @@ const EditProfile: React.FC = () => {
                   )}
                 </Field>
                 {/* Pronouns */}
-                <Field
-                  label="Pronouns"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.pronouns}
-                >
+                <Field label="Pronouns" fontSize="0.75rem" fontWeight="400" invalid={!!errors.pronouns}>
                   <InputGroup w="100%" bg={!!errors.pronouns ? "#ffe0e0" : ""}>
                     <Input
                       {...register("pronouns", {})}
@@ -154,7 +136,7 @@ const EditProfile: React.FC = () => {
                   )}
                 </Field>
                 {/* bil */}
-                <Field label="Bio" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.bio}>
+                <Field label="Bio" fontSize="0.75rem" fontWeight="400" invalid={!!errors.bio}>
                   <InputGroup w="100%" bg={!!errors.bio ? "#ffe0e0" : ""}>
                     <Textarea
                       {...register("bio", {})}
@@ -176,7 +158,7 @@ const EditProfile: React.FC = () => {
 
                 <SubTitle style={{ marginTop: "1rem" }}>Personal Information</SubTitle>
 
-                <Field label="Email" fontFamily="Arial" fontSize="0.75rem" fontWeight="400" invalid={!!errors.email}>
+                <Field label="Email" fontSize="0.75rem" fontWeight="400" invalid={!!errors.email}>
                   <InputGroup w="100%" bg={!!errors.email ? "#ffe0e0" : ""}>
                     <Input
                       {...register("email", {
@@ -198,13 +180,7 @@ const EditProfile: React.FC = () => {
                     </Text>
                   )}
                 </Field>
-                <Field
-                  label="Phone Number"
-                  fontFamily="Arial"
-                  fontSize="0.75rem"
-                  fontWeight="400"
-                  invalid={!!errors.phone}
-                >
+                <Field label="Phone Number" fontSize="0.75rem" fontWeight="400" invalid={!!errors.phone}>
                   <InputGroup w="100%" bg={!!errors.phone ? "#ffe0e0" : ""}>
                     <Input
                       {...register("phone", {})}

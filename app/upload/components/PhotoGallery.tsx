@@ -215,7 +215,6 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                         px={"0.2rem"}
                       >
                         <Text
-                          fontFamily="PingFangSC, PingFang SC"
                           color="white"
                           fontSize="0.69rem"
                           whiteSpace="normal"

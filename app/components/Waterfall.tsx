@@ -1,17 +1,19 @@
 "use client"
 import React, { useState, useRef, useEffect, Suspense, useCallback } from "react"
 import Masonry from "react-masonry-css"
-import { Box, Flex, Spinner, useDisclosure, Image, Show, Button } from "@chakra-ui/react"
-import ImageOverlay from "./ImageOverlay"
-import { css, Global, keyframes } from "@emotion/react"
 import styled from "@emotion/styled"
+import { css, Global, keyframes } from "@emotion/react"
+
+import { Box, Flex, Spinner, useDisclosure, Image, Show, Button } from "@chakra-ui/react"
+
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
+
+import ImageOverlay from "./ImageOverlay"
 import Toast from "@components/Toast"
-import Link from "next/link"
-import loadingIcon from "@img/mainPage/loading.svg"
+import ImageViewer from "@components/ImageViewer"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
-import { useDispatch, useSelector } from "react-redux"
+import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
   image_url: string
   ID: number
@@ -39,6 +41,7 @@ const breakpointColumnsObj = {
 }
 
 import { useSearchParams, useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
 const Waterfall: React.FC = () => {
   const router = useRouter()
   const dispatch = useDispatch()
@@ -233,36 +236,12 @@ const Waterfall: React.FC = () => {
       </Box>
 
       <Show when={viewDetail}>
-        <Toast
+        <ImageViewer
+          imgUrl={selectedImg}
           close={() => {
             setViewDetail(false)
           }}
-          maskVisible={false}
-          boxStyle={{
-            width: "100vw",
-            height: "100vh",
-
-            bottom: "0",
-            left: "0",
-            right: "0",
-            top: "0",
-            transform: "unset",
-
-            padding: "12pt",
-            pt: "0",
-            display: "flex",
-            flexDirection: "column",
-            background: "unset",
-            position: "relative"
-          }}
-        >
-          <Bg
-            onClick={() => {
-              setViewDetail(false)
-            }}
-          />
-          <StyledImg src={selectedImg} />
-          <Footer>
+          footer={
             <Button
               w={"20.38rem"}
               bgColor={"#ee3939"}
@@ -270,14 +249,15 @@ const Waterfall: React.FC = () => {
               type="submit"
               mx="1.53rem"
               onClick={() => {
-                dispatch(setParams({ loadOriginalImage: selectedImg }))
-                router.replace(`/generate`)
+                router.push(
+                  `/generate?loadOriginalImage=${selectedImg}&loadPrintingImage=&backgroundColor=%23FDFCFA&text=&loadFabricImage=`
+                )
               }}
             >
               Generate
             </Button>
-          </Footer>
-        </Toast>
+          }
+        />
       </Show>
     </>
   )
