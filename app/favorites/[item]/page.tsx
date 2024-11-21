@@ -126,41 +126,62 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   // 下载图片
   const handleDownload = () => {
-    const downloadImage = (urls: string[]) => {
-      urls.forEach((url, index) => {
-        // 创建一个新的 iframe 元素
-        let iframe = document.createElement("iframe")
+    // const downloadImage = (urls: string[]) => {
+    //   urls.forEach((url, index) => {
+    //     // 创建一个新的 iframe 元素
+    //     let iframe = document.createElement("iframe")
 
-        // 将 iframe 的 'src' 属性设置为文件的 URL
-        iframe.src = url
+    //     // 将 iframe 的 'src' 属性设置为文件的 URL
+    //     iframe.src = url
 
-        // 设置 iframe 的 'id' 以便稍后移除
-        iframe.id = "download_iframe_" + index
+    //     // 设置 iframe 的 'id' 以便稍后移除
+    //     iframe.id = "download_iframe_" + index
 
-        // 将 iframe 设置为隐藏
-        iframe.style.display = "none"
+    //     // 将 iframe 设置为隐藏
+    //     iframe.style.display = "none"
 
-        // 将 iframe 添加到页面中
-        document.body.appendChild(iframe)
-      })
+    //     // 将 iframe 添加到页面中
+    //     document.body.appendChild(iframe)
+    //   })
 
-      // 一段时间后移除这些 iframe
-      setTimeout(() => {
-        urls.forEach((url, index) => {
-          let iframe = document.getElementById("download_iframe_" + index)
-          if (iframe) {
-            document.body.removeChild(iframe)
-          }
-        })
-      }, 5000)
+    //   // 一段时间后移除这些 iframe
+    //   setTimeout(() => {
+    //     urls.forEach((url, index) => {
+    //       let iframe = document.getElementById("download_iframe_" + index)
+    //       if (iframe) {
+    //         document.body.removeChild(iframe)
+    //       }
+    //     })
+    //   }, 5000)
 
-      // const link = document.createElement("a")
-      // link.href = url?.split("?")[0]
-      // link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
-      // document.body.appendChild(link)
-      // link.click()
-      // document.body.removeChild(link)
-      // saveAs(url, "image.png")
+    //   // const link = document.createElement("a")
+    //   // link.href = url?.split("?")[0]
+    //   // link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
+    //   // document.body.appendChild(link)
+    //   // link.click()
+    //   // document.body.removeChild(link)
+    //   // saveAs(url, "image.png")
+    // }
+
+    const downloadImage = (imageUrls: string[]) => {
+      const download = (index: number) => {
+        if (index < imageUrls.length) {
+          const link = document.createElement("a")
+          link.href = imageUrls[index]
+          link.download = "" // 有些浏览器不允许设置下载名称，可以留空或尝试设置文件名
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+
+          // 设置定时器，1秒后下载下一张图片
+          setTimeout(() => {
+            download(index + 1)
+          }, 1000)
+        }
+      }
+
+      // 从第一张图片开始下载
+      download(0)
     }
 
     if (selectedImgList.length > 0) {
