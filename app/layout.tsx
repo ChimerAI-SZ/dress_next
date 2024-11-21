@@ -27,11 +27,11 @@ Automated garment creation"
         />
         {/* 解决浏览器在聚焦输入框时缩放的问题 begins  */}
         {/* 解决方式是禁止浏览器缩放（同时会仅用用户的缩放） */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="viewport"
-          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         {/* 解决浏览器在聚焦输入框时缩放的问题 ends  */}
         <link rel="icon" href="/icon.png" />
       </head>
