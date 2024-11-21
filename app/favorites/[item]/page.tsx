@@ -6,6 +6,7 @@ import styled from "@emotion/styled"
 import { Provider, useSelector } from "react-redux"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
+import { Helmet } from "react-helmet"
 
 import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 
@@ -203,6 +204,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   return (
     <Container px={"0"} className="favourite-item-container">
+      <Helmet>
+        {/* 解决浏览器在聚焦输入框时缩放的问题 begins  */}
+        {/* 解决方式是禁止浏览器缩放（同时会仅用用户的缩放） */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        {/* 解决浏览器在聚焦输入框时缩放的问题 ends  */}
+      </Helmet>
       <Header
         handleIconClick={handleIconClick}
         collectionId={params.item}
