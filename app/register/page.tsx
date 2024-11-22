@@ -8,7 +8,7 @@ import Right from "@img/login/right.svg"
 import Lock from "@img/login/.svg"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { fetchVerification } from "@lib/request/login"
+import { fetchVerification, fetchEmailExist } from "@lib/request/login"
 import { errorCaptureRes } from "@utils/index"
 import Bg from "@img/login/bg.png"
 import { loadPublicKey, importPublicKey, encryptData, arrayBufferToBase64 } from "./utils"
@@ -45,7 +45,16 @@ const Page = () => {
   }, [password])
   const getEncryption = async () => {
     try {
-      const pem = await loadPublicKey("/public_key.pem")
+      const pem = `-----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnZYq2A7a+eNoK4l5djq
+      vqK6dIdLcDyyK/ukIl+nVSWFLTiyEBTEzqAbyI/Q53QvDjKMakVt60yFVQ5KssG0
+      fLi5vu+mt5VJ4Mb7JwhuJ/Zqi0/Jn1XHJ0xGX/OKyrM44+4tHlOPfHcG4Pz6rQRK
+      u+4ysjDi3nkYdqE09Bgr7nqgQPYVYXxCx9K8xNziASKyg/3/Dh6TPzVAlS8zaez1
+      aP/67O39fXlNffyzjZoQxmRPwHtBO9RD26f/H0MGMbiZiv1p/hoZnRs+4KyJaDgV
+      metDJSPbpepQz+Z58DUxd5jFoWT5U4SPhoY7QWgqANghcWmXSVEGZS8u4ME/sdJv
+      SQIDAQAB
+      -----END PUBLIC KEY-----`
+
       const publicKey = await importPublicKey(pem)
 
       const data = { email: email, timestamp: Math.floor(Date.now() / 1000) }
@@ -63,12 +72,16 @@ const Page = () => {
       return
     }
     setLoading(true)
+    const [err, res] = await errorCaptureRes(fetchEmailExist, {
+      email: email
+    })
     const encryptedBase64 = await getEncryption()
     // const emailRegistered = await checkEmailRegistered(data.email);
-    const [err, res] = await errorCaptureRes(fetchVerification, {
+    console.log(12121)
+    fetchVerification({
       signature: encryptedBase64
     })
-    if (res.success) {
+    if (!res.success) {
       const queryString = new URLSearchParams(data as any).toString()
       router.push(`/register/verification-code?${queryString}`)
     } else {

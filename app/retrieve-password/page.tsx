@@ -8,6 +8,7 @@ import { fetchResetPassword } from "@lib/request/login"
 import { errorCaptureRes } from "@utils/index"
 import { useForm } from "react-hook-form"
 import { InputGroup } from "@components/ui/input-group"
+import { Alert } from "@components/Alert"
 interface FormValues {
   email: string
   first: string
@@ -47,6 +48,10 @@ const Page = () => {
     const [err, res] = await errorCaptureRes(fetchResetPassword, data)
     if (res.success) {
       router.push(`/retrieve-password/verification-code?email=${data.email}`)
+    } else {
+      Alert.open({
+        content: `${res.message}`
+      })
     }
   }
 
