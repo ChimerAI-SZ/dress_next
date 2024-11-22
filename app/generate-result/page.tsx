@@ -6,7 +6,6 @@ import { Checkbox } from "@components/ui/checkbox"
 import { Toaster, toaster } from "@components/Toaster"
 import { Provider } from "react-redux"
 
-import { store } from "../favorites/store"
 import Toast from "@components/Toast"
 import CollectionDialog from "../favorites/components/AlbumDrawer"
 
@@ -30,6 +29,7 @@ import { fetchShoppingAdd, fetchAddImage, collectionsList } from "@lib/request/g
 import AllNo from "@img/generate-result/all-no.svg"
 import { Alert } from "@components/Alert"
 import { useDispatch, useSelector } from "react-redux"
+import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 
 function Page() {
   const dispatch = useDispatch()
@@ -37,7 +37,6 @@ function Page() {
   const userId = storage.get("user_id")
   const searchParams = useSearchParams()
   const params = Object.fromEntries(searchParams.entries())
-
   const [imageList, setImageList] = useState<string[]>(JSON.parse(params.imageList))
   const [selectImage, setSelectImage] = useState(imageList[0])
   const [likeList, setLikeList] = useState<string[]>([])
@@ -209,6 +208,9 @@ function Page() {
       })
     }
   }
+  useEffect(() => {
+    dispatch(setGenerateImage([]))
+  }, [])
 
   useEffect(() => {
     if (active) {
@@ -652,9 +654,5 @@ function Page() {
 }
 
 export default () => {
-  return (
-    <Provider store={store}>
-      <Page />
-    </Provider>
-  )
+  return <Page />
 }

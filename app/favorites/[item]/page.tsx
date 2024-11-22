@@ -18,8 +18,6 @@ import FavouritesDialog from "../components/AlbumDrawer"
 import { FavouriteItem, FavouriteItemImage } from "@definitions/favourites"
 import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
 
-import { store } from "../store"
-
 type GroupList = {
   [key: string]: FavouriteItemImage[]
 }
@@ -379,9 +377,5 @@ const DescriptionBox = styled.div`
 `
 
 export default ({ params }: FavouriteItemProps) => {
-  return (
-    <Provider store={store}>
-      <Collection params={params} />
-    </Provider>
-  )
+  return <Collection params={params} />
 }

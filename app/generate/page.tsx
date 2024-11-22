@@ -22,9 +22,10 @@ function Page() {
   const dispatch = useDispatch()
   const { workInfo, work, params, taskId, generateImage } = useSelector((state: any) => state.work)
   const [currentBarValue, setCurrentBarValue] = useState(() => {
-    console.log(generateImage.length, taskId.length)
-    if (generateImage.length === 0 && taskId.length === 0) {
+    if (generateImage.length === 0 && taskId.length === 0 && work === 0) {
       return 0
+    } else if (work !== 0) {
+      return 10
     } else {
       return 100 - taskId.length * 12.5
     }
@@ -74,7 +75,8 @@ function Page() {
       params &&
       Object.keys(params).length !== 0 &&
       taskId.length === 0 &&
-      imageList.length === 0
+      imageList.length === 0 &&
+      work === 0
     ) {
       const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = params
       if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "") {
@@ -153,15 +155,19 @@ function Page() {
     loadSpline()
     fetchData()
   }, [])
-
+  useEffect(() => {
+    if (taskId.length === 6) {
+      setTaskIDs(taskId)
+    }
+  }, [taskId])
   useEffect(() => {
     if (currentBarValue === 100) {
       const imageListParam = encodeURIComponent(JSON.stringify(generateImage))
-      dispatch(setGenerateImage([]))
+      const newImage = params.loadOriginalImage
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      router.replace(`/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`)
+      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
     }
   }, [currentBarValue])
 
@@ -191,7 +197,6 @@ function Page() {
         })
       } else {
         fetchData()
-        console.log("All tasks complete or no tasks left.")
       }
     }, 5000)
     if (taskIDs.length > 0 || generateImage.length > 0) {

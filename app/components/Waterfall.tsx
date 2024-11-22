@@ -43,7 +43,7 @@ const breakpointColumnsObj = {
 
 import { useSearchParams, useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
-const Waterfall: React.FC = () => {
+const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setViewDetail: (value: boolean) => void }) => {
   const router = useRouter()
   const dispatch = useDispatch()
   const [visibleImage, setVisibleImage] = useState<string | null>(null)
@@ -51,13 +51,11 @@ const Waterfall: React.FC = () => {
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>("")
   const loaderRef = useRef(null)
   const { onOpen } = useDisclosure()
   const observer = useRef<IntersectionObserver | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const [viewDetail, setViewDetail] = useState(false) // 查看大图
   const [selectedImg, setSelectedImg] = useState("") // 选中的图片
   const openModal = (src: string) => {
     setVisibleImage(src)
@@ -112,7 +110,6 @@ const Waterfall: React.FC = () => {
 
   const handleImageClick = (src: string) => {
     // setVisibleImage(src === visibleImage ? null : src)
-    setViewDetail(true)
     setSelectedImg(src)
     dispatch(setParams({ loadOriginalImage: src }))
   }
@@ -251,7 +248,6 @@ const Waterfall: React.FC = () => {
               type="submit"
               mx="1.53rem"
               onClick={() => {
-                storage.set("currentBarValue", "0")
                 router.replace(`/generate`)
               }}
             >

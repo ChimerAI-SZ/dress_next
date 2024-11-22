@@ -25,7 +25,7 @@ import { Alert } from "@components/Alert"
 import { FavouriteItem } from "@definitions/favourites"
 import { HistoryItem } from "@definitions/history"
 import { storage, errorCaptureRes } from "@utils/index"
-import { store } from "../favorites/store"
+import { store } from "@store/index"
 
 // 接口 - 收藏夹列表
 import { queryCollectionList } from "@lib/request/favourites"

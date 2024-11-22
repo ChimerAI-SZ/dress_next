@@ -9,8 +9,7 @@ import Header from "./components/Header"
 import FavouritesList from "./components/FavouritesList"
 
 import { FavouriteItem } from "@definitions/favourites"
-import { setList } from "./collectionSlice"
-import { store } from "./store"
+import { setList } from "../../store/features/collectionSlice"
 import { storage } from "@utils/index"
 
 // 接口 - 收藏夹列表
@@ -53,9 +52,5 @@ function Page() {
 }
 
 export default () => {
-  return (
-    <Provider store={store}>
-      <Page />
-    </Provider>
-  )
+  return <Page />
 }

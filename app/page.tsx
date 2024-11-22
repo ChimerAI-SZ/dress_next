@@ -12,6 +12,8 @@ import { fetchUtilWait } from "@lib/request/generate"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 import GenStatus from "./components/GenStatus"
 import { storage } from "@utils/index"
+import { Alert } from "@components/Alert"
+import ErrorModal from "./components/ErrorModal"
 // header 右侧按钮
 const headerIconList = [
   {
@@ -33,16 +35,38 @@ const headerIconList = [
 
 function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
-  const [isVisible, setIsVisible] = useState(false)
+  const [open, setOpen] = useState(false)
+
   const router = useRouter()
   const dispatch = useDispatch()
   const { workInfo, work, taskId, params, generateImage } = useSelector((state: any) => state.work)
-  console.log(generateImage)
+  const [currentBarValue, setCurrentBarValue] = useState(() => {
+    if (work !== 0) {
+      return 10
+    } else {
+      return 100 - taskId.length * 12.5
+    }
+  })
+  const [barValue, setBarValue] = useState(() => {
+    if (work !== 0) {
+      return 10
+    } else {
+      return 100 - taskId.length * 12.5
+    }
+  })
+  const [isVisible, setIsVisible] = useState(() => {
+    if (work !== 0 || generateImage.length > 0) {
+      return true
+    } else {
+      return false
+    }
+  })
+  console.log(work, taskId, barValue)
+  const [viewDetail, setViewDetail] = useState(false) // 查看大图
   const [imageList, setImageList] = useState<string[]>(generateImage)
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null) // header ref
-  const [currentBarValue, setCurrentBarValue] = useState(100 - taskId.length * 12.5)
-  const [barValue, setBarValue] = useState(100 - taskId.length * 12.5)
+
   const [taskIDs, setTaskIDs] = useState<string[]>(taskId)
   // 页面跳转
   const handleJump = (link: string) => {
@@ -96,12 +120,15 @@ function Dashboard() {
           getImage(taskID)
         })
       } else {
+        clearInterval(interval)
         console.log("All tasks complete or no tasks left.")
       }
     }, 5000)
-    setBarValue(100 - taskIDs.length * 9.5)
-    dispatch(setGenerateImage(imageList))
-    dispatch(setTaskId(taskIDs))
+    if (work === 0) {
+      setBarValue(100 - taskIDs.length * 9.5)
+      dispatch(setGenerateImage(imageList))
+      dispatch(setTaskId(taskIDs))
+    }
     return () => {
       clearInterval(interval)
       console.log("Cleaning up interval")
@@ -109,9 +136,17 @@ function Dashboard() {
   }, [taskIDs])
 
   useEffect(() => {
+    if (taskId.length === 6) {
+      setTaskIDs(taskId)
+    }
+  }, [taskId])
+
+  useEffect(() => {
     const interval = setInterval(() => {
       if (currentBarValue < barValue) {
         setCurrentBarValue(prev => Math.min(prev + 1, barValue))
+      } else {
+        clearInterval(interval)
       }
     }, 200)
 
@@ -173,7 +208,17 @@ function Dashboard() {
             fontSize="1.3rem"
             letterSpacing="0.02rem"
             onClick={() => {
-              router.push("/upload")
+              console.log(taskId.length, work, currentBarValue)
+              if (taskId.length !== 0 || work !== 0 || currentBarValue !== 100) {
+                setOpen(true)
+                return
+              } else {
+                dispatch(setGenerateImage([]))
+                dispatch(setWork(0))
+                dispatch(setParams({}))
+                dispatch(setTaskId([]))
+                router.replace("/upload")
+              }
             }}
             mt={1}
             mb={4}
@@ -194,8 +239,22 @@ function Dashboard() {
           <SubTitle>Quickly generate hot-selling products</SubTitle>
 
           {/* Waterfall Content */}
-          <Box overflowY="auto">
-            <Waterfall />
+          <Box
+            overflowY="auto"
+            onClick={e => {
+              if (taskId.length !== 0 || work !== 0 || currentBarValue !== 100) {
+                setOpen(true)
+                setViewDetail(false)
+                return
+              } else {
+                setViewDetail(true)
+                dispatch(setGenerateImage([]))
+                dispatch(setWork(0))
+                dispatch(setTaskId([]))
+              }
+            }}
+          >
+            <Waterfall viewDetail={viewDetail} setViewDetail={setViewDetail} />
           </Box>
 
           {/* Image Guide Modal */}
@@ -203,9 +262,10 @@ function Dashboard() {
         </MainSection>
       </>
 
-      {/* {isVisible && (
+      {isVisible && (
         <GenStatus barValue={currentBarValue} isVisible={isVisible} generateImage={generateImage}></GenStatus>
-      )} */}
+      )}
+      <ErrorModal open={open} setOpen={setOpen}></ErrorModal>
     </Container>
   )
 }
