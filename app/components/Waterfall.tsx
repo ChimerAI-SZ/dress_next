@@ -13,6 +13,7 @@ import ImageOverlay from "./ImageOverlay"
 import Toast from "@components/Toast"
 import ImageViewer from "@components/ImageViewer"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
+import { storage } from "@utils/index"
 import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
   image_url: string
@@ -58,7 +59,6 @@ const Waterfall: React.FC = () => {
 
   const [viewDetail, setViewDetail] = useState(false) // 查看大图
   const [selectedImg, setSelectedImg] = useState("") // 选中的图片
-
   const openModal = (src: string) => {
     setVisibleImage(src)
     onOpen()
@@ -114,6 +114,7 @@ const Waterfall: React.FC = () => {
     // setVisibleImage(src === visibleImage ? null : src)
     setViewDetail(true)
     setSelectedImg(src)
+    dispatch(setParams({ loadOriginalImage: src }))
   }
 
   useEffect(() => {
@@ -226,9 +227,9 @@ const Waterfall: React.FC = () => {
             </Suspense>
           ))}
         </Masonry>
-        <Box ref={loaderRef} mt={4}>
+        <Box ref={loaderRef}>
           {loading && (
-            <Flex justify="center" align="center">
+            <Flex justify="center" align="center" mt={4}>
               <Spinner size="lg" />
             </Flex>
           )}
@@ -240,6 +241,7 @@ const Waterfall: React.FC = () => {
           imgUrl={selectedImg}
           close={() => {
             setViewDetail(false)
+            dispatch(setParams({}))
           }}
           footer={
             <Button
@@ -249,7 +251,7 @@ const Waterfall: React.FC = () => {
               type="submit"
               mx="1.53rem"
               onClick={() => {
-                dispatch(setParams({ loadOriginalImage: selectedImg }))
+                storage.set("currentBarValue", "0")
                 router.replace(`/generate`)
               }}
             >

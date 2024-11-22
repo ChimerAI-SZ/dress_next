@@ -21,28 +21,28 @@ import { useDispatch, useSelector } from "react-redux"
 function Page() {
   const dispatch = useDispatch()
   const { workInfo, work, params, taskId, generateImage } = useSelector((state: any) => state.work)
-  console.log("workInfo", workInfo, work, params, taskId)
-
-  const [imageList, setImageList] = useState<string[]>([])
+  const [currentBarValue, setCurrentBarValue] = useState(() => {
+    console.log(generateImage.length, taskId.length)
+    if (generateImage.length === 0 && taskId.length === 0) {
+      return 0
+    } else {
+      return 100 - taskId.length * 12.5
+    }
+  })
+  const [imageList, setImageList] = useState<string[]>(generateImage)
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(null)
   const [info, setInfo] = useState({ total_messages: 0, wait_time: 0 })
-  const [taskIDs, setTaskIDs] = useState<string[]>([])
   const router = useRouter()
   const hasRunRef = useRef(false)
-  const [barValue, setBarValue] = useState(0)
-
-  // const goHome = () => {
-  //   if (
-  //     params &&
-  //     Object.keys(params).length === 0 &&
-  //     ((Array.isArray(work) && work.length === 0) || work === 0) &&
-  //     taskId &&
-  //     taskId.length === 0
-  //   ) {
-  //     router.push("/")
-  //   }
-  // }
-
+  const [barValue, setBarValue] = useState(() => {
+    console.log(generateImage.length, taskId.length)
+    if (generateImage.length === 0 && taskId.length === 0) {
+      return 10
+    } else {
+      return 100 - taskId.length * 12.5
+    }
+  })
+  const [taskIDs, setTaskIDs] = useState<string[]>(taskId)
   const fetchData = async () => {
     if (info.total_messages < 3) {
       // 不请求
@@ -62,9 +62,20 @@ function Page() {
     }
   }
 
+  if (params && Object.keys(params).length === 0 && imageList.length === 0 && taskId.length === 0) {
+    router.replace(`/`)
+  }
   useEffect(() => {
-    // goHome()
-    if (!hasRunRef.current && params && Object.keys(params).length !== 0) {
+    if (taskId.length > 0 && imageList.length > 0) {
+      hasRunRef.current = true
+    }
+    if (
+      !hasRunRef.current &&
+      params &&
+      Object.keys(params).length !== 0 &&
+      taskId.length === 0 &&
+      imageList.length === 0
+    ) {
       const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = params
       if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "") {
         console.log(222)
@@ -97,6 +108,7 @@ function Page() {
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
             dispatch(setTaskId(newTaskIDs))
+
             dispatch(setWork(0))
           }
         })
@@ -108,6 +120,7 @@ function Page() {
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
             dispatch(setTaskId(newTaskIDs))
+
             dispatch(setWork(0))
           }
         })
@@ -142,11 +155,15 @@ function Page() {
   }, [])
 
   useEffect(() => {
-    if (taskIDs.length === 0 && imageList.length > 0) {
-      const imageListParam = encodeURIComponent(JSON.stringify(imageList))
+    if (currentBarValue === 100) {
+      const imageListParam = encodeURIComponent(JSON.stringify(generateImage))
+      dispatch(setGenerateImage([]))
+      dispatch(setGenerateImage([]))
+      dispatch(setWork(0))
+      dispatch(setTaskId([]))
       router.replace(`/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`)
     }
-  }, [taskIDs, imageList, router])
+  }, [currentBarValue])
 
   const getImage = async (taskID: string) => {
     try {
@@ -155,28 +172,17 @@ function Page() {
 
       if (success) {
         setImageList(pre => [...pre, result.res])
-        const newImage = result.res
-        const updatedImageList = generateImage.some((item: string) => item === newImage)
-          ? generateImage
-          : [...generateImage, newImage]
-
-        dispatch(setGenerateImage(updatedImageList)) // 直接传递更新后的列表
         setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
-        dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
-        setBarValue(pre => (Math.ceil(pre + 16.6) >= 100 ? 100 : Math.ceil(pre + 16.6)))
       } else {
         console.log(`Task ${taskID} still in progress`)
       }
       if (message !== "Task is running") {
         setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
-        dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
       }
     } catch (err) {
       setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
-      dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
     }
   }
-  console.log(taskIDs)
   useEffect(() => {
     const interval = setInterval(() => {
       if (taskIDs.length > 0) {
@@ -188,12 +194,25 @@ function Page() {
         console.log("All tasks complete or no tasks left.")
       }
     }, 5000)
-
+    if (taskIDs.length > 0 || generateImage.length > 0) {
+      setBarValue(100 - taskIDs.length * 9.5)
+    }
+    dispatch(setGenerateImage(imageList))
+    dispatch(setTaskId(taskIDs))
     return () => {
       console.log("Cleaning up interval")
       clearInterval(interval)
     }
   }, [taskIDs])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentBarValue < barValue) {
+        setCurrentBarValue(prev => Math.min(prev + 1, barValue))
+      }
+    }, 300)
+    return () => clearInterval(interval)
+  }, [barValue])
 
   return (
     <Box h="100vh" position={"relative"}>
@@ -241,7 +260,7 @@ function Page() {
               strokeLinecap: "round",
               trailColor: "transparent"
             })}
-            value={barValue}
+            value={currentBarValue}
           >
             <Flex
               zIndex={0}
@@ -266,7 +285,7 @@ function Page() {
           </CircularProgressbarWithChildren>
         </Box>
         <Text fontWeight="600" fontSize="1.25rem" color="#404040" mt={"1.5rem"}>
-          {info?.total_messages ? `Estimated wait ${info?.wait_time ?? "--"} mins` : barValue + "%"}
+          {info?.total_messages ? `Estimated wait ${info?.wait_time ?? "--"} mins` : currentBarValue + "%"}
         </Text>
         <Text font-weight="400" font-size="0.88rem" color=" #404040" mt={"0.44rem"}>
           {!info?.total_messages ? "Generating for you..." : "Queuing to generate preview..."}

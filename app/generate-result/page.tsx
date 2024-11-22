@@ -29,12 +29,15 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { fetchShoppingAdd, fetchAddImage, collectionsList } from "@lib/request/generate-result"
 import AllNo from "@img/generate-result/all-no.svg"
 import { Alert } from "@components/Alert"
+import { useDispatch, useSelector } from "react-redux"
+
 function Page() {
+  const dispatch = useDispatch()
   const router = useRouter() //
   const userId = storage.get("user_id")
-  console.log(userId)
   const searchParams = useSearchParams()
   const params = Object.fromEntries(searchParams.entries())
+
   const [imageList, setImageList] = useState<string[]>(JSON.parse(params.imageList))
   const [selectImage, setSelectImage] = useState(imageList[0])
   const [likeList, setLikeList] = useState<string[]>([])

@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { getQuery } from "@lib/request/generate"
 import { fetchUtilWait } from "@lib/request/generate"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
+import GenStatus from "./components/GenStatus"
+import { storage } from "@utils/index"
 // header 右侧按钮
 const headerIconList = [
   {
@@ -31,18 +33,17 @@ const headerIconList = [
 
 function Dashboard() {
   // const { onOpen, onClose } = useDisclosure();
-  const [barValue, setBarValue] = useState(0)
-  const [imageList, setImageList] = useState<string[]>([])
-
+  const [isVisible, setIsVisible] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
-
   const { workInfo, work, taskId, params, generateImage } = useSelector((state: any) => state.work)
-  console.log("home", workInfo, work, taskId, params, generateImage)
-
+  console.log(generateImage)
+  const [imageList, setImageList] = useState<string[]>(generateImage)
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null) // header ref
-
+  const [currentBarValue, setCurrentBarValue] = useState(100 - taskId.length * 12.5)
+  const [barValue, setBarValue] = useState(100 - taskId.length * 12.5)
+  const [taskIDs, setTaskIDs] = useState<string[]>(taskId)
   // 页面跳转
   const handleJump = (link: string) => {
     // 没有登陆的话去往登陆页面
@@ -76,14 +77,7 @@ function Dashboard() {
 
       if (success) {
         setImageList(pre => [...pre, result.res])
-        const newImage = result.res
-        const updatedImageList = generateImage.some((item: string) => item === newImage)
-          ? generateImage
-          : [...generateImage, newImage]
-
-        dispatch(setGenerateImage(updatedImageList)) // 直接传递更新后的列表
-        dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
-        setBarValue(pre => (Math.ceil(pre + 16.6) >= 100 ? 100 : Math.ceil(pre + 16.6)))
+        setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
       } else {
         console.log(`Task ${taskID} still in progress`)
       }
@@ -94,51 +88,42 @@ function Dashboard() {
       dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
     }
   }
-  console.log(taskId)
   useEffect(() => {
     const interval = setInterval(() => {
-      if (taskId.length > 0) {
-        taskId.forEach((taskID: string) => {
+      if (taskIDs.length > 0) {
+        setIsVisible(true)
+        taskIDs.forEach((taskID: string) => {
           getImage(taskID)
         })
       } else {
         console.log("All tasks complete or no tasks left.")
       }
     }, 5000)
-
+    setBarValue(100 - taskIDs.length * 9.5)
+    dispatch(setGenerateImage(imageList))
+    dispatch(setTaskId(taskIDs))
     return () => {
-      console.log("Cleaning up interval")
       clearInterval(interval)
+      console.log("Cleaning up interval")
     }
-  }, [taskId])
+  }, [taskIDs])
 
   useEffect(() => {
-    if (barValue > 0) {
-      console.log(1)
-    } else {
-    }
+    const interval = setInterval(() => {
+      if (currentBarValue < barValue) {
+        setCurrentBarValue(prev => Math.min(prev + 1, barValue))
+      }
+    }, 200)
 
-    console.log("barValue:", barValue)
-
-    // 清除之前的 Toast
-    return () => {}
+    return () => clearInterval(interval)
   }, [barValue])
-
-  useEffect(() => {
-    if (taskId.length === 0 && imageList.length > 0) {
-      console.log("generateImage", generateImage)
-
-      const imageListParam = encodeURIComponent(JSON.stringify(imageList))
-      // router.replace(`/generate-result?loadOriginalImage=${params.loadOriginalImage}&imageList=${imageListParam}`)
-    }
-  }, [taskId, imageList, router])
 
   return (
     <Container ref={containerRef}>
       <BackgroundBox>
         <Image src="/assets/images/mainPage/bg.png" alt="bg-img" />
       </BackgroundBox>
-      <Box>
+      <>
         {/* Header Section */}
         <Flex
           ref={headerRef}
@@ -216,26 +201,11 @@ function Dashboard() {
           {/* Image Guide Modal */}
           {/* <ImageGuideModal isOpen={isOpen} onClose={onClose} /> */}
         </MainSection>
-      </Box>
-      {/* <Flex
-        position={"sticky"}
-        boxShadow="0rem 0.13rem 0.5rem 0rem rgba(17,17,17,0.12)"
-        bottom={"2rem"}
-        left={"50%"}
-        width={"11.53rem"}
-        h={"2.5rem"}
-        background="#FFFFFF"
-        transform={"translateX(-50%)"}
-        borderRadius="0.5rem"
-        justifyContent={"space-between"}
-        alignItems={"center"}
-      >
-        <Box>1</Box>
-        <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
-          Generating 26%
-        </Text>
-        <Image></Image>
-      </Flex> */}
+      </>
+
+      {/* {isVisible && (
+        <GenStatus barValue={currentBarValue} isVisible={isVisible} generateImage={generateImage}></GenStatus>
+      )} */}
     </Container>
   )
 }
@@ -273,12 +243,13 @@ const Blending = styled.div`
 `
 
 const MainSection = styled.section`
-  padding: 1rem;
+  padding: 1rem 1rem 0rem 1rem;
   background: linear-gradient(to bottom, #faf1f2, #fff 30vh, #fff);
   border: 2px solid #fff;
   border-radius: 16pt;
   margin-top: 24px;
   border-top-width: 1px;
+  margin-bottom: -40px;
 `
 const Title = styled.div`
   font-weight: 600;

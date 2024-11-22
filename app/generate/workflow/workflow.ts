@@ -615,7 +615,7 @@ export const workflow4 = async (p: Params) => {
   console.log(4)
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 4,
-    offset: Math.floor(Math.random() * 47),
+    offset: Math.floor(Math.random() * 45),
     library: "top_sales"
   })
   console.log(res.data)
@@ -681,7 +681,7 @@ export const workflow4 = async (p: Params) => {
             loadOriginalImage: res.data[1].image_url,
             loadFabricImage: newFabricImage
           }),
-          dressPrintingTryon({ ...p, loadPrintingImage: midImage[0] }),
+          dressPrintingTryon({ ...p, loadPrintingImage: midImage[0], loadFabricImage: newFabricImage }),
           dressPrintingTryon({
             ...p,
             loadPrintingImage: midImage[1],
@@ -723,7 +723,7 @@ export const workflow5 = async (p: Params) => {
   console.log(555)
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 4,
-    offset: Math.floor(Math.random() * 47),
+    offset: Math.floor(Math.random() * 45),
     library: "top_sales"
   })
   console.log(5555555)
