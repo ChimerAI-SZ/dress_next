@@ -60,6 +60,10 @@ const Page = () => {
     })
     if (res.success) {
       router.push(`/retrieve-password/new-password?email=${params.email}&code=${code}`)
+    } else {
+      Alert.open({
+        content: `${res.message}`
+      })
     }
   }
   return (
