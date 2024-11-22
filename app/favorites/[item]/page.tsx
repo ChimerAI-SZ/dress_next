@@ -3,20 +3,23 @@
 import React, { useEffect, useState, useReducer } from "react"
 import dayjs from "dayjs"
 import styled from "@emotion/styled"
-import { Provider, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { Helmet } from "react-helmet"
 
 import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 
+import { Alert } from "@components/Alert"
 import Toast from "@components/Toast"
 import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
 import FavouritesDialog from "../components/AlbumDrawer"
+import ImageViewer from "@components/ImageViewer"
 
 import { FavouriteItem, FavouriteItemImage } from "@definitions/favourites"
-import { queryAllImageInCollection, deleteCollection } from "@lib/request/favourites"
+import { queryAllImageInCollection, deleteCollection, removeImgFromCollection } from "@lib/request/favourites"
+import { errorCaptureRes } from "@utils/index"
 
 type GroupList = {
   [key: string]: FavouriteItemImage[]
@@ -37,6 +40,9 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false) // 全选状态
   const [originImgList, setOriginImgList] = useState<FavouriteItemImage[]>([]) // 分组前的图片列表
+  const [selectedImg, setSelectedImg] = useState<FavouriteItemImage | null>(null) // 非多选的时候查看图片大图的url
+  const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
+
   // 收藏夹信息
   const [description, setDescription] = useState(
     collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description
@@ -108,11 +114,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   // 选择模式下图片的选择、取消选择事件
   // 通过已选图片列表中是否有这个图片来判断是选择还是取消选择
   const handleImgSelect = (img: number) => {
-    if (selectedImgList.includes(img)) {
-      setSelectedImgList(selectedImgList.filter(item => item !== img))
+    if (selectionMode) {
+      if (selectedImgList.includes(img)) {
+        setSelectedImgList(selectedImgList.filter(item => item !== img))
+      } else {
+        selectedImgList.push(img)
+        setSelectedImgList(selectedImgList)
+      }
     } else {
-      selectedImgList.push(img)
-      setSelectedImgList(selectedImgList)
+      setSelectedImg(originImgList.find(item => item.id === img) ?? null)
+      setViewDetail(true)
     }
 
     forceUpdate()
@@ -124,7 +135,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   }
 
   // 下载图片
-  const handleDownload = () => {
+  const handleDownload = (defaultUrls?: string[]) => {
     // const downloadImage = (urls: string[]) => {
     //   urls.forEach((url, index) => {
     //     // 创建一个新的 iframe 元素
@@ -183,10 +194,34 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       download(0)
     }
 
-    if (selectedImgList.length > 0) {
-      const imgUrls = originImgList.filter(item => selectedImgList.includes(item.id)).map(item => item.image_url)
+    if (Array.isArray(defaultUrls) && defaultUrls.length > 0) {
+      downloadImage(defaultUrls)
+    } else {
+      if (selectedImgList.length > 0) {
+        const imgUrls = originImgList.filter(item => selectedImgList.includes(item.id)).map(item => item.image_url)
 
-      downloadImage(imgUrls)
+        downloadImage(imgUrls)
+      }
+    }
+  }
+
+  // 取消收藏
+  // defaultImages 需要同在一个收藏夹里
+  const hanldeRemoveFromCollection = async (defaultImages?: FavouriteItemImage[]) => {
+    if (defaultImages) {
+      const imgurls = defaultImages.map(img => img.image_url)
+      const collection_id = defaultImages[0].collection_id
+
+      const [err, res] = await errorCaptureRes(removeImgFromCollection, { image_urls: imgurls, collection_id })
+
+      if (res.success) {
+        setViewDetail(false)
+        queryData()
+      } else {
+        Alert.open({
+          content: err.message
+        })
+      }
     }
   }
 
@@ -205,10 +240,9 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
       <Helmet>
         {/* 解决浏览器在聚焦输入框时缩放的问题 begins  */}
         {/* 解决方式是禁止浏览器缩放（同时会仅用用户的缩放） */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
         {/* 解决浏览器在聚焦输入框时缩放的问题 ends  */}
       </Helmet>
@@ -300,7 +334,9 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 h={"22pt"}
                 ml={"8pt"}
                 src={"/assets/images/favourites/download.svg"}
-                onClick={handleDownload}
+                onClick={() => {
+                  handleDownload()
+                }}
                 alt="download-icon"
               />
               <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/favourites/liked.svg"} alt="liked-icon" />
@@ -352,6 +388,41 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
         close={closeDialog}
         onSuccess={onAblumEditSuccess}
       />
+
+      <Show when={viewDetail && selectedImg}>
+        <ImageViewer
+          imgUrl={selectedImg?.image_url ?? ""}
+          close={() => {
+            setViewDetail(false)
+          }}
+          footer={
+            <Flex alignItems={"center"} justifyContent={"flex-end"} mx={"1rem"} width={"100%"}>
+              <Image
+                boxSize={"2.2rem"}
+                mx={"0.5rem"}
+                onClick={() => {
+                  handleDownload([selectedImg?.image_url ?? ""])
+                }}
+                src={"/assets/images/favourites/download.svg"}
+                alt="download-icon"
+              />
+              <Image
+                boxSize={"2.2rem"}
+                mx={"0.5rem"}
+                onClick={() => {
+                  selectedImg && hanldeRemoveFromCollection([selectedImg])
+                }}
+                src={`/assets/images/favourites/liked.svg`}
+                alt="liked-icon"
+              />
+              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <Button ml={"0.5rem"} bgColor={"#ee3939"} borderRadius={"40px"}>
+                Further Generate
+              </Button>
+            </Flex>
+          }
+        />
+      </Show>
     </Container>
   )
 }

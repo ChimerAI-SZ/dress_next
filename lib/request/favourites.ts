@@ -1,12 +1,12 @@
-'收藏夹页面'
-import axios from '../axios'
+"收藏夹页面"
+import axios from "../axios"
 
 // 获取收藏夹列表
 interface queryCollectionListProps {
   user_id: number
 }
 export const queryCollectionList = (params: queryCollectionListProps) => {
-  return axios.post('/api/collections/list', params)
+  return axios.post("/api/collections/list", params)
 }
 
 // 新建收藏夹
@@ -17,7 +17,7 @@ interface addNewCollectionProps {
 }
 // 新增收藏夹
 export const addNewCollection = (params: addNewCollectionProps) => {
-  return axios.post('/api/collections/create', params)
+  return axios.post("/api/collections/create", params)
 }
 
 // 获取收藏夹中的所有图片
@@ -25,7 +25,7 @@ interface queryAllImageInCollectionProps {
   collection_id: number
 }
 export const queryAllImageInCollection = (params: queryAllImageInCollectionProps) => {
-  return axios.post('/api/collections/get_all_images', params)
+  return axios.post("/api/collections/get_all_images", params)
 }
 
 // 删除收藏夹
@@ -33,7 +33,7 @@ interface deleteCollectionProps {
   collection_id: number
 }
 export const deleteCollection = (params: deleteCollectionProps) => {
-  return axios.post('/api/collections/delete', params)
+  return axios.post("/api/collections/delete", params)
 }
 
 // 编辑收藏夹信息
@@ -44,5 +44,14 @@ interface upadteCollectionProps {
   description?: string
 }
 export const upadteCollection = (params: upadteCollectionProps) => {
-  return axios.post('/api/collections/edit', params)
+  return axios.post("/api/collections/edit", params)
+}
+
+// 移除收藏
+interface removeImgFromCollectionProps {
+  collection_id: number
+  image_urls: string[]
+}
+export const removeImgFromCollection = (params: removeImgFromCollectionProps) => {
+  return axios.post("/api/collections/remove_images", params)
 }
