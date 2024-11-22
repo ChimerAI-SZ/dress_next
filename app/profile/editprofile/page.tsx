@@ -84,6 +84,7 @@ const EditProfile: React.FC = () => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.first_name && (
@@ -106,6 +107,7 @@ const EditProfile: React.FC = () => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.first_name && (
@@ -127,6 +129,7 @@ const EditProfile: React.FC = () => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.pronouns && (
@@ -172,6 +175,7 @@ const EditProfile: React.FC = () => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.email && (
@@ -191,6 +195,7 @@ const EditProfile: React.FC = () => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.phone && (

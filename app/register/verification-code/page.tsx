@@ -3,11 +3,12 @@ import { Button, Input, Container, VStack, Text, Image, Flex, Box } from "@chakr
 import { PinInput } from "@components/ui/pin-input"
 import { useSearchParams, useRouter } from "next/navigation"
 import Back from "@img/login/back.svg"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { fetchVerification, fetchRegister, fetchReset } from "@lib/request/login"
 import { errorCaptureRes } from "@utils/index"
 import { loadPublicKey, importPublicKey, encryptData, arrayBufferToBase64 } from "../utils"
 import { Alert } from "@components/Alert"
+
 const Page = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -15,6 +16,17 @@ const Page = () => {
   const [seconds, setSeconds] = useState(60) // 初始倒计时秒数
   const [canResend, setCanResend] = useState(false) // 控制是否可以重新发送验证码
   const [code, setCode] = useState("")
+  const hasRunRef = useRef(false)
+
+  useEffect(() => {
+    if (!hasRunRef.current) {
+      Alert.open({
+        content: "Sent Successfully!"
+      })
+      hasRunRef.current = true
+    }
+  }, [])
+
   useEffect(() => {
     if (seconds === 0) {
       setCanResend(true) // 倒计时结束后，允许重新发送验证码

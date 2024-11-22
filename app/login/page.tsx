@@ -139,6 +139,7 @@ const Page = () => {
                       outlineStyle: "none"
                     }}
                     onChange={handleEmailChange}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {emailError && (
@@ -167,6 +168,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.password && (

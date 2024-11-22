@@ -147,6 +147,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.password && (
@@ -207,6 +208,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.newPassword && (

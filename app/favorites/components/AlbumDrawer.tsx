@@ -116,6 +116,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
                           boxShadow: "none",
                           outlineStyle: "none"
                         }}
+                        caretColor="black"
                       />
                     </InputGroup>
                     {errors.title && (

@@ -126,6 +126,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.first && (
@@ -149,6 +150,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.last && (
@@ -176,6 +178,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.email && (
@@ -203,6 +206,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.password && (

@@ -93,6 +93,7 @@ const Page = () => {
                       boxShadow: "none",
                       outlineStyle: "none"
                     }}
+                    caretColor="black"
                   />
                 </InputGroup>
                 {errors.email && (

@@ -113,6 +113,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.full_name && (
@@ -135,6 +136,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.country && (
@@ -158,6 +160,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.street_address_1 && (
@@ -179,6 +182,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.street_address_2 && (
@@ -201,6 +205,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                         boxShadow: "none",
                         outlineStyle: "none"
                       }}
+                      caretColor="black"
                     />
                   </InputGroup>
                   {errors.city && (
@@ -225,6 +230,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                           boxShadow: "none",
                           outlineStyle: "none"
                         }}
+                        caretColor="black"
                       />
                     </InputGroup>
                     <InputGroup bg={!!errors.postal_code ? "#ffe0e0" : ""}>
@@ -240,6 +246,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
                           boxShadow: "none",
                           outlineStyle: "none"
                         }}
+                        caretColor="black"
                       />
                     </InputGroup>
                   </Flex>
