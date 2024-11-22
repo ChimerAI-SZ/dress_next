@@ -8,11 +8,12 @@ import { fetchVerification, fetchRegister, fetchReset } from "@lib/request/login
 import { errorCaptureRes } from "@utils/index"
 import { loadPublicKey, importPublicKey, encryptData, arrayBufferToBase64 } from "../utils"
 import { Alert } from "@components/Alert"
-
+import { storage } from "@utils/index"
 const Page = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const params = Object.fromEntries(searchParams.entries())
+  const storedPassword = sessionStorage.getItem("user-password")
+  const params = JSON.parse(storedPassword ?? "")
   const [seconds, setSeconds] = useState(60) // 初始倒计时秒数
   const [canResend, setCanResend] = useState(false) // 控制是否可以重新发送验证码
   const [code, setCode] = useState("")
@@ -92,6 +93,9 @@ const Page = () => {
         verification_code: code
       })
       if (res.success) {
+        Alert.open({
+          content: `registered successfully`
+        })
         router.push(`/login`)
       } else {
         Alert.open({

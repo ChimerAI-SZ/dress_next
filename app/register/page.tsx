@@ -13,6 +13,7 @@ import { errorCaptureRes } from "@utils/index"
 import Bg from "@img/login/bg.png"
 import { loadPublicKey, importPublicKey, encryptData, arrayBufferToBase64 } from "./utils"
 import { Alert } from "@components/Alert"
+import { storage } from "@utils/index"
 interface FormValues {
   email: string
   first: string
@@ -82,8 +83,9 @@ const Page = () => {
       signature: encryptedBase64
     })
     if (!res.success) {
-      const queryString = new URLSearchParams(data as any).toString()
-      router.push(`/register/verification-code?${queryString}`)
+      const queryString = JSON.stringify(data)
+      sessionStorage.setItem("user-password", queryString)
+      router.push(`/register/verification-code`)
     } else {
       Alert.open({
         content: `${res.message}`
