@@ -1,5 +1,7 @@
+import { useEffect } from "react"
 import Toast from "@components/Toast"
 import styled from "@emotion/styled"
+import { Portal } from "@chakra-ui/react"
 
 import { Image } from "@chakra-ui/react"
 
@@ -10,35 +12,79 @@ interface ImageViewerProps {
 }
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, imgUrl, footer }) => {
+  const getWindowConfig = () => {
+    let windowWidth = window.innerWidth
+    let windowHeight = window.innerHeight
+
+    if (typeof windowWidth !== "number") {
+      if (document.compatMode === "CSS1Compat") {
+        windowWidth = document.documentElement.clientWidth
+        windowHeight = document.documentElement.clientHeight
+      } else {
+        windowWidth = document.body.clientWidth
+        windowHeight = document.body.clientHeight
+      }
+    }
+    return {
+      windowWidth: windowWidth,
+      windowHeight: windowHeight
+    }
+  }
+  useEffect(() => {
+    console.log(getWindowConfig())
+  }, [])
+
   return (
-    <Toast
-      close={close}
-      maskVisible={false}
-      boxStyle={{
-        width: "100vw",
-        height: "100vh",
-
-        bottom: "0",
-        left: "0",
-        right: "0",
-        top: "0",
-        transform: "unset",
-
-        padding: "12pt",
-        pt: "0",
-        display: "flex",
-        flexDirection: "column",
-        background: "unset",
-        position: "relative"
-      }}
-    >
-      <Bg onClick={close} />
-      <StyledImg src={imgUrl} />
-      <Footer>{footer}</Footer>
-    </Toast>
+    <Portal>
+      <Container>
+        <Wrapper>
+          <Content>
+            <Bg onClick={close} />
+            <StyledImg src={imgUrl} />
+            <Footer>{footer}</Footer>
+          </Content>
+        </Wrapper>
+      </Container>
+    </Portal>
   )
 }
+const Container = styled.div`
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 0;
+
+  background: transparent;
+`
+const Wrapper = styled.div`
+  flex-grow: 1;
+  display: flex;
+
+  height: 100%;
+  width: 100%;
+
+  background: transparent;
+`
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+  bottom: 0;
+  top: 0;
+
+  width: 100%;
+
+  background: transparent;
+`
 const Bg = styled.div`
   position: absolute;
   top: 0;

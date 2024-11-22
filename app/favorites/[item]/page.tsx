@@ -6,6 +6,7 @@ import styled from "@emotion/styled"
 import { Provider, useSelector } from "react-redux"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
+import { Helmet } from "react-helmet"
 
 import { Container, Box, For, Image, Flex, Show, Button, Heading, Text } from "@chakra-ui/react"
 
@@ -126,41 +127,62 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   // 下载图片
   const handleDownload = () => {
-    const downloadImage = (urls: string[]) => {
-      urls.forEach((url, index) => {
-        // 创建一个新的 iframe 元素
-        let iframe = document.createElement("iframe")
+    // const downloadImage = (urls: string[]) => {
+    //   urls.forEach((url, index) => {
+    //     // 创建一个新的 iframe 元素
+    //     let iframe = document.createElement("iframe")
 
-        // 将 iframe 的 'src' 属性设置为文件的 URL
-        iframe.src = url
+    //     // 将 iframe 的 'src' 属性设置为文件的 URL
+    //     iframe.src = url
 
-        // 设置 iframe 的 'id' 以便稍后移除
-        iframe.id = "download_iframe_" + index
+    //     // 设置 iframe 的 'id' 以便稍后移除
+    //     iframe.id = "download_iframe_" + index
 
-        // 将 iframe 设置为隐藏
-        iframe.style.display = "none"
+    //     // 将 iframe 设置为隐藏
+    //     iframe.style.display = "none"
 
-        // 将 iframe 添加到页面中
-        document.body.appendChild(iframe)
-      })
+    //     // 将 iframe 添加到页面中
+    //     document.body.appendChild(iframe)
+    //   })
 
-      // 一段时间后移除这些 iframe
-      setTimeout(() => {
-        urls.forEach((url, index) => {
-          let iframe = document.getElementById("download_iframe_" + index)
-          if (iframe) {
-            document.body.removeChild(iframe)
-          }
-        })
-      }, 5000)
+    //   // 一段时间后移除这些 iframe
+    //   setTimeout(() => {
+    //     urls.forEach((url, index) => {
+    //       let iframe = document.getElementById("download_iframe_" + index)
+    //       if (iframe) {
+    //         document.body.removeChild(iframe)
+    //       }
+    //     })
+    //   }, 5000)
 
-      // const link = document.createElement("a")
-      // link.href = url?.split("?")[0]
-      // link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
-      // document.body.appendChild(link)
-      // link.click()
-      // document.body.removeChild(link)
-      // saveAs(url, "image.png")
+    //   // const link = document.createElement("a")
+    //   // link.href = url?.split("?")[0]
+    //   // link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
+    //   // document.body.appendChild(link)
+    //   // link.click()
+    //   // document.body.removeChild(link)
+    //   // saveAs(url, "image.png")
+    // }
+
+    const downloadImage = (imageUrls: string[]) => {
+      const download = (index: number) => {
+        if (index < imageUrls.length) {
+          const link = document.createElement("a")
+          link.href = imageUrls[index]
+          link.download = "" // 有些浏览器不允许设置下载名称，可以留空或尝试设置文件名
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+
+          // 设置定时器，1秒后下载下一张图片
+          setTimeout(() => {
+            download(index + 1)
+          }, 1000)
+        }
+      }
+
+      // 从第一张图片开始下载
+      download(0)
     }
 
     if (selectedImgList.length > 0) {
@@ -182,6 +204,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   return (
     <Container px={"0"} className="favourite-item-container">
+      <Helmet>
+        {/* 解决浏览器在聚焦输入框时缩放的问题 begins  */}
+        {/* 解决方式是禁止浏览器缩放（同时会仅用用户的缩放） */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        {/* 解决浏览器在聚焦输入框时缩放的问题 ends  */}
+      </Helmet>
       <Header
         handleIconClick={handleIconClick}
         collectionId={params.item}
