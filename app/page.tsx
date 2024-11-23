@@ -1,24 +1,23 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { Box, Flex, Link, Image, Button, For, Text } from "@chakra-ui/react"
 import styled from "@emotion/styled"
+import { useDispatch, useSelector } from "react-redux"
+
+import { Box, Flex, Image, Button, For } from "@chakra-ui/react"
+import { useRouter } from "next/navigation"
+
+import { getQuery } from "@lib/request/generate"
+import { setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 
 import Waterfall from "./components/Waterfall"
-import { useRouter } from "next/navigation"
-import { useDispatch, useSelector } from "react-redux"
-import { getQuery } from "@lib/request/generate"
-import { fetchUtilWait } from "@lib/request/generate"
-import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 import GenStatus from "./components/GenStatus"
-import { storage } from "@utils/index"
-import { Alert } from "@components/Alert"
 import ErrorModal from "./components/ErrorModal"
 // header 右侧按钮
 const headerIconList = [
   {
-    key: "favorites",
-    link: "/favorites",
+    key: "album",
+    link: "/album",
     imgUrl: "/assets/images/mainPage/like.svg"
   },
   {

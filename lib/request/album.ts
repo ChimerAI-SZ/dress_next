@@ -2,56 +2,56 @@
 import axios from "../axios"
 
 // 获取收藏夹列表
-interface queryCollectionListProps {
+interface queryAlbumListProps {
   user_id: number
 }
-export const queryCollectionList = (params: queryCollectionListProps) => {
+export const queryAlbumList = (params: queryAlbumListProps) => {
   return axios.post("/api/collections/list", params)
 }
 
 // 新建收藏夹
-interface addNewCollectionProps {
+interface addNewAlbumProps {
   user_id: number
   title: string
   description?: string
 }
 // 新增收藏夹
-export const addNewCollection = (params: addNewCollectionProps) => {
+export const addNewAlbum = (params: addNewAlbumProps) => {
   return axios.post("/api/collections/create", params)
 }
 
 // 获取收藏夹中的所有图片
-interface queryAllImageInCollectionProps {
+interface queryAllImageInAlbumProps {
   collection_id: number
 }
-export const queryAllImageInCollection = (params: queryAllImageInCollectionProps) => {
+export const queryAllImageInAlbum = (params: queryAllImageInAlbumProps) => {
   return axios.post("/api/collections/get_all_images", params)
 }
 
 // 删除收藏夹
-interface deleteCollectionProps {
+interface deleteAlbumProps {
   collection_id: number
 }
-export const deleteCollection = (params: deleteCollectionProps) => {
+export const deleteAlbum = (params: deleteAlbumProps) => {
   return axios.post("/api/collections/delete", params)
 }
 
 // 编辑收藏夹信息
-interface upadteCollectionProps {
+interface updateAlbumProps {
   collection_id: number
   user_id: number
   title: string
   description?: string
 }
-export const upadteCollection = (params: upadteCollectionProps) => {
+export const updateAlbum = (params: updateAlbumProps) => {
   return axios.post("/api/collections/edit", params)
 }
 
 // 移除收藏
-interface removeImgFromCollectionProps {
+interface removeImgFromAlbumProps {
   collection_id: number
   image_urls: string[]
 }
-export const removeImgFromCollection = (params: removeImgFromCollectionProps) => {
+export const removeImgFromAlbum = (params: removeImgFromAlbumProps) => {
   return axios.post("/api/collections/remove_images", params)
 }

@@ -23,16 +23,16 @@ import { CloseOutlined } from "@ant-design/icons"
 
 import { storage } from "@utils/index"
 
-import { FavouriteDialogProps } from "@definitions/favourites"
+import { AlbumDialogProps } from "@definitions/album"
 
-import { addNewCollection, upadteCollection } from "@lib/request/favourites" // 接口 - 新建收藏夹
+import { addNewAlbum, updateAlbum } from "@lib/request/album" // 接口 - 新建收藏夹
 
 interface FormValues {
   title: string
   description: string
 }
 
-const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visible, close, onSuccess }) => {
+const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, close, onSuccess }) => {
   const collectionList = useSelector((state: any) => state.collectionList.value)
 
   const {
@@ -59,7 +59,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
           title: formData.title,
           description: formData.description ?? ""
         }
-        const { message, data, success } = await addNewCollection(params)
+        const { message, data, success } = await addNewAlbum(params)
 
         if (success) {
           close && close()
@@ -72,7 +72,7 @@ const AlbumDrawer: React.FC<FavouriteDialogProps> = ({ type, collectionId, visib
           description: formData.description ?? "",
           collection_id: collectionId ?? 0
         }
-        const { success } = await upadteCollection(params)
+        const { success } = await updateAlbum(params)
 
         if (success) {
           close && close()

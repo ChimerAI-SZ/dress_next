@@ -13,24 +13,24 @@ import { Alert } from "@components/Alert"
 import Toast from "@components/Toast"
 import ImageGroupByData from "@components/ImageGroupByDate"
 import Header from "./components/Header"
-import FavouritesDialog from "../components/AlbumDrawer"
+import AlbumDrawer from "../components/AlbumDrawer"
 import ImageViewer from "@components/ImageViewer"
 
-import { FavouriteItem, FavouriteItemImage } from "@definitions/favourites"
-import { queryAllImageInCollection, deleteCollection, removeImgFromCollection } from "@lib/request/favourites"
+import { AlbumItem, AlbumItemImage } from "@definitions/album"
+import { queryAllImageInAlbum, deleteAlbum, removeImgFromAlbum } from "@lib/request/album"
 import { errorCaptureRes } from "@utils/index"
 
 type GroupList = {
-  [key: string]: FavouriteItemImage[]
+  [key: string]: AlbumItemImage[]
 }
-interface FavouriteItemProps {
+interface AlbumItemProps {
   params: { item: string }
 }
 
-const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
+const Album: React.FC<AlbumItemProps> = ({ params }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const collectionList = useSelector((state: any) => state.collectionList.value)
+  const albumList = useSelector((state: any) => state.collectionList.value)
 
   const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
   const [selectionMode, setSelectionMode] = useState<boolean>(false) // 用于标记是否进入多选状态
@@ -38,13 +38,13 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false) // 全选状态
-  const [originImgList, setOriginImgList] = useState<FavouriteItemImage[]>([]) // 分组前的图片列表
-  const [selectedImg, setSelectedImg] = useState<FavouriteItemImage | null>(null) // 非多选的时候查看图片大图的url
+  const [originImgList, setOriginImgList] = useState<AlbumItemImage[]>([]) // 分组前的图片列表
+  const [selectedImg, setSelectedImg] = useState<AlbumItemImage | null>(null) // 非多选的时候查看图片大图的url
   const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
 
   // 收藏夹信息
   const [description, setDescription] = useState(
-    collectionList.find((item: FavouriteItem) => item.collection_id + "" === params.item)?.description
+    albumList.find((item: AlbumItem) => item.collection_id + "" === params.item)?.description
   )
   const [title, setTitle] = useState(decodeURIComponent(searchParams.get("name") ?? ""))
 
@@ -70,7 +70,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   // 查询收藏夹数据
   const queryData = async () => {
     try {
-      const res = await queryAllImageInCollection({ collection_id: +params.item })
+      const res = await queryAllImageInAlbum({ collection_id: +params.item })
       const { data, success } = res
 
       // 把图片根据日期进行分栏
@@ -100,7 +100,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   // 删除收藏夹
   const handleDelete = async () => {
-    const res = await deleteCollection({ collection_id: +params.item })
+    const res = await deleteAlbum({ collection_id: +params.item })
     const { data, success } = res
 
     if (success) {
@@ -206,12 +206,12 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
 
   // 取消收藏
   // defaultImages 需要同在一个收藏夹里
-  const hanldeRemoveFromCollection = async (defaultImages?: FavouriteItemImage[]) => {
+  const hanldeRemoveFromCollection = async (defaultImages?: AlbumItemImage[]) => {
     if (defaultImages) {
       const imgurls = defaultImages.map(img => img.image_url)
       const collection_id = defaultImages[0].collection_id
 
-      const [err, res] = await errorCaptureRes(removeImgFromCollection, { image_urls: imgurls, collection_id })
+      const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
       if (res.success) {
         setViewDetail(false)
@@ -235,7 +235,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
   }, [])
 
   return (
-    <Container px={"0"} className="favourite-item-container">
+    <Container px={"0"} className="album-item-container">
       <Header
         handleIconClick={handleIconClick}
         collectionId={params.item}
@@ -243,8 +243,16 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
         handleSetSelectMode={handleSetSelectMode}
       />
       {/* 收藏夹名称 */}
-      <Heading p={"0 16pt"} mb={"8pt"}>
-        {title}
+      <Heading p={"0 1rem"} mb={"8pt"}>
+        {(function () {
+          const ablumData = albumList.find((item: AlbumItem) => item.collection_id + "" === params.item)
+
+          return ablumData
+            ? ablumData.is_default
+              ? "Default Album"
+              : ablumData.title
+            : decodeURIComponent(searchParams.get("name") ?? "")
+        })()}
       </Heading>
       {/* 收藏夹说明 */}
       <Show when={description}>
@@ -254,7 +262,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
               <Image
                 boxSize={"2rem"}
                 mr={"0.5rem"}
-                src={"/assets/images/favourites/collectionDescription.svg"}
+                src={"/assets/images/album/collectionDescription.svg"}
                 alt="description-icon"
               />
               <Text display={"inline-block"} mt={"0.5rem"} fontWeight={500} fontSize={"1.1rem"}>
@@ -323,14 +331,14 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 w={"22pt"}
                 h={"22pt"}
                 ml={"8pt"}
-                src={"/assets/images/favourites/download.svg"}
+                src={"/assets/images/album/download.svg"}
                 onClick={() => {
                   handleDownload()
                 }}
                 alt="download-icon"
               />
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/favourites/liked.svg"} alt="liked-icon" />
-              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/album/liked.svg"} alt="liked-icon" />
+              <Image w={"22pt"} h={"22pt"} ml={"8pt"} src={"/assets/images/album/buy.svg"} alt="buy-icon" />
             </Flex>
           </Flex>
         </Box>
@@ -371,7 +379,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
         </Toast>
       </Show>
 
-      <FavouritesDialog
+      <AlbumDrawer
         type="edit"
         collectionId={+params.item}
         visible={dialogVisible}
@@ -393,7 +401,7 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 onClick={() => {
                   handleDownload([selectedImg?.image_url ?? ""])
                 }}
-                src={"/assets/images/favourites/download.svg"}
+                src={"/assets/images/album/download.svg"}
                 alt="download-icon"
               />
               <Image
@@ -402,10 +410,10 @@ const Collection: React.FC<FavouriteItemProps> = ({ params }) => {
                 onClick={() => {
                   selectedImg && hanldeRemoveFromCollection([selectedImg])
                 }}
-                src={`/assets/images/favourites/liked.svg`}
+                src={`/assets/images/album/liked.svg`}
                 alt="liked-icon"
               />
-              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/album/buy.svg"} alt="buy-icon" />
               <Button ml={"0.5rem"} bgColor={"#ee3939"} borderRadius={"40px"}>
                 Further Generate
               </Button>
@@ -437,6 +445,6 @@ const DescriptionBox = styled.div`
   }
 `
 
-export default ({ params }: FavouriteItemProps) => {
-  return <Collection params={params} />
+export default ({ params }: AlbumItemProps) => {
+  return <Album params={params} />
 }

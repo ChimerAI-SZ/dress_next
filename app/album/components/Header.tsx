@@ -5,13 +5,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LeftOutlined } from "@ant-design/icons"
 
-import FavouritesDialog from "./AlbumDrawer"
+import AlbumDrawer from "./AlbumDrawer"
 
-import addIcon from "@img/favourites/addIcon.svg"
+import addIcon from "@img/album/addIcon.svg"
 
-import { FavouritesHeaderProps } from "@definitions/favourites"
+import { AlbumHeaderProps } from "@definitions/album"
 
-const Header: React.FC<FavouritesHeaderProps> = ({ name, onSuccess }) => {
+const Header: React.FC<AlbumHeaderProps> = ({ name, onSuccess }) => {
   const pathname = usePathname()
   const [dialogVisible, setDialogVisible] = useState<boolean>(false) // 编辑收藏夹信息的弹窗是否可以见
 
@@ -21,11 +21,11 @@ const Header: React.FC<FavouritesHeaderProps> = ({ name, onSuccess }) => {
   }
 
   return (
-    <Container className="favourites-header-contaienr" p={"11pt 16pt"}>
+    <Container className="album-header-contaienr" p={"11pt 16pt"}>
       <Flex gap="4" alignItems={"center"} justify="space-between" position={"relative"}>
         {/* 如果当前在收藏夹列表，返回主页，不然返回收藏夹页 */}
         {/* todo：这种情况只有在‘收藏夹的来源只有主页’的情况下使用 */}
-        <Link href={pathname === "/favorites" ? "/" : "/favorites"}>
+        <Link href={pathname === "/album" ? "/" : "/album"}>
           {/* <Image w="24px" h="24px" src={closeIcon.src} alt="" /> */}
           <LeftOutlined style={{ width: "22pt", height: "22pt" }} />
         </Link>
@@ -48,7 +48,7 @@ const Header: React.FC<FavouritesHeaderProps> = ({ name, onSuccess }) => {
         >
           <Image src={addIcon.src} h={"14pt"} w={"14pt"} alt="add icon" />
         </Box>
-        <FavouritesDialog type="add" visible={dialogVisible} close={closeDialog} onSuccess={onSuccess} />
+        <AlbumDrawer type="add" visible={dialogVisible} close={closeDialog} onSuccess={onSuccess} />
       </Flex>
     </Container>
   )

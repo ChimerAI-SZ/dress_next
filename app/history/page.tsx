@@ -10,26 +10,26 @@ import { Checkbox } from "@components/ui/checkbox"
 
 import ImageViewer from "@components/ImageViewer"
 import ImageGroupByData from "@components/ImageGroupByDate"
-import CollectionDialog from "../favorites/components/AlbumDrawer"
+import CollectionDialog from "../album/components/AlbumDrawer"
 
 import NoSelect from "@img/generate-result/no-select.svg"
 import Selected from "@img/generate-result/selected.svg"
 import ModalRight from "@img/generate-result/modal-right.svg"
 import ModalBack from "@img/generate-result/modal-back.svg"
-import addIcon from "@img/favourites/addIcon.svg"
+import addIcon from "@img/album/addIcon.svg"
 
 import Header from "./components/Header"
 import Toast from "@components/Toast"
 import { Alert } from "@components/Alert"
 
-import { FavouriteItem } from "@definitions/favourites"
+import { AlbumItem } from "@definitions/album"
 import { HistoryItem } from "@definitions/history"
 import { storage, errorCaptureRes } from "@utils/index"
 import { store } from "@store/index"
 
 // 接口 - 收藏夹列表
-import { queryCollectionList } from "@lib/request/favourites"
-import { queryHistory, addImgToFavourite, removeImgFromCollection } from "@lib/request/history"
+import { queryAlbumList } from "@lib/request/album"
+import { queryHistory, addImgToAlbum, removeImgFromAlbum } from "@lib/request/history"
 
 type GroupList = {
   [key: string]: HistoryItem[]
@@ -141,13 +141,13 @@ function Page() {
       const user_id = storage.get("user_id")
 
       if (user_id && selectedImgList.length > 0) {
-        const { message, data: collectionList, success } = await queryCollectionList({ user_id: +user_id })
+        const { message, data: collectionList, success } = await queryAlbumList({ user_id: +user_id })
 
         if (success && collectionList?.length > 0) {
           setCollectionList(collectionList)
 
           // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
-          const defalutCollection = collectionList.find((item: FavouriteItem) => item.is_default) ?? collectionList[0]
+          const defalutCollection = collectionList.find((item: AlbumItem) => item.is_default) ?? collectionList[0]
           const imgUrls = originImgList
             .filter(item => selectedImgList.includes(item.history_id))
             .filter(item => item.collection_id !== defalutCollection.collection_id) // 过滤掉已经在默认收藏夹中的图片
@@ -158,7 +158,7 @@ function Page() {
           }
 
           if (imgUrls.length > 0) {
-            const { message, data, success } = await addImgToFavourite(params)
+            const { message, data, success } = await addImgToAlbum(params)
 
             if (success) {
               setCollectSuccessVisible(true)
@@ -222,7 +222,7 @@ function Page() {
       const imgurls = defaultImages.map(img => img.image_url)
       const collection_id = defaultImages[0].collection_id
 
-      const [err, res] = await errorCaptureRes(removeImgFromCollection, { image_urls: imgurls, collection_id })
+      const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
       if (res.success) {
         queryData()
@@ -246,7 +246,7 @@ function Page() {
           image_urls: imgUrls
         }
 
-        return addImgToFavourite(params)
+        return addImgToAlbum(params)
       })
     ).then(() => {
       setCollectionSelectorVisible(false)
@@ -318,16 +318,16 @@ function Page() {
                 onClick={() => {
                   handleDownload()
                 }}
-                src={"/assets/images/favourites/download.svg"}
+                src={"/assets/images/album/download.svg"}
                 alt="download-icon"
               />
               <StyledImage
                 selectedImgList={selectedImgList}
                 onClick={handleCollect}
-                src={"/assets/images/favourites/unliked.svg"}
+                src={"/assets/images/album/unliked.svg"}
                 alt="liked-icon"
               />
-              <StyledImage selectedImgList={selectedImgList} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <StyledImage selectedImgList={selectedImgList} src={"/assets/images/album/buy.svg"} alt="buy-icon" />
             </Flex>
           </Flex>
         </Box>
@@ -366,7 +366,7 @@ function Page() {
               fontSize={"1.5rem"}
               borderRadius={"50%"}
             >
-              <Image src={"/assets/images/favourites/closeIcon.svg"} boxSize={"14pt"} />
+              <Image src={"/assets/images/album/closeIcon.svg"} boxSize={"14pt"} />
             </Flex>
             <Text
               fontSize={"1.06rem"}
@@ -400,7 +400,7 @@ function Page() {
             >
               <Fieldset.Content>
                 <For each={collectionList}>
-                  {(item: FavouriteItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
+                  {(item: AlbumItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
                 </For>
               </Fieldset.Content>
             </CheckboxGroup>
@@ -484,7 +484,7 @@ function Page() {
                 onClick={() => {
                   handleDownload([selectedImg?.image_url ?? ""])
                 }}
-                src={"/assets/images/favourites/download.svg"}
+                src={"/assets/images/album/download.svg"}
                 alt="download-icon"
               />
               <Image
@@ -500,10 +500,10 @@ function Page() {
                     }
                   }
                 }}
-                src={`/assets/images/favourites/${/^0$/.test(selectedImg?.collection_id + "") ? "unliked" : "liked"}.svg`}
+                src={`/assets/images/album/${/^0$/.test(selectedImg?.collection_id + "") ? "unliked" : "liked"}.svg`}
                 alt="liked-icon"
               />
-              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/favourites/buy.svg"} alt="buy-icon" />
+              <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/album/buy.svg"} alt="buy-icon" />
               <Button ml={"0.5rem"} bgColor={"#ee3939"} borderRadius={"40px"}>
                 Further Generate
               </Button>

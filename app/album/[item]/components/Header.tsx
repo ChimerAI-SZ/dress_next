@@ -8,14 +8,14 @@ import { LeftOutlined, EllipsisOutlined } from "@ant-design/icons"
 import { useSelector } from "react-redux"
 // import { usePathname } from 'next/navigation'
 
-import fullSelectionIcon from "@img/favourites/fullSelection.svg"
-import fullSelectionActiveIcon from "@img/favourites/fullSelectionActive.svg"
-import deleteIcon from "@img/favourites/deleteIcon.svg"
-import editIcon from "@img/favourites/editIcon.svg"
+import fullSelectionIcon from "@img/album/fullSelection.svg"
+import fullSelectionActiveIcon from "@img/album/fullSelectionActive.svg"
+import deleteIcon from "@img/album/deleteIcon.svg"
+import editIcon from "@img/album/editIcon.svg"
 
-import { CollectionDetailHeaderProps } from "@definitions/favourites"
+import { AlbumDetailHeaderProps } from "@definitions/album"
 
-const Header: React.FC<CollectionDetailHeaderProps> = ({
+const Header: React.FC<AlbumDetailHeaderProps> = ({
   handleIconClick,
   collectionId,
   selectMode,
@@ -25,16 +25,16 @@ const Header: React.FC<CollectionDetailHeaderProps> = ({
   const collectionList = useSelector((state: any) => state.collectionList.value)
 
   return (
-    <Container className="favourites-header-contaienr" p={"11pt 16pt"}>
+    <Container className="ablum-header-contaienr" p={"11pt 16pt"}>
       <Flex gap="4" alignItems={"center"} justify="space-between" position={"relative"}>
         {/* 如果当前在收藏夹列表，返回主页，不然返回收藏夹页 */}
         {/* todo：这种情况只有在‘收藏夹的来源只有主页’的情况下使用 */}
-        <Link href={"/favorites"}>
+        <Link href={"/album"}>
           {/* <Image w="24px" h="24px" src={closeIcon.src} alt="" /> */}
           <LeftOutlined style={{ width: "22pt", height: "22pt" }} />
         </Link>
         <Heading whiteSpace={"nowrap"} position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
-          Collection Details
+          Album Details
         </Heading>
         {/* 新增 icon 与编辑/删除的menu多选 icon */}
         <Flex alignItems={"center"}>

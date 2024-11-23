@@ -1,4 +1,4 @@
-interface FavouriteItemImage {
+export interface AlbumItemImage {
   id: number
   collection_id: number
   image_url: string
@@ -8,31 +8,25 @@ interface FavouriteItemImage {
 }
 
 // 收藏夹数据类型
-export type FavouriteItem = {
+export type AlbumItem = {
   collection_id: string | number
   user_id: string | number
   is_default: boolean
   is_deleted: boolean
   title: string
-  images: FavouriteItemImage[]
+  images: AlbumItemImage[]
   description: string
   created_at: string
   total: number
 }
 
-export type FavouriteImage = {
-  message: string
-  success: boolean
-  data: FavouriteItemImage[]
-}
-
 // 收藏页 header 的 props 类型
-export interface FavouritesHeaderProps {
+export interface AlbumHeaderProps {
   name?: string | null
   onSuccess?: () => void
 }
 
-export interface CollectionDetailHeaderProps {
+export interface AlbumDetailHeaderProps {
   handleIconClick: (type: string) => void
   collectionId?: string // 在收藏夹内部的header要传一下当前收藏夹的id
   selectMode: boolean
@@ -40,7 +34,7 @@ export interface CollectionDetailHeaderProps {
 }
 
 // 收藏页 弹窗 props 类型
-export interface FavouriteDialogProps {
+export interface AlbumDialogProps {
   type: "add" | "edit"
   collectionId?: number // 在收藏夹内部的header要传一下当前收藏夹的id
   visible: boolean

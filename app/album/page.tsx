@@ -2,31 +2,30 @@
 import { useEffect, useState } from "react"
 import { Container } from "@chakra-ui/react"
 import { useDispatch } from "react-redux"
-import { Provider } from "react-redux"
 
 // 引用组件
 import Header from "./components/Header"
-import FavouritesList from "./components/FavouritesList"
+import AlbumList from "./components/AlbumList"
 
-import { FavouriteItem } from "@definitions/favourites"
+import { AlbumItem } from "@definitions/album"
 import { setList } from "../../store/features/collectionSlice"
 import { storage } from "@utils/index"
 
 // 接口 - 收藏夹列表
-import { queryCollectionList } from "@lib/request/favourites"
+import { queryAlbumList } from "@lib/request/album"
 
 function Page() {
-  const [collectionList, setCollectionList] = useState<FavouriteItem[]>([])
+  const [albumList, setAlbumList] = useState<AlbumItem[]>([])
   const dispatch = useDispatch()
 
-  const queryCollectionData = async () => {
+  const queryAlbumData = async () => {
     const user_id = storage.get("user_id")
 
     if (user_id) {
-      const { message, data, success } = await queryCollectionList({ user_id: +user_id as number })
+      const { message, data, success } = await queryAlbumList({ user_id: +user_id as number })
 
       if (success) {
-        setCollectionList(data)
+        setAlbumList(data)
         dispatch(setList(data))
       } else {
         // todo erro hanlder
@@ -35,18 +34,18 @@ function Page() {
   }
 
   useEffect(() => {
-    queryCollectionData()
+    queryAlbumData()
   }, [])
 
   return (
     <Container p={0}>
       <Header
-        name="Collections"
+        name="Albums"
         onSuccess={() => {
-          queryCollectionData()
+          queryAlbumData()
         }}
       />
-      <FavouritesList collectionList={collectionList} />
+      <AlbumList albumList={albumList} />
     </Container>
   )
 }

@@ -2,16 +2,16 @@ import styled from "@emotion/styled"
 import dayjs from "dayjs"
 import { Box, For, Grid, GridItem, Image, Show } from "@chakra-ui/react"
 
-import selectedIcon from "@img/favourites/selectedIcon.svg"
-import unselectedIcon from "@img/favourites/unselectedIcon.svg"
+import selectedIcon from "@img/album/selectedIcon.svg"
+import unselectedIcon from "@img/album/unselectedIcon.svg"
 
 import { HistoryItem } from "@definitions/history"
-import { FavouriteItemImage } from "@definitions/favourites"
+import { AlbumItemImage } from "@definitions/album"
 
 interface ImageGroupByDataProps {
   imgKey: string
   date: string
-  imageList: HistoryItem[] | FavouriteItemImage[]
+  imageList: HistoryItem[] | AlbumItemImage[]
   selectionMode: boolean // 多选态
   selectedImageList: number[]
   handleSelect: (img: number) => void // 图片点击事件

@@ -11,19 +11,19 @@ export const queryHistory = (params: queryHistoryProps) => {
   return axios.post("/api/generate_image_history/get", params)
 }
 
-interface addImgToFavouriteProps {
+interface addImgToAlbumProps {
   collection_id: number
   image_urls: string[]
 }
-export const addImgToFavourite = (params: addImgToFavouriteProps) => {
+export const addImgToAlbum = (params: addImgToAlbumProps) => {
   return axios.post("/api/collections/add_images", params)
 }
 
 // 移除收藏
-interface removeImgFromCollectionProps {
+interface removeImgFromAlbumProps {
   collection_id: number
   image_urls: string[]
 }
-export const removeImgFromCollection = (params: removeImgFromCollectionProps) => {
+export const removeImgFromAlbum = (params: removeImgFromAlbumProps) => {
   return axios.post("/api/collections/remove_images", params)
 }

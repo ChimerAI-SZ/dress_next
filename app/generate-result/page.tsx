@@ -7,7 +7,7 @@ import { Toaster, toaster } from "@components/Toaster"
 import { Provider } from "react-redux"
 
 import Toast from "@components/Toast"
-import CollectionDialog from "../favorites/components/AlbumDrawer"
+import CollectionDialog from "../album/components/AlbumDrawer"
 
 import Header from "@components/Header"
 import Download from "@img/generate-result/download.png"
@@ -19,10 +19,10 @@ import NoSelect from "@img/generate-result/no-select.svg"
 import Selected from "@img/generate-result/selected.svg"
 import ModalRight from "@img/generate-result/modal-right.svg"
 import ModalBack from "@img/generate-result/modal-back.svg"
-import addIcon from "@img/favourites/addIcon.svg"
+import addIcon from "@img/album/addIcon.svg"
 
 import ToastTest from "@components/ToastTest"
-import { FavouriteItem } from "@definitions/favourites" // 收藏夹type
+import { AlbumItem } from "@definitions/album" // 收藏夹type
 import { errorCaptureRes, storage } from "@utils/index"
 import { useSearchParams, useRouter } from "next/navigation"
 import { fetchShoppingAdd, fetchAddImage, collectionsList } from "@lib/request/generate-result"
@@ -161,11 +161,11 @@ function Page() {
     let defaultCollectionIds = []
     console.log(res.data)
     if (res) {
-      // 筛选出 is_default 为 true 的 collection
-      const defaultCollection = res.data.filter((collection: { is_default: boolean }) => collection.is_default === true)
+      // 筛选出 is_default 为 true 的 album
+      const defaultCollection = res.data.filter((album: { is_default: boolean }) => album.is_default === true)
 
       // 提取 collection_id
-      defaultCollectionIds = defaultCollection.map((collection: { collection_id: any }) => collection.collection_id)
+      defaultCollectionIds = defaultCollection.map((album: { collection_id: any }) => album.collection_id)
       setCollectionList(res.data)
     }
     const [err2, res2] = await errorCaptureRes(fetchAddImage, {
@@ -541,7 +541,7 @@ function Page() {
               fontSize={"1.5rem"}
               borderRadius={"50%"}
             >
-              <Image src={"/assets/images/favourites/closeIcon.svg"} boxSize={"14pt"} />
+              <Image src={"/assets/images/album/closeIcon.svg"} boxSize={"14pt"} />
             </Flex>
             <Text
               fontSize={"1.06rem"}
@@ -576,7 +576,7 @@ function Page() {
             >
               <Fieldset.Content>
                 <For each={collectionList}>
-                  {(item: FavouriteItem) => (
+                  {(item: AlbumItem) => (
                     <Checkbox value={item.collection_id + ""} key={item.collection_id}>
                       {item.title}
                     </Checkbox>
