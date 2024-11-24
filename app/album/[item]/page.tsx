@@ -70,15 +70,14 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
   // 查询收藏夹数据
   const queryData = async () => {
     try {
-      const res = await queryAllImageInAlbum({ collection_id: +params.item })
-      const { data, success } = res
+      const [err, res] = await errorCaptureRes(queryAllImageInAlbum, { collection_id: +params.item })
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
-      if (success && data?.length > 0) {
+      if (res.success && res.data?.length > 0) {
         const groupedByDate = new Map()
 
-        data.forEach((item: any) => {
+        res.data.forEach((item: any) => {
           const date = dayjs(item.added_at).format("YYYY-MM-DD")
           // 如果 Map 中还没有这个日期的键，初始化一个空数组
           if (!groupedByDate.has(date)) {
@@ -88,25 +87,28 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
           groupedByDate.get(date).push(item)
         })
 
-        setOriginImgList(data)
+        setOriginImgList(res.data)
         setImgGroupList(Object.fromEntries(groupedByDate))
       }
 
       console.log(res, "res")
     } catch (err: any) {
-      // todo error hanlder
+      Alert.open({
+        content: err.message
+      })
     }
   }
 
   // 删除收藏夹
   const handleDelete = async () => {
-    const res = await deleteAlbum({ collection_id: +params.item })
-    const { data, success } = res
+    const [err, res] = await errorCaptureRes(deleteAlbum, { collection_id: +params.item })
 
-    if (success) {
+    if (res.success) {
       router.back()
     } else {
-      // todo error handler
+      Alert.open({
+        content: err.message
+      })
     }
   }
 

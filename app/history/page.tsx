@@ -94,44 +94,41 @@ function Page() {
   }
 
   const queryData = async () => {
-    try {
-      // const res = await featchHistoryData("123")
-      const user_id = storage.get("user_id")
+    const user_id = storage.get("user_id")
 
-      if (user_id) {
-        const params = {
-          user_id: +user_id as number,
-          start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"),
-          end_date: dayjs().add(1, "day").format("YYYY-MM-DD")
-        }
-        const { message, data, success } = await queryHistory(params)
-
-        // 把图片根据日期进行分栏
-        // 日期要从今往前排序
-        if (success && data?.length > 0) {
-          const groupedByDate = new Map()
-
-          data.forEach((item: any) => {
-            const date = dayjs(item.created_date).format("YYYY-MM-DD")
-            // 如果 Map 中还没有这个日期的键，初始化一个空数组
-            if (!groupedByDate.has(date)) {
-              groupedByDate.set(date, [])
-            }
-            // 将当前对象的 url 添加到对应日期的数组中
-            groupedByDate.get(date).push(item)
-          })
-
-          setOriginImgList(data)
-          setImgGroupList(Object.fromEntries(groupedByDate))
-
-          // 重置一下选中的图片的数据
-          if (selectedImg) {
-            setSelectedImg(data.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
-          }
-        }
+    if (user_id) {
+      const params = {
+        user_id: +user_id as number,
+        start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"),
+        end_date: dayjs().add(1, "day").format("YYYY-MM-DD")
       }
-    } catch (err: any) {
-      // todo error hanlder
+      const [err, res] = await errorCaptureRes(queryHistory, params)
+
+      // 把图片根据日期进行分栏
+      // 日期要从今往前排序
+      if (res.success && res.data?.length > 0) {
+        const groupedByDate = new Map()
+
+        res.data.forEach((item: any) => {
+          const date = dayjs(item.created_date).format("YYYY-MM-DD")
+          // 如果 Map 中还没有这个日期的键，初始化一个空数组
+          if (!groupedByDate.has(date)) {
+            groupedByDate.set(date, [])
+          }
+          // 将当前对象的 url 添加到对应日期的数组中
+          groupedByDate.get(date).push(item)
+        })
+
+        setOriginImgList(res.data)
+        setImgGroupList(Object.fromEntries(groupedByDate))
+
+        // 重置一下选中的图片的数据
+        selectedImg && setSelectedImg(res.data.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
+      } else {
+        Alert.open({
+          content: err.message
+        })
+      }
     }
   }
 
@@ -141,13 +138,13 @@ function Page() {
       const user_id = storage.get("user_id")
 
       if (user_id && selectedImgList.length > 0) {
-        const { message, data: collectionList, success } = await queryAlbumList({ user_id: +user_id })
+        const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id })
 
-        if (success && collectionList?.length > 0) {
-          setCollectionList(collectionList)
+        if (res.success && res.data?.length > 0) {
+          setCollectionList(res.data)
 
           // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
-          const defalutCollection = collectionList.find((item: AlbumItem) => item.is_default) ?? collectionList[0]
+          const defalutCollection = res.data.find((item: AlbumItem) => item.is_default) ?? res.data[0]
           const imgUrls = originImgList
             .filter(item => selectedImgList.includes(item.history_id))
             .filter(item => item.collection_id !== defalutCollection.collection_id) // 过滤掉已经在默认收藏夹中的图片
@@ -158,13 +155,13 @@ function Page() {
           }
 
           if (imgUrls.length > 0) {
-            const { message, data, success } = await addImgToAlbum(params)
+            const [err, res] = await errorCaptureRes(addImgToAlbum, params)
 
-            if (success) {
+            if (res.success) {
               setCollectSuccessVisible(true)
             } else {
               Alert.open({
-                content: message
+                content: err.message
               })
             }
           } else {
@@ -173,7 +170,7 @@ function Page() {
           }
         } else {
           Alert.open({
-            content: message
+            content: err.message
           })
         }
       }

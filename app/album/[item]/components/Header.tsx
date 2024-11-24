@@ -78,7 +78,6 @@ const Header: React.FC<AlbumDetailHeaderProps> = ({
                   <Image src={editIcon.src} h={"12pt"} w="12pt" alt="edit-icon" />
                   <Box>Edit Album</Box>
                 </MenuItem>
-                {/* todo 默认收藏夹是不能删除的 */}
                 <MenuItem value="delete" color={"#E02020"}>
                   <Image src={deleteIcon.src} h={"12pt"} w="12pt" alt="edit-icon" /> Delete Album
                 </MenuItem>

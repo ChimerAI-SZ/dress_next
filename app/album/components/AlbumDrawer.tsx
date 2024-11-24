@@ -20,8 +20,9 @@ import {
 } from "@components/ui/drawer"
 import { Field } from "@components/ui/field"
 import { CloseOutlined } from "@ant-design/icons"
+import { Alert } from "@components/Alert"
 
-import { storage } from "@utils/index"
+import { storage, errorCaptureRes } from "@utils/index"
 
 import { AlbumDialogProps } from "@definitions/album"
 
@@ -59,11 +60,15 @@ const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, 
           title: formData.title,
           description: formData.description ?? ""
         }
-        const { message, data, success } = await addNewAlbum(params)
+        const [err, res] = await errorCaptureRes(addNewAlbum, params)
 
-        if (success) {
+        if (res.success) {
           close && close()
-          onSuccess && onSuccess(data)
+          onSuccess && onSuccess(res.data)
+        } else {
+          Alert.open({
+            content: err.message
+          })
         }
       } else {
         const params = {
@@ -72,11 +77,15 @@ const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, 
           description: formData.description ?? "",
           collection_id: collectionId ?? 0
         }
-        const { success } = await updateAlbum(params)
+        const [err, res] = await errorCaptureRes(updateAlbum, params)
 
-        if (success) {
+        if (res.success) {
           close && close()
           onSuccess && onSuccess(formData)
+        } else {
+          Alert.open({
+            content: err.message
+          })
         }
       }
     }
