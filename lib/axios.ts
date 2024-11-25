@@ -1,9 +1,10 @@
 import axios, {
   AxiosRequestConfig,
-  AxiosResponse,
+  RawAxiosResponseHeaders,
   CancelTokenSource,
   InternalAxiosRequestConfig,
-  AxiosRequestHeaders
+  AxiosRequestHeaders,
+  AxiosResponseHeaders
 } from "axios"
 import { exitLogin, storage } from "@utils/index"
 
@@ -14,13 +15,17 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
 }
 
 // 统一定义一下 axios 返回类型
-declare module "axios" {
-  export interface AxiosResponse<T = any, D = any> {
-    data: T
-    code?: number
-    message: string
-    success?: boolean
-  }
+export interface AxiosResponse<T = any, D = any> {
+  data: T
+  code?: number
+  message?: string
+  success?: boolean
+  value?: object
+  status: number
+  statusText: string
+  headers: RawAxiosResponseHeaders | AxiosResponseHeaders
+  config: InternalAxiosRequestConfig<D>
+  request?: any
 }
 
 declare global {
@@ -100,7 +105,7 @@ instance.interceptors.response.use(
       window.$message?.destroy()
       console.error(status)
     } else if (status === 401) {
-      // exitLogin();
+      exitLogin()
     }
     return Promise.reject(error)
   }

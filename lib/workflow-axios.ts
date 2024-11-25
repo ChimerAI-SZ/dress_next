@@ -1,12 +1,25 @@
 import axios, {
   AxiosRequestConfig,
-  AxiosResponse,
   CancelTokenSource,
+  RawAxiosResponseHeaders,
+  AxiosResponseHeaders,
   InternalAxiosRequestConfig,
   AxiosRequestHeaders
 } from "axios"
 import { exitLogin, storage } from "@utils/index"
-
+// 统一定义一下 axios 返回类型
+export interface AxiosResponse<T = any, D = any> {
+  data: T
+  code?: number
+  message?: string
+  success?: boolean
+  value?: object
+  status: number
+  statusText: string
+  headers: RawAxiosResponseHeaders | AxiosResponseHeaders
+  config: InternalAxiosRequestConfig<D>
+  request?: any
+}
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   cancelToken?: CancelTokenSource["token"]
   headers: AxiosRequestHeaders
@@ -76,7 +89,7 @@ instance.interceptors.request.use(
 )
 
 instance.interceptors.response.use(
-  (response: AxiosResponse) => {
+  (response: any) => {
     // 在一个 ajax 响应后再执行一下取消操作，把已经完成的请求从 pending 中移除
     // removePendingRequest(response.config);
     if (response.status === 401) {
