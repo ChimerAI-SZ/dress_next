@@ -79,7 +79,7 @@ const Page = () => {
     console.log(err, res)
     if (res?.success) {
       storage.set("user_id", res.data.user_id.toString())
-      storage.set("token", res.data.token)
+      storage.set("token", `Bearer ${res.data.token}`)
       router.push("/")
     } else {
       Alert.open({
