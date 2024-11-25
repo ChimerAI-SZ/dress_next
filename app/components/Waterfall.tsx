@@ -83,7 +83,9 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           // 生成一个随机索引
           index = Math.floor(Math.random() * (MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN))
           // 检查接下来的4个索引是否可用
-          availableIndexes = Array.from({ length: 5 }, (_, i) => index + i).every(i => !usedIndexes.has(i))
+          availableIndexes = Array.from({ length: NUMBER_OF_IMAGES_LOADED_EACH_TURN }, (_, i) => index + i).every(
+            i => !usedIndexes.has(i)
+          )
         } while (!availableIndexes)
 
         return index
@@ -112,12 +114,12 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           // 如果是下拉刷新的话，重置
           let newSet = refreshType === "pullUp" ? new Set(prevIndexes) : new Set()
 
-          for (let i = 0; i < 5; i++) {
+          for (let i = 0; i < NUMBER_OF_IMAGES_LOADED_EACH_TURN; i++) {
             newSet.add(randomIndex + i)
           }
 
           // 由于是随机开始查询的，如果剩下可用的图片已经没有两倍的单次请求数量的，重置。
-          if (newSet.size > MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN * 2) {
+          if (newSet.size >= MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN * 2) {
             return new Set()
           }
 
