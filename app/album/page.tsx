@@ -6,10 +6,12 @@ import { useDispatch } from "react-redux"
 // 引用组件
 import Header from "./components/Header"
 import AlbumList from "./components/AlbumList"
+import { Alert } from "@components/Alert"
 
 import { AlbumItem } from "@definitions/album"
 import { setList } from "../../store/features/collectionSlice"
 import { storage } from "@utils/index"
+import { errorCaptureRes } from "@utils/index"
 
 // 接口 - 收藏夹列表
 import { queryAlbumList } from "@lib/request/album"
@@ -22,13 +24,15 @@ function Page() {
     const user_id = storage.get("user_id")
 
     if (user_id) {
-      const { message, data, success } = await queryAlbumList({ user_id: +user_id as number })
+      const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id as number })
 
-      if (success) {
-        setAlbumList(data)
-        dispatch(setList(data))
+      if (res.success) {
+        setAlbumList(res.data)
+        dispatch(setList(res.data))
       } else {
-        // todo erro hanlder
+        Alert.open({
+          content: err.message
+        })
       }
     }
   }

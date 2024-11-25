@@ -67,7 +67,7 @@ export const exitLogin = () => {
 export const errorCaptureRes = async (asyncFunc: (arg0: any) => any, data?: any, flag = true) => {
   try {
     const res = await asyncFunc(data)
-    if (res.code !== 200) {
+    if (!res.success) {
       // window.$message.error(res.message || '未获取到信息');
       return [{ message: res.message || "未获取到信息", code: res.code }, res]
     }

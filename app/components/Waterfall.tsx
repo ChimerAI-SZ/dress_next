@@ -9,11 +9,10 @@ import { Box, Flex, Spinner, useDisclosure, Image, Show, Button } from "@chakra-
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 
+import { Alert } from "@components/Alert"
 import ImageOverlay from "./ImageOverlay"
-import Toast from "@components/Toast"
 import ImageViewer from "@components/ImageViewer"
-import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
-import { storage } from "@utils/index"
+import { setParams } from "@store/features/workSlice"
 import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
   image_url: string
@@ -41,52 +40,101 @@ const breakpointColumnsObj = {
   500: 2
 }
 
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
+
+const NUMBER_OF_IMAGES_LOADED_EACH_TURN = 10 //每次加载的图片数量
+const MAXIMUN_NUMBER_OF_IMAGES = 50 //每次加载的图片数量
+
 const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setViewDetail: (value: boolean) => void }) => {
   const router = useRouter()
   const dispatch = useDispatch()
+  const { onOpen } = useDisclosure()
+
   const [visibleImage, setVisibleImage] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
   const [imageList, setImageList] = useState<Item[]>([])
   const [page, setPage] = useState(0)
-  const [hasMore, setHasMore] = useState(true)
-  const [loading, setLoading] = useState(false)
-  const loaderRef = useRef(null)
-  const { onOpen } = useDisclosure()
-  const observer = useRef<IntersectionObserver | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+
+  const [usedIndexes, setUsedIndexes] = useState(new Set())
 
   const [selectedImg, setSelectedImg] = useState("") // 选中的图片
+  const loaderRef = useRef(null)
+  const observer = useRef<IntersectionObserver | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const hasFetchedOnce = useRef(false)
+
   const openModal = (src: string) => {
     setVisibleImage(src)
     onOpen()
   }
 
   const fetchData = useCallback(
-    async (callback?: () => void) => {
+    async (refreshType: "pullDown" | "pullUp" = "pullUp", callback?: () => void) => {
       if (loading || !hasMore) return // 避免重复请求
       setLoading(true)
+
+      const generateRandomIndex = () => {
+        let index: number
+        let availableIndexes: boolean
+
+        do {
+          // 生成一个随机索引
+          index = Math.floor(Math.random() * (MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN))
+          // 检查接下来的4个索引是否可用
+          availableIndexes = Array.from({ length: 5 }, (_, i) => index + i).every(i => !usedIndexes.has(i))
+        } while (!availableIndexes)
+
+        return index
+      }
+
+      const randomIndex = generateRandomIndex()
+
       const [err, res] = await errorCaptureRes(fetchHomePage, {
-        limit: 10,
-        offset: page * 10,
+        limit: NUMBER_OF_IMAGES_LOADED_EACH_TURN,
+        offset: randomIndex,
         library: "top_sales"
       })
 
-      if (res.success) {
-        const newImages = res?.data
-        console.log(newImages)
-        setImageList(prev => [...prev, ...newImages])
+      if (res.success && res.data?.length > 0) {
+        const newImages = res.data.slice().sort(() => Math.random() - 0.5)
+
+        // 下拉刷新的话重置imglist
+        setImageList(prev => (refreshType === "pullUp" ? [...prev, ...newImages] : [...newImages]))
+
         setHasMore(newImages.length > 0)
+
         setPage(prev => prev + 1)
 
+        // 存一下本次使用到的图片
+        setUsedIndexes(prevIndexes => {
+          // 如果是下拉刷新的话，重置
+          let newSet = refreshType === "pullUp" ? new Set(prevIndexes) : new Set()
+
+          for (let i = 0; i < 5; i++) {
+            newSet.add(randomIndex + i)
+          }
+
+          // 由于是随机开始查询的，如果剩下可用的图片已经没有两倍的单次请求数量的，重置。
+          if (newSet.size > MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN * 2) {
+            return new Set()
+          }
+
+          return newSet
+        })
+
         callback && callback()
+      } else {
+        Alert.open({
+          content: err.message
+        })
       }
+
       setLoading(false)
     },
     [hasMore, page]
   )
-
-  const hasFetchedOnce = useRef(false)
 
   const lastImageRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -130,8 +178,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
       let refreshStatus = false
 
       const pullCallback = () => {
-        console.log("callback")
-        fetchData(() => {
+        fetchData("pullDown", () => {
           app.style["transition"] = "transform 0.4s"
           app.style["transform"] = "translate(0, 0px)"
         })
