@@ -79,7 +79,13 @@ function Page() {
       work === 0
     ) {
       const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = params
-      if (loadPrintingImage && backgroundColor === "#FDFCFA" && text?.trim() === "") {
+      console.log(
+        loadPrintingImage,
+        backgroundColor,
+        text?.trim(),
+        loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()
+      )
+      if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
         console.log(222)
         dispatch(setWork(2))
         dispatch(setParams(params))
