@@ -254,33 +254,35 @@ function Page() {
                 src={jionLike.includes(selectImage) ? LikeTop.src : Like.src}
                 onClick={() => {
                   AddImage([selectImage])
-                  toaster.create({
-                    description: (
-                      <Flex justifyContent={"space-between"} alignItems={"center"}>
-                        <Flex alignItems={"center"} gap={"0.56rem"}>
-                          <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-                          <Text fontWeight="400" fontSize="0.88rem" color="#171717">
-                            Collect in Default
-                          </Text>
+                  if (userId !== null) {
+                    toaster.create({
+                      description: (
+                        <Flex justifyContent={"space-between"} alignItems={"center"}>
+                          <Flex alignItems={"center"} gap={"0.56rem"}>
+                            <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
+                            <Text fontWeight="400" fontSize="0.88rem" color="#171717">
+                              Collect in Default
+                            </Text>
+                          </Flex>
+                          <Flex alignItems={"center"} gap={"0.56rem"}>
+                            <Text
+                              fontWeight="400"
+                              fontSize="0.88rem"
+                              color="#EE3939"
+                              onClick={() => {
+                                console.log(1111)
+                                toaster.dismiss()
+                                setCollectionSelectorVisible(true)
+                              }}
+                            >
+                              Move to
+                            </Text>
+                            <Image src={ModalBack.src} boxSize={"1rem"}></Image>
+                          </Flex>
                         </Flex>
-                        <Flex alignItems={"center"} gap={"0.56rem"}>
-                          <Text
-                            fontWeight="400"
-                            fontSize="0.88rem"
-                            color="#EE3939"
-                            onClick={() => {
-                              console.log(1111)
-                              toaster.dismiss()
-                              setCollectionSelectorVisible(true)
-                            }}
-                          >
-                            Move to
-                          </Text>
-                          <Image src={ModalBack.src} boxSize={"1rem"}></Image>
-                        </Flex>
-                      </Flex>
-                    )
-                  })
+                      )
+                    })
+                  }
                 }}
               ></Image>
               <Image
