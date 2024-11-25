@@ -33,7 +33,11 @@ const EditAvatar: React.FC = () => {
         user_id: +user_id as number
       }
       const [err, res] = await errorCaptureRes(queryAllAddress, params)
-      if (res.success) {
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success) {
         // 把默认数据放在最前面
         res.data.sort((a: shippingAddressType, b: shippingAddressType) => {
           if (a.is_default && !b.is_default) {
@@ -48,10 +52,6 @@ const EditAvatar: React.FC = () => {
         setAddressList(res.data)
 
         localStorage.setItem("addressList", JSON.stringify(res.data))
-      } else {
-        Alert.open({
-          content: err.message
-        })
       }
     }
   }

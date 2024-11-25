@@ -76,16 +76,17 @@ const Page = () => {
     }
     setLoading(true)
     const [err, res] = await errorCaptureRes(fetchLogin, data)
-    console.log(err, res)
-    if (res?.success) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       storage.set("user_id", res.data.user_id.toString())
       storage.set("token", `Bearer ${res.data.token}`)
       router.push("/")
-    } else {
-      Alert.open({
-        content: res?.message ?? "error"
-      })
     }
+
     setLoading(false)
   }
 

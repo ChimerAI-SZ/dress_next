@@ -76,7 +76,11 @@ function Profile() {
       }
       const [err, res] = await errorCaptureRes(queryProfileData, params)
 
-      if (res.success) {
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success) {
         const newProfileData = {
           ...profileData,
           ...res.data
@@ -85,10 +89,6 @@ function Profile() {
         setProfileData(newProfileData)
 
         dispatch(setData(newProfileData))
-      } else {
-        Alert.open({
-          content: err.message
-        })
       }
     }
   }

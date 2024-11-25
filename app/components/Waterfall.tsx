@@ -99,7 +99,11 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         library: "top_sales"
       })
 
-      if (res.success && res.data?.length > 0) {
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success && res.data?.length > 0) {
         const newImages = res.data.slice().sort(() => Math.random() - 0.5)
 
         // 下拉刷新的话重置imglist
@@ -127,10 +131,6 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         })
 
         callback && callback()
-      } else {
-        Alert.open({
-          content: err.message
-        })
       }
 
       setLoading(false)

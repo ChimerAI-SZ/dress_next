@@ -119,11 +119,9 @@ function Page() {
     })
     console.log(err, "err")
 
-    if (res?.success) {
-      console.log(1)
-    } else {
+    if (err) {
       Alert.open({
-        content: res.message
+        content: err.message
       })
     }
   }
@@ -160,7 +158,12 @@ function Page() {
     })
     let defaultCollectionIds = []
     console.log(res.data)
-    if (res) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       // 筛选出 is_default 为 true 的 album
       const defaultCollection = res.data.filter((album: { is_default: boolean }) => album.is_default === true)
 
@@ -173,7 +176,11 @@ function Page() {
       collection_id: defaultCollectionIds[0]
     })
 
-    if (res2?.success) {
+    if (err2) {
+      Alert.open({
+        content: err2.message
+      })
+    } else if (res2.success) {
       setJionLike(pre => {
         return [...pre, ...list]
       })
@@ -199,13 +206,14 @@ function Page() {
       image_urls: [selectImage],
       collection_id: (selectedCollection[0] as any) - 0
     })
-    if (res2.success) {
-      setCollectionSelectorVisible(false)
-    } else {
+
+    if (err2) {
       setCollectionSelectorVisible(false)
       Alert.open({
         content: res2.message
       })
+    } else if (res2.success) {
+      setCollectionSelectorVisible(false)
     }
   }
   useEffect(() => {

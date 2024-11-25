@@ -50,12 +50,12 @@ const EditProfile: React.FC = () => {
         user_id: +user_id as number
       })
 
-      if (res.success) {
-        router.back()
-      } else {
+      if (err) {
         Alert.open({
           content: err.message
         })
+      } else if (res.success) {
+        router.back()
       }
     }
   }

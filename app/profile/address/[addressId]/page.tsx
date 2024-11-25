@@ -65,12 +65,12 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           ...formData
         })
 
-        if (res.success) {
-          router.back()
-        } else {
+        if (err) {
           Alert.open({
             content: err.message
           })
+        } else if (res.success) {
+          router.back()
         }
       } else {
         const [err, res] = await errorCaptureRes(editAddress, {
@@ -79,12 +79,12 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           ...formData
         })
 
-        if (res.success) {
-          router.back()
-        } else {
+        if (err) {
           Alert.open({
             content: err.message
           })
+        } else if (res.success) {
+          router.back()
         }
       }
     }

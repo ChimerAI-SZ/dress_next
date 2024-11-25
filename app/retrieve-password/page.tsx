@@ -46,12 +46,13 @@ const Page = () => {
   // 处理发送验证码逻辑
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchResetPassword, data)
-    if (res.success) {
-      router.push(`/retrieve-password/verification-code?email=${data.email}`)
-    } else {
+
+    if (err) {
       Alert.open({
-        content: `${res.message}`
+        content: err.message
       })
+    } else if (res.success) {
+      router.push(`/retrieve-password/verification-code?email=${data.email}`)
     }
   }
 

@@ -44,7 +44,12 @@ const Page = () => {
     const [err, res] = await errorCaptureRes(fetchResetPassword, {
       email: params.email
     })
-    if (res) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       setSeconds(60)
       setCanResend(false)
       Alert.open({
@@ -58,12 +63,13 @@ const Page = () => {
       ...params,
       verification_code: code
     })
-    if (res.success) {
-      router.push(`/retrieve-password/new-password?email=${params.email}&code=${code}`)
-    } else {
+
+    if (err) {
       Alert.open({
-        content: `${res.message}`
+        content: err.message
       })
+    } else if (res.success) {
+      router.push(`/retrieve-password/new-password?email=${params.email}&code=${code}`)
     }
   }
   return (

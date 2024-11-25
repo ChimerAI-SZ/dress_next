@@ -3,13 +3,18 @@ import { Box, Flex, Text, Grid, GridItem, Image, Input } from "@chakra-ui/react"
 import ReactLoading from "react-loading"
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload"
 import { Swiper, SwiperSlide } from "swiper/react"
+import { Alert } from "@components/Alert"
+
 import "swiper/css"
 import "swiper/css/pagination"
+
 import Add from "@img/upload/add2.svg"
 import Delete from "@img/upload/delete.svg"
+
 import { TypesClothingProps } from "@definitions/update"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
+
 const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   const [total, setTotal] = useState(0)
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
@@ -36,7 +41,12 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       offset: (index || 0) * (index === 0 ? 7 : 8),
       library: flied ? "fabric" : "print"
     })
-    if (res?.success) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       const newImages = res?.data
       setTotal(res.total)
       setUrlList(prev => [...prev, ...newImages])

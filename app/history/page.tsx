@@ -106,7 +106,11 @@ function Page() {
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
-      if (res.success && res.data?.length > 0) {
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success && res.data?.length > 0) {
         const groupedByDate = new Map()
 
         res.data.forEach((item: any) => {
@@ -124,10 +128,6 @@ function Page() {
 
         // 重置一下选中的图片的数据
         selectedImg && setSelectedImg(res.data.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
-      } else {
-        Alert.open({
-          content: err.message
-        })
       }
     }
   }
@@ -140,7 +140,11 @@ function Page() {
       if (user_id && selectedImgList.length > 0) {
         const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id })
 
-        if (res.success && res.data?.length > 0) {
+        if (err) {
+          Alert.open({
+            content: err.message
+          })
+        } else if (res.success && res.data?.length > 0) {
           setCollectionList(res.data)
 
           // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
@@ -157,21 +161,17 @@ function Page() {
           if (imgUrls.length > 0) {
             const [err, res] = await errorCaptureRes(addImgToAlbum, params)
 
-            if (res.success) {
-              setCollectSuccessVisible(true)
-            } else {
+            if (err) {
               Alert.open({
                 content: err.message
               })
+            } else if (res.success) {
+              setCollectSuccessVisible(true)
             }
           } else {
             // 如果都已经在了的话
             setCollectSuccessVisible(true)
           }
-        } else {
-          Alert.open({
-            content: err.message
-          })
         }
       }
     },
@@ -221,12 +221,12 @@ function Page() {
 
       const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
-      if (res.success) {
-        queryData()
-      } else {
+      if (err) {
         Alert.open({
           content: err.message
         })
+      } else if (res.success) {
+        queryData()
       }
     }
   }

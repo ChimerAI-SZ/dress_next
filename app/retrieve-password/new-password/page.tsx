@@ -2,24 +2,15 @@
 import { Button, Input, Box, VStack, Text, Image, Flex, Fieldset } from "@chakra-ui/react"
 import { Field } from "@components/ui/field"
 import { useSearchParams, useRouter } from "next/navigation"
+import { Alert } from "@components/Alert"
 import Back from "@img/login/back.svg"
 import { useState, useEffect } from "react"
 import { fetchReset } from "@lib/request/login"
 import { errorCaptureRes } from "@utils/index"
-import { set, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import Right from "@img/login/right.svg"
 import { InputGroup } from "@components/ui/input-group"
-import {
-  DialogActionTrigger,
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger
-} from "@components/ui/dialog"
+import { DialogContent, DialogRoot } from "@components/ui/dialog"
 interface FormValues {
   email: string
   first: string
@@ -73,7 +64,12 @@ const Page = () => {
       new_password: password,
       verification_code: params.code
     })
-    if (res.success) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       setOpen(true)
     }
   }

@@ -73,15 +73,16 @@ const Page = () => {
     const [err, res] = await errorCaptureRes(fetchVerification, {
       signature: encryptedBase64
     })
-    if (res) {
+
+    if (err) {
+      Alert.open({
+        content: err.message
+      })
+    } else if (res.success) {
       setSeconds(60)
       setCanResend(false)
       Alert.open({
         content: "Sent Successfully!"
-      })
-    } else {
-      Alert.open({
-        content: `${res.message}`
       })
     }
   }
@@ -92,22 +93,28 @@ const Page = () => {
         ...params,
         verification_code: code
       })
-      if (res.success) {
+
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success) {
         Alert.open({
           content: `registered successfully`
         })
         router.push(`/login`)
-      } else {
-        Alert.open({
-          content: `${res.message}`
-        })
       }
     } else if (code.length === 4 && params.retrievePassword) {
       const [err, res] = await errorCaptureRes(fetchReset, {
         ...params,
         verification_code: code
       })
-      if (res.success) {
+
+      if (err) {
+        Alert.open({
+          content: err.message
+        })
+      } else if (res.success) {
         router.push(`/retrieve-password/new-password?email=${params.email}`)
       }
     }
