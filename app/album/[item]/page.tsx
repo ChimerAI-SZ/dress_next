@@ -74,9 +74,9 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success && res.data?.length > 0) {
         const groupedByDate = new Map()
@@ -107,9 +107,9 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
   const handleDelete = async () => {
     const [err, res] = await errorCaptureRes(deleteAlbum, { collection_id: +params.item })
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       router.back()
@@ -219,9 +219,9 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
 
       const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success) {
         setViewDetail(false)

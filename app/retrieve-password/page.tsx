@@ -47,9 +47,9 @@ const Page = () => {
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchResetPassword, data)
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       router.push(`/retrieve-password/verification-code?email=${data.email}`)

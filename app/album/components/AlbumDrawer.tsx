@@ -62,9 +62,9 @@ const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, 
         }
         const [err, res] = await errorCaptureRes(addNewAlbum, params)
 
-        if (err) {
+        if (err || !res.success) {
           Alert.open({
-            content: err.message
+            content: err.message ?? res.message
           })
         } else if (res.success) {
           close && close()
@@ -79,9 +79,9 @@ const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, 
         }
         const [err, res] = await errorCaptureRes(updateAlbum, params)
 
-        if (err) {
+        if (err || !res.success) {
           Alert.open({
-            content: err.message
+            content: err.message ?? res.message
           })
         } else if (res.success) {
           close && close()

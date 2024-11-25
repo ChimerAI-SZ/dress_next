@@ -119,9 +119,9 @@ function Page() {
     })
     console.log(err, "err")
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     }
   }
@@ -159,9 +159,9 @@ function Page() {
     let defaultCollectionIds = []
     console.log(res.data)
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       // 筛选出 is_default 为 true 的 album

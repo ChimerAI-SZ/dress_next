@@ -33,9 +33,9 @@ const EditAvatar: React.FC = () => {
         user_id: +user_id as number
       }
       const [err, res] = await errorCaptureRes(queryAllAddress, params)
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success) {
         // 把默认数据放在最前面

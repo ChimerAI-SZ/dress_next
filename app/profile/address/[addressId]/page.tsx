@@ -65,9 +65,9 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           ...formData
         })
 
-        if (err) {
+        if (err || !res.success) {
           Alert.open({
-            content: err.message
+            content: err.message ?? res.message
           })
         } else if (res.success) {
           router.back()
@@ -79,9 +79,9 @@ const EditAddress: React.FC<EditAddressProps> = ({ params }) => {
           ...formData
         })
 
-        if (err) {
+        if (err || !res.success) {
           Alert.open({
-            content: err.message
+            content: err.message ?? res.message
           })
         } else if (res.success) {
           router.back()

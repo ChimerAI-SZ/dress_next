@@ -51,9 +51,9 @@ function Page() {
     }
     const [err, res] = await errorCaptureRes(fetchUtilWait)
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       setInfo(pre => ({

@@ -99,9 +99,9 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         library: "top_sales"
       })
 
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success && res.data?.length > 0) {
         const newImages = res.data.slice().sort(() => Math.random() - 0.5)

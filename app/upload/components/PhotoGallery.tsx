@@ -42,9 +42,9 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       library: flied ? "fabric" : "print"
     })
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       const newImages = res?.data

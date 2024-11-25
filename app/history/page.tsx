@@ -106,9 +106,9 @@ function Page() {
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success && res.data?.length > 0) {
         const groupedByDate = new Map()
@@ -140,9 +140,9 @@ function Page() {
       if (user_id && selectedImgList.length > 0) {
         const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id })
 
-        if (err) {
+        if (err || !res.success) {
           Alert.open({
-            content: err.message
+            content: err.message ?? res.message
           })
         } else if (res.success && res.data?.length > 0) {
           setCollectionList(res.data)
@@ -161,9 +161,9 @@ function Page() {
           if (imgUrls.length > 0) {
             const [err, res] = await errorCaptureRes(addImgToAlbum, params)
 
-            if (err) {
+            if (err || !res.success) {
               Alert.open({
-                content: err.message
+                content: err.message ?? res.message
               })
             } else if (res.success) {
               setCollectSuccessVisible(true)
@@ -221,9 +221,9 @@ function Page() {
 
       const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
-      if (err) {
+      if (err || !res.success) {
         Alert.open({
-          content: err.message
+          content: err.message ?? res.message
         })
       } else if (res.success) {
         queryData()

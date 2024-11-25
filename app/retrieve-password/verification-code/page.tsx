@@ -45,9 +45,9 @@ const Page = () => {
       email: params.email
     })
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       setSeconds(60)
@@ -64,9 +64,9 @@ const Page = () => {
       verification_code: code
     })
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       router.push(`/retrieve-password/new-password?email=${params.email}&code=${code}`)

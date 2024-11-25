@@ -77,9 +77,9 @@ const Page = () => {
     setLoading(true)
     const [err, res] = await errorCaptureRes(fetchLogin, data)
 
-    if (err) {
+    if (err || !res.success) {
       Alert.open({
-        content: err.message
+        content: err.message ?? res.message
       })
     } else if (res.success) {
       storage.set("user_id", res.data.user_id.toString())
