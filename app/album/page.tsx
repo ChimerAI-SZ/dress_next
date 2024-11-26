@@ -31,8 +31,8 @@ function Page() {
           content: err.message ?? res.message
         })
       } else {
-        setAlbumList(res.data)
-        dispatch(setList(res.data))
+        setAlbumList(res?.data)
+        dispatch(setList(res?.data))
       }
     }
   }

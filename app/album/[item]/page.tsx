@@ -78,7 +78,7 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
         Alert.open({
           content: err.message ?? res.message
         })
-      } else if (res.success && res.data?.length > 0) {
+      } else if (res?.success && res.data?.length > 0) {
         const groupedByDate = new Map()
 
         res.data.forEach((item: any) => {

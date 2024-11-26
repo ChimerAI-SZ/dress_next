@@ -110,7 +110,7 @@ function Page() {
         Alert.open({
           content: err.message ?? res.message
         })
-      } else if (res.success && res.data?.length > 0) {
+      } else if (res?.success && res?.data?.length > 0) {
         const groupedByDate = new Map()
 
         res.data.forEach((item: any) => {
@@ -123,7 +123,7 @@ function Page() {
           groupedByDate.get(date).push(item)
         })
 
-        setOriginImgList(res.data)
+        setOriginImgList(res?.data)
         setImgGroupList(Object.fromEntries(groupedByDate))
 
         // 重置一下选中的图片的数据
@@ -144,7 +144,7 @@ function Page() {
           Alert.open({
             content: err.message ?? res.message
           })
-        } else if (res.success && res.data?.length > 0) {
+        } else if (res?.success && res.data?.length > 0) {
           setCollectionList(res.data)
 
           // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
@@ -165,7 +165,7 @@ function Page() {
               Alert.open({
                 content: err.message ?? res.message
               })
-            } else if (res.success) {
+            } else if (res?.success) {
               setCollectSuccessVisible(true)
             }
           } else {
