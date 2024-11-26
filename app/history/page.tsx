@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useReducer } from "react"
+import { useEffect, useState, useReducer, useCallback, useRef } from "react"
 import dayjs from "dayjs"
 import styled from "@emotion/styled"
 import { useDebounceFn } from "ahooks"
@@ -41,6 +41,8 @@ function Page() {
   const [imgGroupList, setImgGroupList] = useState<GroupList>({})
   // 分组前的图片列表
   const [originImgList, setOriginImgList] = useState<HistoryItem[]>([])
+  const [lastImageId, setLastImageId] = useState<number | undefined>()
+  const [loading, setLoading] = useState<boolean>(false)
 
   const [selectedImgList, setSelectedImgList] = useState<number[]>([]) // 多选图片列表
   const [selectedImg, setSelectedImg] = useState<HistoryItem | null>(null) // 非多选的时候查看图片大图的url
@@ -54,6 +56,10 @@ function Page() {
   const [collectSuccessVisible, setCollectSuccessVisible] = useState(false) // 收藏成功弹窗
   const [collectionSelectorVisible, setCollectionSelectorVisible] = useState(false) // 选择收藏夹
   const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
+
+  // 懒加载
+  const [offset, setOffset] = useState(0)
+  const [limit, setLimit] = useState(40) // 第一次加载40张
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
@@ -100,7 +106,9 @@ function Page() {
       const params = {
         user_id: +user_id as number,
         start_date: dayjs().subtract(1, "year").format("YYYY-MM-DD"),
-        end_date: dayjs().add(1, "day").format("YYYY-MM-DD")
+        end_date: dayjs().add(1, "day").format("YYYY-MM-DD"),
+        offset,
+        limit
       }
       const [err, res] = await errorCaptureRes(queryHistory, params)
 
@@ -111,9 +119,15 @@ function Page() {
           content: err.message ?? res.message
         })
       } else if (res?.success && res?.data?.length > 0) {
+        setOffset(offset + res.data.length)
+        setLimit(20) //第一次之后每次只加载 20 张
+
         const groupedByDate = new Map()
 
-        res.data.forEach((item: any) => {
+        const oriImgList = [...originImgList, ...res.data]
+        setOriginImgList(oriImgList)
+
+        oriImgList.forEach((item: any) => {
           const date = dayjs(item.created_date).format("YYYY-MM-DD")
           // 如果 Map 中还没有这个日期的键，初始化一个空数组
           if (!groupedByDate.has(date)) {
@@ -123,13 +137,20 @@ function Page() {
           groupedByDate.get(date).push(item)
         })
 
-        setOriginImgList(res?.data)
         setImgGroupList(Object.fromEntries(groupedByDate))
 
+        // 这里取倒数第10张图片开始加载下一组
+        setLastImageId(oriImgList.at(-10)?.history_id ?? oriImgList.at(-1)?.history_id)
+
         // 重置一下选中的图片的数据
-        selectedImg && setSelectedImg(res.data.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
+        selectedImg &&
+          setSelectedImg(oriImgList.find((item: HistoryItem) => item.history_id === selectedImg.history_id))
       }
     }
+  }
+
+  const hanldeLastImageInView = () => {
+    queryData()
   }
 
   // 批量收藏
@@ -227,6 +248,7 @@ function Page() {
         })
       } else if (res.success) {
         queryData()
+        // todo 做成懒加载之后就不应该刷新接口而是把图片从imagelist中去除
       }
     }
   }
@@ -271,6 +293,8 @@ function Page() {
                 selectionMode={selectionMode}
                 selectedImageList={selectedImgList}
                 handleSelect={handleImgSelect}
+                lastImageId={lastImageId}
+                hanldeLastImageInView={hanldeLastImageInView}
               />
             )
           }}
@@ -491,7 +515,9 @@ function Page() {
                   if (selectedImg) {
                     // 如果没有被收藏
                     if (/^0$/.test(selectedImg?.collection_id + "")) {
-                      // todo 收藏
+                      setSelectedImgList([selectedImg.history_id])
+
+                      handleCollect()
                     } else {
                       hanldeRemoveFromCollection([selectedImg])
                     }

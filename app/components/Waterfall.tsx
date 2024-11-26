@@ -4,7 +4,7 @@ import Masonry from "react-masonry-css"
 import styled from "@emotion/styled"
 import { css, Global, keyframes } from "@emotion/react"
 
-import { Box, Flex, Spinner, useDisclosure, Image, Show, Button } from "@chakra-ui/react"
+import { Box, Flex, Spinner, Image, Show, Button } from "@chakra-ui/react"
 
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
@@ -49,9 +49,7 @@ const MAXIMUN_NUMBER_OF_IMAGES = 50 //每次加载的图片数量
 const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setViewDetail: (value: boolean) => void }) => {
   const router = useRouter()
   const dispatch = useDispatch()
-  const { onOpen } = useDisclosure()
 
-  const [visibleImage, setVisibleImage] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
   const [imageList, setImageList] = useState<Item[]>([])
@@ -66,11 +64,6 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
   const hasFetchedOnce = useRef(false)
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
-
-  const openModal = (src: string) => {
-    setVisibleImage(src)
-    onOpen()
-  }
 
   const fetchData = useCallback(
     async (refreshType: "pullDown" | "pullUp" = "pullUp", callback?: () => void) => {
@@ -161,7 +154,6 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
   )
 
   const handleImageClick = (src: string) => {
-    // setVisibleImage(src === visibleImage ? null : src)
     setSelectedImg(src)
     dispatch(setParams({ loadOriginalImage: src }))
   }
@@ -266,8 +258,6 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
               <Box>
                 <ImageOverlay
                   src={item.image_url}
-                  openModal={() => openModal(item.image_url)}
-                  isVisible={visibleImage === item.image_url}
                   ref={index === imageList.length - 1 ? lastImageRef : null}
                   onClick={() => handleImageClick(item.image_url)}
                 />

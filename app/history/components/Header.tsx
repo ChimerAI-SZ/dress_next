@@ -1,7 +1,6 @@
 "use client"
 
 import { Container, Image, Flex, Heading } from "@chakra-ui/react"
-import { LeftOutlined } from "@ant-design/icons"
 import { useRouter } from "next/navigation"
 
 import fullSelectionIcon from "@img/album/fullSelection.svg"

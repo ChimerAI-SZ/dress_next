@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react"
 import styled from "@emotion/styled"
 import dayjs from "dayjs"
 import { Box, For, Grid, GridItem, Image, Show } from "@chakra-ui/react"
@@ -15,6 +16,8 @@ interface ImageGroupByDataProps {
   selectionMode: boolean // 多选态
   selectedImageList: number[]
   handleSelect: (img: number) => void // 图片点击事件
+  lastImageId?: number // 标记最后一张图片的id，用于懒加载
+  hanldeLastImageInView?: () => void
 }
 
 const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
@@ -23,8 +26,45 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
   imageList,
   selectionMode,
   selectedImageList,
-  handleSelect
+  handleSelect,
+  lastImageId,
+  hanldeLastImageInView
 }): React.ReactNode => {
+  const lastImageRef = useRef(null)
+
+  console.log(lastImageId, "lastImageId")
+
+  useEffect(() => {
+    if (!lastImageId) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            console.log("Last image in last group is in view, load next set of images")
+            // observer.disconnect() // 停止监听
+            hanldeLastImageInView && hanldeLastImageInView()
+          }
+        })
+      },
+      {
+        rootMargin: "50px"
+      }
+    )
+
+    if (lastImageRef.current) {
+      observer.observe(lastImageRef.current)
+    }
+
+    return () => {
+      if (lastImageRef.current) {
+        observer.unobserve(lastImageRef.current)
+      }
+    }
+  }, [lastImageId]) // 依赖于isLastGroup，确保只在最后一个组时运行
+
   return (
     <Box mb={"1rem"}>
       <SubTitle>{dayjs().isSame(date, "day") ? "Today" : dayjs(date).format("MMMM DD, YYYY")}</SubTitle>
@@ -32,6 +72,7 @@ const ImageGroupByData: React.FC<ImageGroupByDataProps> = ({
         <For each={imageList as HistoryItem[]}>
           {(item: HistoryItem, index: number) => (
             <GridItem
+              ref={item[imgKey] === lastImageId && lastImageId ? lastImageRef : null} // 只有在最后一个组时，最后一张图片设置ref
               className="image-group-by-date"
               key={item[imgKey] + "" + index}
               position={"relative"}
