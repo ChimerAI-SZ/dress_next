@@ -45,7 +45,7 @@ const Page = () => {
       email: params.email
     })
 
-    if (err || (res && !res?.success)?.success)?.success)?.success)) {
+    if (err || (res && !res?.success)) {
       Alert.open({
         content: err.message ?? res.message
       })
