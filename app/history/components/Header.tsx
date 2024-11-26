@@ -15,8 +15,10 @@ const Header: React.FC<HistoryHeaderProps> = ({ selectionMode, handleSetSelectMo
   return (
     <Container className="album-header-contaienr" p={"11pt 16pt"}>
       <Flex gap="4" alignItems={"center"} justify="space-between" position={"relative"}>
-        <LeftOutlined
-          style={{ width: "22pt", height: "22pt" }}
+        <Image
+          src={"/assets/images/album/backIcon.svg"}
+          boxSize={"1.22rem"}
+          alt="add icon"
           onClick={() => {
             router.back()
           }}
@@ -30,8 +32,7 @@ const Header: React.FC<HistoryHeaderProps> = ({ selectionMode, handleSetSelectMo
             onClick={() => {
               handleSetSelectMode(!selectionMode)
             }}
-            w="22pt"
-            h="22pt"
+            boxSize={"1.56rem"}
             mr={"4pt"}
             src={selectionMode ? fullSelectionActiveIcon.src : fullSelectionIcon.src}
             alt=""

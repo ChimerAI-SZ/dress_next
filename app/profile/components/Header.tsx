@@ -1,8 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Container, Flex, Heading, Box } from "@chakra-ui/react"
-import { LeftOutlined } from "@ant-design/icons"
+import { Container, Flex, Heading, Box, Image } from "@chakra-ui/react"
 
 interface HeaderProps {
   title?: string
@@ -14,8 +13,10 @@ const Header: React.FC<HeaderProps> = ({ title = "" }) => {
   return (
     <Container className="homepage-header-contaienr" p={"11pt 16pt"} zIndex={1}>
       <Flex gap="4" alignItems={"center"} justify="space-between" position={"relative"}>
-        <LeftOutlined
-          style={{ width: "22pt", height: "22pt" }}
+        <Image
+          src={"/assets/images/album/backIcon.svg"}
+          boxSize={"1.22rem"}
+          alt="add icon"
           onClick={() => {
             router.back()
           }}

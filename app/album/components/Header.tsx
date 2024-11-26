@@ -27,7 +27,7 @@ const Header: React.FC<AlbumHeaderProps> = ({ name, onSuccess }) => {
         {/* todo：这种情况只有在‘收藏夹的来源只有主页’的情况下使用 */}
         <Link href={pathname === "/album" ? "/" : "/album"}>
           {/* <Image w="24px" h="24px" src={closeIcon.src} alt="" /> */}
-          <LeftOutlined style={{ width: "22pt", height: "22pt" }} />
+          <Image src={"/assets/images/album/backIcon.svg"} boxSize={"1.22rem"} alt="add icon" />
         </Link>
         <Heading whiteSpace={"nowrap"} position={"absolute"} left={"50%"} transform={"translateX(-50%)"}>
           {name}

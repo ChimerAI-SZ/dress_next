@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useRef, useEffect, Suspense, useCallback } from "react"
+import React, { useState, useRef, useEffect, Suspense, useCallback, useReducer } from "react"
 import Masonry from "react-masonry-css"
 import styled from "@emotion/styled"
 import { css, Global, keyframes } from "@emotion/react"
@@ -64,6 +64,8 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
   const observer = useRef<IntersectionObserver | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const hasFetchedOnce = useRef(false)
+
+  const [, forceUpdate] = useReducer(x => x + 1, 0)
 
   const openModal = (src: string) => {
     setVisibleImage(src)
@@ -288,6 +290,8 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           close={() => {
             setViewDetail(false)
             dispatch(setParams({}))
+
+            forceUpdate()
           }}
           footer={
             <Button

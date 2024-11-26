@@ -1,17 +1,17 @@
 import { useEffect } from "react"
-import Toast from "@components/Toast"
 import styled from "@emotion/styled"
-import { Portal } from "@chakra-ui/react"
 
-import { Image } from "@chakra-ui/react"
+import { LeftOutlined } from "@ant-design/icons"
+import { Portal, Image } from "@chakra-ui/react"
 
 interface ImageViewerProps {
   close: () => void
   imgUrl: string
   footer: React.ReactNode
+  maskClosable?: boolean
 }
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ close, imgUrl, footer }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({ close, imgUrl, footer, maskClosable = false }) => {
   const getWindowConfig = () => {
     let windowWidth = window.innerWidth
     let windowHeight = window.innerHeight
@@ -39,7 +39,19 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, imgUrl, footer }) => {
       <Container>
         <Wrapper>
           <Content>
-            <Bg onClick={close} />
+            <BackIcon onClick={close}>
+              {/* <Image src={"/assets/images/backIcon_white.svg"} alt="back-icon" /> */}
+              <LeftOutlined style={{ fontSize: "1.22rem", color: "#fff" }} />
+            </BackIcon>
+            <Bg
+              onClick={e => {
+                e.stopPropagation()
+
+                if (maskClosable) {
+                  close && close()
+                }
+              }}
+            />
             <StyledImg src={imgUrl} />
             <Footer>{footer}</Footer>
           </Content>
@@ -63,6 +75,8 @@ const Container = styled.div`
   padding-bottom: 0;
 
   background: transparent;
+
+  z-index: 1000;
 `
 const Wrapper = styled.div`
   flex-grow: 1;
@@ -85,6 +99,14 @@ const Content = styled.div`
 
   background: transparent;
 `
+const BackIcon = styled.div`
+  z-index: 1;
+  position: absolute;
+  width: 1.22rem;
+  top: 0.61rem;
+  left: 0.86rem;
+`
+
 const Bg = styled.div`
   position: absolute;
   top: 0;
@@ -98,12 +120,12 @@ const StyledImg = styled(Image)`
   max-width: 90vw;
   z-index: 1;
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0px 2px 17px 0px rgba(0, 0, 0, 0.07);
-  border-radius: 12px;
-  border: 1px solid rgba(182, 182, 182, 0.5);
+  box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
+  border-radius: 0.57rem;
+  border: 0.03rem solid rgba(182, 182, 182, 0.5);
 `
 const Footer = styled.div`
   position: absolute;
@@ -112,12 +134,12 @@ const Footer = styled.div`
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
-  padding: 8pt 0;
+  padding: 0.56rem 0 1.56rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0px -1px 5px 0px rgba(214, 214, 214, 0.5);
-  border-radius: 12px 12px 0px 0px;
+  box-shadow: 0rem -0.06rem 0.28rem 0rem rgba(214, 214, 214, 0.5);
+  border-radius: 0.67rem 0.67rem 0rem 0rem;
 `
 
 export default ImageViewer
