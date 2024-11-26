@@ -33,7 +33,7 @@ const EditAvatar: React.FC = () => {
         user_id: +user_id as number
       }
       const [err, res] = await errorCaptureRes(queryAllAddress, params)
-      if (err || !res.success) {
+      if (err || (res && !res?.success)?.success)?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

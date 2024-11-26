@@ -37,7 +37,7 @@ const EditAvatar: React.FC = () => {
 
       const [err, res] = await errorCaptureRes(editProdile, params)
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

@@ -3,7 +3,7 @@ import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 import { createRoot } from "react-dom/client"
 import { Show } from "@chakra-ui/react"
-
+import { v4 as uuidv4 } from "uuid"
 import { AlertProps } from "@definitions/index"
 import warnIcon from "@img/AlterWarningIcon.svg"
 
@@ -24,9 +24,10 @@ export const Alert = ({
         </StyledIcon>
       </Show>
 
-      {content.split("\n").map(item => (
-        <StyledContent>{item}</StyledContent>
-      ))}
+      {content.split("\n").map(item => {
+        const id = uuidv4()
+        return <StyledContent key={id}>{item}</StyledContent>
+      })}
     </AlertContainer>
   )
 }

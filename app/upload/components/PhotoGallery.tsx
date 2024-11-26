@@ -42,11 +42,11 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       library: flied ? "fabric" : "print"
     })
 
-    if (err || !res.success) {
+    if (err || (res && !res?.success)) {
       Alert.open({
-        content: err.message ?? res.message
+        content: err?.message || res?.message || "Interface Error"
       })
-    } else if (res.success) {
+    } else if (res?.success) {
       const newImages = res?.data
       setTotal(res.total)
       setUrlList(prev => [...prev, ...newImages])

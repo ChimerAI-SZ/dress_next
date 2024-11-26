@@ -76,7 +76,7 @@ function Profile() {
       }
       const [err, res] = await errorCaptureRes(queryProfileData, params)
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

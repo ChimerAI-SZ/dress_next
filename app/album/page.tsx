@@ -26,7 +26,7 @@ function Page() {
     if (user_id) {
       const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id as number })
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

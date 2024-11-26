@@ -119,7 +119,7 @@ function Page() {
     })
     console.log(err, "err")
 
-    if (err || !res.success) {
+    if (err || (res && !res?.success)) {
       Alert.open({
         content: err.message ?? res.message
       })
@@ -159,7 +159,7 @@ function Page() {
     let defaultCollectionIds = []
     console.log(res.data)
 
-    if (err || !res.success) {
+    if (err || (res && !res?.success)) {
       Alert.open({
         content: err.message ?? res.message
       })

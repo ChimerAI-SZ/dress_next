@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Box, Flex, Text, Button, Image, Spinner, VStack } from "@chakra-ui/react"
 import { toaster } from "@components/ui/toaster"
 
@@ -9,21 +9,93 @@ import ReUpload from "@img/upload/re-upload.svg"
 import ImageGuide from "./ImageGuide"
 import { TypesClothingProps } from "@definitions/update"
 import ReactLoading from "react-loading"
+import { fetchUpdateNeedGuide } from "@lib/request/login"
+import { errorCaptureRes, storage } from "@utils/index"
+
 function Page({ onParamsUpdate }: TypesClothingProps) {
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [showGuide, setShowGuide] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+
+  // 获取并更新新手引导状态
+  const updateGuideStatus = async () => {
+    const user_id = storage.get("user_id")
+    const need_guide = storage.get("need_guide")
+
+    // 如果 need_guide 为 false 或不存在，设置为 false（需要显示引导）
+    if ((!need_guide || need_guide === "false") && user_id) {
+      storage.set("need_guide", "false")
+
+      const [err, res] = await errorCaptureRes(fetchUpdateNeedGuide, {
+        user_id,
+        need_guide: false
+      })
+
+      if (!err && res.success) {
+        storage.set("need_guide", res.data?.need_guide ?? "false")
+      }
+    }
+  }
+
+  // 初始化检查新手引导状态
+  useEffect(() => {
+    updateGuideStatus()
+  }, [])
+
+  // 处理上传按钮点击
+  const handleUploadClick = async () => {
+    const need_guide = storage.get("need_guide")
+
+    if (need_guide === "false" || !need_guide) {
+      setShowGuide(true)
+      return
+    }
+
+    // 如果不需要引导，直接打开文件选择框
+    fileInputRef.current?.click()
+  }
+
+  // 处理文件选择
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files) return
+    handleUpload(files[0])
+  }
+
+  const handleUpload = async (file: File) => {
     try {
       toaster.success({
         title: "Update successful",
         description: "File saved successfully to the server"
       })
-      await uploadToOss(files[0])
+      await uploadToOss(file)
     } catch (error) {
       console.error("Upload failed", error)
     }
   }
+
+  const handleGuideClose = async () => {
+    setShowGuide(false)
+
+    // 更新本地存储和后端状态
+    storage.set("need_guide", "true")
+    const user_id = storage.get("user_id")
+    await errorCaptureRes(fetchUpdateNeedGuide, {
+      user_id,
+      need_guide: true
+    })
+
+    // 引导关闭后自动打开文件选择框
+    setTimeout(() => {
+      fileInputRef.current?.click()
+    }, 100)
+  }
+
+  const handleGuideOpen = () => {
+    setShowGuide(true)
+  }
+
   useEffect(() => {
     if (uploadProgress === 100) {
       const newParams = { loadOriginalImage: uploadedUrl }
@@ -52,7 +124,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             *
           </Text>
         </Flex>
-        <ImageGuide></ImageGuide>
+        <ImageGuide open={showGuide} onClose={handleGuideClose} onOpen={handleGuideOpen} />
       </Flex>
       <Flex
         width="100%"
@@ -93,12 +165,13 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
                 right="0.75rem"
               />
               <input
+                ref={fileInputRef}
                 type="file"
                 multiple
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={handleFileUpload}
-              ></input>
+                onChange={handleFileSelect}
+              />
             </Box>
           </Flex>
         ) : (
@@ -109,16 +182,23 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
               borderRadius="1rem"
               bg="rgba(255,255,255,0.5)"
               border="0.06rem solid #EE3939"
-              as="label"
               cursor="pointer"
               gap={"0.2rem"}
+              onClick={handleUploadClick}
             >
-              <input type="file" multiple accept="image/*" style={{ display: "none" }} onChange={handleFileUpload} />
               <Image src={UploadImage.src} w="1.13rem" h="1.13rem" />
               <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
                 Upload image
               </Text>
             </Button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleFileSelect}
+            />
 
             <Text fontWeight="400" fontSize="0.81rem" color="#BFBFBF" mt="0.38rem">
               10.0MB maximum file size

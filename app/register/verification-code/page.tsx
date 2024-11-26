@@ -74,7 +74,7 @@ const Page = () => {
       signature: encryptedBase64
     })
 
-    if (err || !res.success) {
+    if (err || (res && !res?.success)) {
       Alert.open({
         content: err.message ?? res.message
       })
@@ -94,7 +94,7 @@ const Page = () => {
         verification_code: code
       })
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })
@@ -110,7 +110,7 @@ const Page = () => {
         verification_code: code
       })
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

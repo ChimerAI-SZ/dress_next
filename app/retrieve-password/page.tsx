@@ -47,7 +47,7 @@ const Page = () => {
   const handleSendCode = async (data: FormValues) => {
     const [err, res] = await errorCaptureRes(fetchResetPassword, data)
 
-    if (err || !res.success) {
+    if (err || (res && !res?.success)?.success)) {
       Alert.open({
         content: err.message ?? res.message
       })

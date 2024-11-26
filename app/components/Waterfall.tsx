@@ -99,7 +99,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         library: "top_sales"
       })
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

@@ -68,15 +68,15 @@ export const errorCaptureRes = async (asyncFunc: (arg0: any) => any, data?: any,
   try {
     const res = await asyncFunc(data)
     if (!res.success) {
-      // window.$message.error(res.message || '未获取到信息');
       return [{ message: res.message || "未获取到信息", code: res.code }, res]
     }
     return [null, res]
-  } catch (e) {
-    // 快速连续点击，接口取消，不要报错
-    // if (flag && e.code !== 'ERR_CANCELED') {
-    //     window.$message.error(e.message);
-    // }
+  } catch (e: any) {
+    // 如果是接口取消的错误，直接返回 null
+    if (e.code === "ERR_CANCELED") {
+      return [null, null]
+    }
+    // 其他错误正常返回
     return [e, null]
   }
 }

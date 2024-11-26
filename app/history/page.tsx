@@ -106,7 +106,7 @@ function Page() {
 
       // 把图片根据日期进行分栏
       // 日期要从今往前排序
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })
@@ -140,7 +140,7 @@ function Page() {
       if (user_id && selectedImgList.length > 0) {
         const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id })
 
-        if (err || !res.success) {
+        if (err || (res && !res?.success)) {
           Alert.open({
             content: err.message ?? res.message
           })
@@ -161,7 +161,7 @@ function Page() {
           if (imgUrls.length > 0) {
             const [err, res] = await errorCaptureRes(addImgToAlbum, params)
 
-            if (err || !res.success) {
+            if (err || (res && !res?.success)) {
               Alert.open({
                 content: err.message ?? res.message
               })
@@ -221,7 +221,7 @@ function Page() {
 
       const [err, res] = await errorCaptureRes(removeImgFromAlbum, { image_urls: imgurls, collection_id })
 
-      if (err || !res.success) {
+      if (err || (res && !res?.success)) {
         Alert.open({
           content: err.message ?? res.message
         })

@@ -95,7 +95,7 @@ instance.interceptors.response.use(
     // 在一个 ajax 响应后再执行一下取消操作，把已经完成的请求从 pending 中移除
     removePendingRequest(response.config)
     if (response.status === 401) {
-      // exitLogin();
+      exitLogin()
     }
     return response.data
   },
