@@ -80,7 +80,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     storage.set("need_guide", "true")
     const user_id = storage.get("user_id")
     await errorCaptureRes(fetchUpdateNeedGuide, {
-      user_id,
+      user_id: Number(user_id),
       need_guide: true
     })
 
