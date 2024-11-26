@@ -32,9 +32,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         need_guide: false
       })
 
-      if (!err && res.success) {
-        storage.set("need_guide", res.data?.need_guide ?? "false")
-      }
+      storage.set("need_guide", res?.data?.need_guide ?? "false")
     }
   }
 
