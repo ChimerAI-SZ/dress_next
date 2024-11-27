@@ -1,4 +1,10 @@
 "use client"
+import dynamic from "next/dynamic"
+import { Alert } from "@components/Alert"
+
+// 动态导入非关键组件
+const Toaster = dynamic(() => import("@components/Toaster").then(mod => mod.Toaster), { ssr: false })
+
 import { Button, Input, VStack, Text, Flex, Box, ButtonProps, StackProps } from "@chakra-ui/react"
 import { useState } from "react"
 import { Field } from "@components/ui/field"
@@ -7,7 +13,6 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { fetchLogin } from "@lib/request/login"
 import { errorCaptureRes, storage } from "@utils/index"
-import { Alert } from "@components/Alert"
 import { PasswordInput } from "@components/ui/password-input"
 
 interface FormValues {

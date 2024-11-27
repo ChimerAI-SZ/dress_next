@@ -1,15 +1,19 @@
-import { Metadata } from "next"
+import { Suspense } from "react"
 import { LoginPage } from "./components/LoginPage"
+import { Loading } from "@components/Loading"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Login - CREAMODA",
   description: "Login to access your account"
 }
 
-export const dynamic = "force-static"
-export const revalidate = 3600
-export const fetchCache = "force-cache"
+export const dynamic = "auto"
+export const revalidate = false
 
 export default function Page() {
-  return <LoginPage />
+  return (
+    <Suspense fallback={<Loading />}>
+      <LoginPage />
+    </Suspense>
+  )
 }

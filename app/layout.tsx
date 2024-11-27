@@ -2,17 +2,28 @@ import Provider from "./provider"
 import { Suspense } from "react"
 import "./global.css"
 import loginBg from "@img/login/bg.png"
+import { headers } from "next/headers"
 
 import type { Viewport, Metadata } from "next"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = headers()
+  const pathname = headersList.get("x-pathname") || "/"
+
   return (
     <html suppressHydrationWarning>
       <head>
         <link rel="icon" href="/icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link rel="preload" href="/login" as="document" />
+        {pathname === "/" && (
+          <>
+            <link rel="prefetch" href="/login" as="document" />
+            <link rel="prefetch" href="/album" as="document" />
+            <link rel="prefetch" href="/profile" as="document" />
+          </>
+        )}
         <link rel="preload" href={loginBg.src} as="image" />
+        <link rel="preload" href="/assets/images/logo-CREAMODA.png" as="image" />
       </head>
       <body
         style={{

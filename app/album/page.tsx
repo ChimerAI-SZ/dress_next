@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { Container } from "@chakra-ui/react"
 import { useDispatch } from "react-redux"
+import { Loading } from "@components/Loading"
 
 // 引用组件
 import Header from "./components/Header"
@@ -17,23 +18,29 @@ import { errorCaptureRes } from "@utils/index"
 import { queryAlbumList } from "@lib/request/album"
 
 function Page() {
+  const [loading, setLoading] = useState(true)
   const [albumList, setAlbumList] = useState<AlbumItem[]>([])
   const dispatch = useDispatch()
 
   const queryAlbumData = async () => {
-    const user_id = storage.get("user_id")
+    try {
+      setLoading(true)
+      const user_id = storage.get("user_id")
 
-    if (user_id) {
-      const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id as number })
+      if (user_id) {
+        const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id as number })
 
-      if (err || (res && !res?.success)) {
-        Alert.open({
-          content: err.message ?? res.message
-        })
-      } else {
-        setAlbumList(res?.data)
-        dispatch(setList(res?.data))
+        if (err || (res && !res?.success)) {
+          Alert.open({
+            content: err.message ?? res.message
+          })
+        } else {
+          setAlbumList(res?.data)
+          dispatch(setList(res?.data))
+        }
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -43,6 +50,7 @@ function Page() {
 
   return (
     <Container p={0}>
+      {loading && <Loading />}
       <Header
         name="Albums"
         onSuccess={() => {

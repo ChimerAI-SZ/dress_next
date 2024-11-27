@@ -139,14 +139,6 @@ const Page = ({ onParamsUpdate }: TypesClothingProps) => {
           </DrawerContent>
         </DrawerRoot>
 
-        {/* <Image
-          src={ColorPicker.src}
-          width="1.75rem"
-          height="1.75rem"
-          border="0.06rem solid #BFBFBF"
-          borderRadius={"50%"}
-        ></Image> */}
-
         <Box
           width="1.75rem"
           height="1.75rem"
