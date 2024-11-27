@@ -1,35 +1,28 @@
 "use client"
-import { useEffect, useState, useReducer, useCallback, useRef } from "react"
+import { useEffect, useState, useReducer } from "react"
 import dayjs from "dayjs"
 import styled from "@emotion/styled"
 import { useDebounceFn } from "ahooks"
 import { Provider } from "react-redux"
 
-import { Container, Box, For, Image, Flex, Show, Text, CheckboxGroup, Fieldset, Button } from "@chakra-ui/react"
-import { Checkbox } from "@components/ui/checkbox"
+import { Container, Box, For, Image, Flex, Show, Text, Button } from "@chakra-ui/react"
 
 import ImageViewer from "@components/ImageViewer"
 import ImageGroupByData from "@components/ImageGroupByDate"
-import CollectionDialog from "../album/components/AlbumDrawer"
 
 import NoSelect from "@img/generate-result/no-select.svg"
 import Selected from "@img/generate-result/selected.svg"
-import ModalRight from "@img/generate-result/modal-right.svg"
-import ModalBack from "@img/generate-result/modal-back.svg"
-import addIcon from "@img/album/addIcon.svg"
 
 import Header from "./components/Header"
-import Toast from "@components/Toast"
 import { Alert } from "@components/Alert"
 
-import { AlbumItem } from "@definitions/album"
 import { HistoryItem } from "@definitions/history"
 import { storage, errorCaptureRes } from "@utils/index"
 import { store } from "@store/index"
 
 // 接口 - 收藏夹列表
-import { queryAlbumList } from "@lib/request/album"
-import { queryHistory, addImgToAlbum, removeImgFromAlbum } from "@lib/request/history"
+import { queryHistory, removeImgFromAlbum } from "@lib/request/history"
+import useAddImageToAlbum from "@hooks/useAddImageToAlbum"
 
 type GroupList = {
   [key: string]: HistoryItem[]
@@ -48,13 +41,8 @@ function Page() {
   const [selectedImg, setSelectedImg] = useState<HistoryItem | null>(null) // 非多选的时候查看图片大图的url
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false)
 
-  const [collectionList, setCollectionList] = useState<any[]>([])
-  const [selectedCollection, setSelectedCollection] = useState<string[]>([]) // 添加到收藏夹时选中的收藏夹
-
   // 弹窗visible
-  const [dialogVisible, setDialogVisible] = useState(false) // 新增收藏夹弹窗
-  const [collectSuccessVisible, setCollectSuccessVisible] = useState(false) // 收藏成功弹窗
-  const [collectionSelectorVisible, setCollectionSelectorVisible] = useState(false) // 选择收藏夹
+
   const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
 
   // 懒加载
@@ -62,6 +50,8 @@ function Page() {
   const [limit, setLimit] = useState(40) // 第一次加载40张
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
+
+  const { handldeSetImage, AddImageToAlbum } = useAddImageToAlbum()
 
   const handleSetSelectMode = (mode: any) => {
     setSelectionMode(mode)
@@ -156,45 +146,19 @@ function Page() {
   // 批量收藏
   const { run: handleCollect } = useDebounceFn(
     async () => {
-      const user_id = storage.get("user_id")
+      handldeSetImage(
+        selectedImgList
+          .map(id => {
+            const img = originImgList.find(item => item.history_id === id)
 
-      if (user_id && selectedImgList.length > 0) {
-        const [err, res] = await errorCaptureRes(queryAlbumList, { user_id: +user_id })
-
-        if (err || (res && !res?.success)) {
-          Alert.open({
-            content: err.message ?? res.message
-          })
-        } else if (res?.success && res.data?.length > 0) {
-          setCollectionList(res.data)
-
-          // 虽然没有 is_default 的情况很夸张，但是测试环境真的遇到了！！！
-          const defalutCollection = res.data.find((item: AlbumItem) => item.is_default) ?? res.data[0]
-          const imgUrls = originImgList
-            .filter(item => selectedImgList.includes(item.history_id))
-            .filter(item => item.collection_id !== defalutCollection.collection_id) // 过滤掉已经在默认收藏夹中的图片
-            .map(item => item.image_url)
-          const params = {
-            collection_id: defalutCollection.collection_id,
-            image_urls: imgUrls
-          }
-
-          if (imgUrls.length > 0) {
-            const [err, res] = await errorCaptureRes(addImgToAlbum, params)
-
-            if (err || (res && !res?.success)) {
-              Alert.open({
-                content: err.message ?? res.message
-              })
-            } else if (res?.success) {
-              setCollectSuccessVisible(true)
+            if (img) {
+              return { collection_id: img?.collection_id ?? 0, image_url: img?.image_url ?? "" }
             }
-          } else {
-            // 如果都已经在了的话
-            setCollectSuccessVisible(true)
-          }
-        }
-      }
+
+            return null
+          })
+          .filter(item => item !== null)
+      )
     },
     { wait: 500 }
   )
@@ -251,25 +215,6 @@ function Page() {
         // todo 做成懒加载之后就不应该刷新接口而是把图片从imagelist中去除
       }
     }
-  }
-
-  const batchAddToCollection = async () => {
-    Promise.all(
-      selectedCollection.map(item => {
-        const imgUrls = originImgList
-          .filter(item => selectedImgList.includes(item.history_id))
-          .filter(subItem => "" + subItem.collection_id !== item) // 过滤掉已经在默认收藏夹中的图片
-          .map(item => item.image_url)
-        const params = {
-          collection_id: Number(item),
-          image_urls: imgUrls
-        }
-
-        return addImgToAlbum(params)
-      })
-    ).then(() => {
-      setCollectionSelectorVisible(false)
-    })
   }
 
   useEffect(() => {
@@ -354,137 +299,6 @@ function Page() {
         </Box>
       </Show>
 
-      {/* 选择收藏夹的弹窗 */}
-      <Show when={collectionSelectorVisible}>
-        <Toast
-          close={() => {
-            setCollectSuccessVisible(false)
-          }}
-          maskVisible={false}
-          boxStyle={{
-            boxShadow: "0px 2px 8px 0px rgba(17,17,17,0.12)",
-            borderRadius: "16px 16px 0 0",
-            width: "100vw",
-            bottom: "0",
-            left: "0",
-            right: "0",
-            top: "unset",
-            transform: "unset",
-            padding: "12pt",
-            pt: "0",
-            display: "flex",
-            flexDirection: "column"
-          }}
-        >
-          <Flex alignItems={"center"} justifyContent={"space-between"} my={"8pt"}>
-            <Flex
-              onClick={() => {
-                setCollectionSelectorVisible(false)
-              }}
-              boxSize={"22pt"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              fontSize={"1.5rem"}
-              borderRadius={"50%"}
-            >
-              <Image src={"/assets/images/album/closeIcon.svg"} boxSize={"14pt"} />
-            </Flex>
-            <Text fontSize={"1.06rem"} fontWeight={"500"} font-size="1.06rem" color="#171717">
-              Select Albums
-            </Text>
-            <Flex
-              onClick={() => {
-                setCollectionSelectorVisible(false)
-                setDialogVisible(true)
-              }}
-              boxSize={"20pt"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              fontSize={"1.5rem"}
-              borderRadius={"50%"}
-              border={"1px solid #BFBFBF"}
-            >
-              <Image src={addIcon.src} boxSize={"14pt"} alt="add icon" />
-            </Flex>
-          </Flex>
-          <Fieldset.Root flexGrow={1} maxH={"30vh"} minH={"20vh"} overflow={"auto"}>
-            <CheckboxGroup
-              onValueChange={value => {
-                setSelectedCollection(value)
-              }}
-            >
-              <Fieldset.Content>
-                <For each={collectionList}>
-                  {(item: AlbumItem) => <Checkbox value={item.collection_id + ""}>{item.title}</Checkbox>}
-                </For>
-              </Fieldset.Content>
-            </CheckboxGroup>
-          </Fieldset.Root>
-          <Box mt={"16pt"}>
-            <Button w={"100%"} bgColor={"#ee3939"} borderRadius={"40px"} type="submit" onClick={batchAddToCollection}>
-              Done
-            </Button>
-          </Box>
-        </Toast>
-      </Show>
-
-      {/* 收藏成功弹窗 */}
-      <Show when={collectSuccessVisible}>
-        <Toast
-          close={() => {
-            setCollectSuccessVisible(false)
-          }}
-          maskVisible={false}
-          boxStyle={{
-            boxShadow: "0px 2px 8px 0px rgba(17,17,17,0.12)",
-            borderRadius: "8px",
-            width: "75vw",
-            bottom: "10vh",
-            top: "unset",
-            padding: "12pt"
-          }}
-        >
-          <Flex justifyContent={"space-between"} alignItems={"center"}>
-            <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Image src={ModalRight.src} boxSize={"1.38rem"}></Image>
-              <Text fontWeight="400" fontSize="0.88rem" lineHeight={"1.38rem"} color="#171717">
-                Collect in Default
-              </Text>
-            </Flex>
-            <Flex alignItems={"center"} gap={"0.56rem"}>
-              <Text
-                fontWeight="400"
-                fontSize="0.88rem"
-                color="#EE3939"
-                onClick={() => {
-                  // 关闭收藏成功的提示，打开选择收藏夹的底部抽屉
-                  setCollectSuccessVisible(false)
-                  setCollectionSelectorVisible(true)
-                }}
-              >
-                Move to
-              </Text>
-              <Image src={ModalBack.src} boxSize={"1rem"} />
-            </Flex>
-          </Flex>
-        </Toast>
-      </Show>
-
-      <CollectionDialog
-        type="add"
-        visible={dialogVisible}
-        close={() => {
-          setDialogVisible(false)
-        }}
-        onSuccess={(newCollection: any) => {
-          collectionList.push(newCollection)
-          setCollectionList(collectionList)
-
-          setDialogVisible(false)
-          setCollectionSelectorVisible(true)
-        }}
-      />
-
       <Show when={viewDetail && selectedImg}>
         <ImageViewer
           imgUrl={selectedImg?.image_url ?? ""}
@@ -528,6 +342,8 @@ function Page() {
           }
         />
       </Show>
+
+      <AddImageToAlbum />
     </Container>
   )
 }
