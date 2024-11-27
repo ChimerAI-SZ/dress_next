@@ -2,7 +2,7 @@
 module.exports = {
   reactStrictMode: true,
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true,
     externalDir: true,
     optimizePackageImports: ["@chakra-ui/react"]
   },
