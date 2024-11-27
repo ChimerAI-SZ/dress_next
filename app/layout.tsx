@@ -1,6 +1,7 @@
 import Provider from "./provider"
 import { Suspense } from "react"
 import "./global.css"
+import loginBg from "@img/login/bg.png"
 
 import type { Viewport, Metadata } from "next"
 
@@ -10,6 +11,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="preload" href="/login" as="document" />
+        <link rel="preload" href={loginBg.src} as="image" />
       </head>
       <body
         style={{
