@@ -115,7 +115,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     >
       <Flex justifyContent={"space-between"} alignItems={"center"} py={"0.66rem"} pl={"0.1rem"}>
         <Flex>
-          <Text fontFamily="PingFangSC" fontWeight="500" fontSize="1rem" color="#171717">
+          <Text fontWeight="500" fontSize="1rem" color="#171717">
             Upload image
           </Text>
           <Text font-weight="500" font-size="1rem" color="#EE3939">

@@ -19,7 +19,6 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     >
       <Flex px="0.75rem">
         <Text
-          fontFamily="PingFangSC"
           fontWeight="500"
           fontSize="1rem"
           color="#171717"

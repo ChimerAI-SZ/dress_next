@@ -389,13 +389,7 @@ function Page() {
             >
               <Image src={"/assets/images/album/closeIcon.svg"} boxSize={"14pt"} />
             </Flex>
-            <Text
-              fontSize={"1.06rem"}
-              fontWeight={"500"}
-              font-family="PingFangSC, PingFang SC"
-              font-size="1.06rem"
-              color="#171717"
-            >
+            <Text fontSize={"1.06rem"} fontWeight={"500"} font-size="1.06rem" color="#171717">
               Select Albums
             </Text>
             <Flex

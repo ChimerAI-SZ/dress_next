@@ -59,7 +59,7 @@ const MessageBox = forwardRef<HTMLDivElement, MessageBoxProps>(({ barValue, isVi
                 value={barValue}
               ></CircularProgressbarWithChildren>
             </Box>
-            <Text fontFamily="PingFangSC, PingFang SC" fontWeight="400" fontSize="0.88rem" color="#171717">
+            <Text fontWeight="400" fontSize="0.88rem" color="#171717">
               Generating {barValue}%
             </Text>
             <Image
@@ -74,14 +74,7 @@ const MessageBox = forwardRef<HTMLDivElement, MessageBoxProps>(({ barValue, isVi
         {barValue === 100 && (
           <>
             <Image ml="0.5rem" src={Finish.src} boxSize={"2.1rem"}></Image>
-            <Text
-              ml={"0.5rem"}
-              fontFamily="PingFangSC, PingFang SC"
-              fontWeight="400"
-              fontSize="0.88rem"
-              color="#171717"
-              flex={1}
-            >
+            <Text ml={"0.5rem"} fontWeight="400" fontSize="0.88rem" color="#171717" flex={1}>
               Succeed
             </Text>
             <Image

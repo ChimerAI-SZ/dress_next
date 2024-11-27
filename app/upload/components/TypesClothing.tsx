@@ -19,7 +19,7 @@ function Page() {
       px="0.75rem"
     >
       <Flex>
-        <Text fontFamily="PingFangSC" fontWeight="500" fontSize="1rem" color="#171717">
+        <Text fontWeight="500" fontSize="1rem" color="#171717">
           Category
         </Text>
         <Text font-weight="500" font-size="1rem" color="#EE3939">

@@ -24,18 +24,10 @@ const Demo = ({ open, setOpen }: { open: boolean; setOpen: (value: boolean) => v
       >
         <Flex mt={"1.06rem"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
           <Image w={"2.53rem"} h={"2.59rem"} src={Warning.src}></Image>
-          <Text fontFamily="PingFangSC, PingFang SC" fontWeight="500" fontSize="1.06rem" color="171717">
+          <Text fontWeight="500" fontSize="1.06rem" color="171717">
             Ooops!
           </Text>
-          <Text
-            mx={"0.38rem"}
-            mt={"0.5rem"}
-            fontFamily="PingFangSC, PingFang SC"
-            fontWeight="400"
-            fontSize=" 0.88rem"
-            color="#171717"
-            textAlign={"center"}
-          >
+          <Text mx={"0.38rem"} mt={"0.5rem"} fontWeight="400" fontSize=" 0.88rem" color="#171717" textAlign={"center"}>
             A generation task is already in progress. Please try again later.
           </Text>
           <Button
