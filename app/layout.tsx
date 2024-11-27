@@ -1,9 +1,9 @@
-import Provider from "./provider"
+import { Providers } from "./providers"
 import { Suspense } from "react"
 import "./global.css"
 import loginBg from "@img/login/bg.png"
 import { headers } from "next/headers"
-
+import { Loading } from "@components/Loading/index"
 import type { Viewport, Metadata } from "next"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,9 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           overflow: "auto"
         }}
       >
-        <Suspense>
-          <Provider>{children}</Provider>
-        </Suspense>
+        <Providers>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </Providers>
       </body>
     </html>
   )
