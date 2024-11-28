@@ -508,16 +508,17 @@ function Page() {
                 onClick={() => {
                   if (selectedImg) {
                     // 如果没有被收藏
-                    if (/^0$/.test(selectedImg?.collection_id + "")) {
+                    if (selectedImg?.collection_id) {
+                      hanldeRemoveFromCollection([selectedImg])
+                    } else {
                       setSelectedImgList([selectedImg.history_id])
 
                       handleCollect()
-                    } else {
-                      hanldeRemoveFromCollection([selectedImg])
                     }
                   }
                 }}
-                src={`/assets/images/album/${/^0$/.test(selectedImg?.collection_id + "") ? "unliked" : "liked"}.svg`}
+                // collection_id 为 0 时未被收藏
+                src={`/assets/images/album/${selectedImg?.collection_id ? "liked" : "unliked"}.svg`}
                 alt="liked-icon"
               />
               <Image boxSize={"2.2rem"} mx={"0.5rem"} src={"/assets/images/album/buy.svg"} alt="buy-icon" />
