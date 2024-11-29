@@ -38,7 +38,7 @@ function Page({ show, noTitle, cb }: { show?: boolean; noTitle?: boolean; cb?: (
           </Text>
         }
       >
-        <Image w={"6.8rem"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
+        <Image w={"6.8rem"} src={"/assets/images/aiAvatar_black.png"} alt="creamoda-logo" />
       </Show>
 
       {show && (

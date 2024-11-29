@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
         <link rel="preload" href={loginBg.src} as="image" />
-        <link rel="preload" href="/assets/images/logo-CREAMODA.png" as="image" />
+        <link rel="preload" href="/assets/images/aiAvatar_black.png" as="image" />
       </head>
       <body
         style={{
