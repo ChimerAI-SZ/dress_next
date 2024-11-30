@@ -58,7 +58,7 @@ function Page() {
   const [viewDetail, setViewDetail] = useState(false) // 查看图片详情
 
   // 懒加载
-  const [offset, setOffset] = useState(0)
+  const [offset, setOffset] = useState(0) // 偏移量
   const [limit, setLimit] = useState(40) // 第一次加载40张
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
