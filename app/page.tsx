@@ -175,7 +175,7 @@ function Dashboard() {
           background={"transparent"}
           transition={"background-color 0.3s"}
         >
-          <Image w={"150px"} src={"/assets/images/aiAvatar_black.png"} alt="creamoda-logo" />
+          <Image w={"150px"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
 
           <Flex gap="0.5rem">
             <For each={headerIconList}>
