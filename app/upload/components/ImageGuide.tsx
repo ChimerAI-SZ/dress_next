@@ -36,12 +36,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
 ]
 
 const GuideButton = memo(({ onClick }: { onClick?: () => void }) => (
-  <Button w="6.13rem" h="1.38rem" borderRadius="0.94rem" gap="0.25rem" onClick={onClick} _hover={{ opacity: 0.8 }}>
-    <Image src={ImageGuideIcon.src} w="0.75rem" h="0.75rem" alt="guide icon" />
-    <Text fontWeight="400" fontSize="0.75rem" color="white">
-      Image guide
-    </Text>
-  </Button>
+  <Image src={ImageGuideIcon.src} w="0.75rem" h="0.75rem" alt="guide icon" onClick={onClick} />
 ))
 
 const GuideSection = memo(({ title, images }: GuideSection) => (

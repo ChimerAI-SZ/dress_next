@@ -33,23 +33,8 @@ function Page() {
       <Header></Header>
       <TypesClothing></TypesClothing>
       <UploadImage onParamsUpdate={handleParamsUpdate}></UploadImage>
-      <Flex alignItems="center" justifyContent="center" w="100%">
-        <Box
-          flex="1"
-          height="0.06rem"
-          bg="linear-gradient( 90deg,#f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
-        />
-        <Text fontWeight="400" fontSize="0.81rem" color=" #737373" mx={"0.75rem"}>
-          Advanced design
-        </Text>
-        <Box
-          flex="1"
-          height="0.06rem"
-          bg="linear-gradient(270deg, #f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
-        />
-      </Flex>
       <PrintSelect onParamsUpdate={handleParamsUpdate}></PrintSelect>
-      <Fabric onParamsUpdate={handleParamsUpdate}></Fabric>
+      {/* <Fabric onParamsUpdate={handleParamsUpdate}></Fabric> */}
       <Box h="4.55rem"></Box>
       <Flex
         height="3.75rem"

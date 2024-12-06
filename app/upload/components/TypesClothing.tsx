@@ -19,7 +19,7 @@ function Page() {
       px="0.75rem"
     >
       <Flex>
-        <Text fontWeight="500" fontSize="1rem" color="#171717">
+        <Text fontWeight="600" fontSize="0.94rem" color="#171717">
           Category
         </Text>
         <Text font-weight="500" font-size="1rem" color="#EE3939">
@@ -76,6 +76,18 @@ function Page() {
             >
               Coming soon
             </Text>
+            <Box
+              bg="#15191c"
+              position={"absolute"}
+              bottom={"-1.5px"}
+              borderBottomRadius="0.5rem"
+              w="100%"
+              height="1.55rem"
+            >
+              <Text fontWeight="400" fontSize="0.75rem" color="#FFFFFF" textAlign={"center"} lineHeight={"1.53rem"}>
+                T-shirt
+              </Text>
+            </Box>
           </Flex>
         </Box>
         <Box w="5.94rem" h="7.81rem" bg="#F5F5F5" borderRadius="0.5rem" position={"relative"} flexShrink="0">
@@ -103,6 +115,18 @@ function Page() {
             >
               Coming soon
             </Text>
+            <Box
+              bg="#15191c"
+              position={"absolute"}
+              bottom={"-1.5px"}
+              borderBottomRadius="0.5rem"
+              w="100%"
+              height="1.55rem"
+            >
+              <Text fontWeight="400" fontSize="0.75rem" color="#FFFFFF" textAlign={"center"} lineHeight={"1.53rem"}>
+                Hoodie
+              </Text>
+            </Box>
           </Flex>
         </Box>
       </Flex>

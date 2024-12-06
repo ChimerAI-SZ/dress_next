@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Box, Flex, Text, Button, Image, Spinner, VStack } from "@chakra-ui/react"
+import { Box, Flex, Text, Button, Image, Spinner, Textarea, Input } from "@chakra-ui/react"
 import { toaster } from "@components/ui/toaster"
 
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload"
-import UploadImage from "@img/upload/upload-image.svg"
+import UploadImage from "@img/upload/upload-icon.png"
 import ReUpload from "@img/upload/re-upload.svg"
 import ImageGuide from "./ImageGuide"
 import { TypesClothingProps } from "@definitions/update"
@@ -17,7 +17,14 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
   const [showGuide, setShowGuide] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
-
+  const [text, setText] = useState("")
+  const handleChange = (e: { target: { value: any } }) => {
+    const inputText = e.target.value
+    if (inputText.length <= 200) {
+      setText(inputText)
+      onParamsUpdate({ text: inputText })
+    }
+  }
   // 获取并更新新手引导状态
   const updateGuideStatus = async () => {
     const user_id = storage.get("user_id")
@@ -116,7 +123,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       <Flex justifyContent={"space-between"} alignItems={"center"} py={"0.66rem"} pl={"0.1rem"}>
         <Flex>
           <Text fontWeight="500" fontSize="1rem" color="#171717">
-            Upload image
+            Outfit generation
           </Text>
           <Text font-weight="500" font-size="1rem" color="#EE3939">
             *
@@ -126,8 +133,8 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       </Flex>
       <Flex
         width="100%"
-        height="19.38rem"
-        background="#F5F5F5"
+        height="12.81rem"
+        background="#F9F9F9"
         borderRadius="0.5rem"
         alignItems="center"
         justifyContent="center"
@@ -173,22 +180,11 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             </Box>
           </Flex>
         ) : (
-          <>
-            <Button
-              w="8.19rem"
-              h="2rem"
-              borderRadius="1rem"
-              bg="rgba(255,255,255,0.5)"
-              border="0.06rem solid #EE3939"
-              cursor="pointer"
-              gap={"0.2rem"}
-              onClick={handleUploadClick}
-            >
-              <Image src={UploadImage.src} w="1.13rem" h="1.13rem" />
-              <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
-                Upload image
-              </Text>
-            </Button>
+          <Box onClick={handleUploadClick}>
+            <Image src={UploadImage.src} w="3.13rem" h="3.13rem" />
+            <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
+              Upload image
+            </Text>
 
             <input
               ref={fileInputRef}
@@ -201,8 +197,22 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             <Text fontWeight="400" fontSize="0.81rem" color="#BFBFBF" mt="0.38rem">
               10.0MB maximum file size
             </Text>
-          </>
+          </Box>
         )}
+      </Flex>
+      <Flex px="0.75rem" mt={"0.7rem"}>
+        <Input
+          value={text}
+          onChange={handleChange}
+          placeholder="please enter your editing"
+          resize="vertical"
+          width="full"
+          height="2.5rem"
+          background="#ffffff"
+          borderRadius="0.5rem"
+          border="0.09rem solid #F5F5F5"
+          mt={"0.5rem"}
+        />
       </Flex>
     </Box>
   )
