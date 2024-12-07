@@ -139,6 +139,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         alignItems="center"
         justifyContent="center"
         flexFlow="column"
+        onClick={handleUploadClick}
       >
         {isUploading ? (
           <ReactLoading type={"spinningBubbles"} color={"#747474"} height={"3.38rem"} width={"3.38rem"} />
@@ -180,9 +181,11 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             </Box>
           </Flex>
         ) : (
-          <Box onClick={handleUploadClick}>
-            <Image src={UploadImage.src} w="3.13rem" h="3.13rem" />
-            <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
+          <>
+            <Image src={UploadImage.src} boxSize={"10.13rem"} mt={"-1.5rem"} />
+            <Text
+
+              fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.5rem"}>
               Upload image
             </Text>
 
@@ -197,10 +200,10 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             <Text fontWeight="400" fontSize="0.81rem" color="#BFBFBF" mt="0.38rem">
               10.0MB maximum file size
             </Text>
-          </Box>
+          </>
         )}
       </Flex>
-      <Flex px="0.75rem" mt={"0.7rem"}>
+      <Flex mt={"0.5rem"}>
         <Input
           value={text}
           onChange={handleChange}
@@ -211,7 +214,6 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           background="#ffffff"
           borderRadius="0.5rem"
           border="0.09rem solid #F5F5F5"
-          mt={"0.5rem"}
         />
       </Flex>
     </Box>
