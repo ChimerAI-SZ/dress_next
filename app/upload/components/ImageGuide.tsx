@@ -5,7 +5,7 @@ import { Button, Flex, Text, Image, VStack, Box, Grid, useDisclosure } from "@ch
 import { DrawerActionTrigger, DrawerBackdrop, DrawerContent, DrawerRoot, DrawerTrigger } from "@components/ui/drawer"
 
 // 导入图片资源
-import ImageGuideIcon from "@img/upload/image-guide.svg"
+import ImageGuideIcon from "@img/upload/tips.png"
 import CloseIcon from "@img/upload/close.svg"
 import Index1 from "@img/upload/index-1.png"
 import Index2 from "@img/upload/index-2.png"
@@ -36,7 +36,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
 ]
 
 const GuideButton = memo(({ onClick }: { onClick?: () => void }) => (
-  <Image src={ImageGuideIcon.src} w="0.75rem" h="0.75rem" alt="guide icon" onClick={onClick} />
+  <Image src={ImageGuideIcon.src} w="1.13rem" h="1.13rem" alt="guide icon" onClick={onClick} />
 ))
 
 const GuideSection = memo(({ title, images }: GuideSection) => (

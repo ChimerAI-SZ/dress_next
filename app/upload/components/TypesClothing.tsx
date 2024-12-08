@@ -10,7 +10,7 @@ function Page() {
     <Box
       alignItems="center"
       justifyContent="center"
-      mt={4}
+      mt={5}
       width="full"
       position="relative"
       bg={"#FFFFFF"}
