@@ -234,7 +234,7 @@ function Dashboard() {
         {/* 图片区块 */}
         <MainSection>
           {/* Subtitle */}
-          <Title>Fashion Trend</Title>
+          <Title>Printed dress</Title>
           <SubTitle>Quickly generate hot-selling products</SubTitle>
 
           {/* Waterfall Content */}
