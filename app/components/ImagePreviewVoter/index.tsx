@@ -22,6 +22,7 @@ const imageList = [
   "https://aimoda-ai.oss-us-east-1.aliyuncs.com/c2bb048fef5e5eba5fb8c0c5116c0fed5158c7b5e2c5e5ea2e68a1ad2214aadf?x-oss-process=image/format,jpg",
   "https://aimoda-ai.oss-us-east-1.aliyuncs.com/e824feb21c8d94d9df039992329da0bc642da97d070dc3f782f182abf93cc14f?x-oss-process=image/format,jpg"
 ]
+
 const detailList = [
   {
     label: "Culture",
