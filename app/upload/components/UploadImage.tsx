@@ -18,13 +18,26 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [text, setText] = useState("")
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const adjustHeight = () => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = "2.4rem"
+      const scrollHeight = textarea.scrollHeight
+      textarea.style.height = scrollHeight > 38 ? "3.2rem" : "2.4rem"
+    }
+  }
+
   const handleChange = (e: { target: { value: any } }) => {
     const inputText = e.target.value
     if (inputText.length <= 200) {
       setText(inputText)
       onParamsUpdate({ text: inputText })
+      setTimeout(adjustHeight, 0)
     }
   }
+
   // 获取并更新新手引导状态
   const updateGuideStatus = async () => {
     const user_id = storage.get("user_id")
@@ -107,6 +120,44 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       onParamsUpdate(newParams)
     }
   }, [uploadProgress])
+
+  // 添加 useEffect 来设置初始高度
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "2.4rem"
+    }
+  }, []) // 仅在组件挂载时执行一次
+
+  // 修改 textareaStyles
+  const textareaStyles = {
+    _focus: {
+      borderColor: "#EE3939",
+      boxShadow: "none",
+      outline: "none"
+    },
+    _hover: {
+      borderColor: "#EE3939",
+      boxShadow: "none",
+      outline: "none"
+    },
+    height: "2.4rem",
+    minHeight: "2.4rem",
+    maxHeight: "3.2rem",
+    resize: "none",
+    overflow: "hidden",
+    border: "0.09rem solid #F5F5F5",
+    _active: {
+      border: "0.09rem solid #F5F5F5"
+    },
+    _focusVisible: {
+      border: "0.09rem solid #EE3939",
+      boxShadow: "none",
+      outline: "none"
+    },
+    display: "flex",
+    alignItems: "center"
+  }
+
   return (
     <Box
       alignItems="center"
@@ -183,9 +234,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         ) : (
           <>
             <Image src={UploadImage.src} boxSize={"10.13rem"} mt={"-1.5rem"} />
-            <Text
-
-              fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.5rem"}>
+            <Text fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.5rem"}>
               Upload image
             </Text>
 
@@ -204,16 +253,15 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
         )}
       </Flex>
       <Flex mt={"0.5rem"}>
-        <Input
+        <Textarea
+          ref={textareaRef}
           value={text}
           onChange={handleChange}
           placeholder="please enter your editing"
-          resize="vertical"
           width="full"
-          height="2.5rem"
           background="#ffffff"
           borderRadius="0.5rem"
-          border="0.09rem solid #F5F5F5"
+          {...textareaStyles}
         />
       </Flex>
     </Box>

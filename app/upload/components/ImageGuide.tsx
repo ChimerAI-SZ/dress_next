@@ -28,10 +28,6 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: "Print",
     images: [Index3.src, Index4.src]
-  },
-  {
-    title: "Fabric",
-    images: [Index5.src, Index6.src]
   }
 ]
 
