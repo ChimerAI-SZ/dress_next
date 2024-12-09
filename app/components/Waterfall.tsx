@@ -274,7 +274,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         </Box>
       </Box>
 
-      <Show when={viewDetail}>
+      {viewDetail && (
         <ImageViewer
           initImgUrl={selectedImg}
           close={() => {
@@ -283,7 +283,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
             forceUpdate()
           }}
         />
-      </Show>
+      )}
     </>
   )
 }

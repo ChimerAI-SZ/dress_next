@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import ReactDOM from "react-dom"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 
@@ -48,7 +49,8 @@ const detailList = [
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
   const [imgUrl, setImgUrl] = useState(initImgUrl)
-  const [footerHeight, setFooterHeight] = useState<number>(80)
+  const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
+  const [imgBoxHeight, setImgBoxHeight] = useState<number>(500) // 预览的图片的容器高度，由宽度以比例3:4计算获得
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
 
@@ -57,12 +59,18 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
   const [detailText, setDetailText] = useState("details")
   const [footerBtnText, setFooterBtnText] = useState("Start To Design")
 
+  // refs begins
+  const imgBoxRef = useRef<null | HTMLDivElement>(null)
   const currentImgRef = useRef<null | HTMLImageElement>(null)
   const nextImgRef = useRef<null | HTMLImageElement>(null)
-  const headerRef = useRef<null | HTMLDivElement>(null)
+
+  // 底部footer区块
   const footerRef = useRef<null | HTMLDivElement>(null)
+
+  // 喜欢、不喜欢的prompt
   const dislikeRef = useRef<null | HTMLDivElement>(null)
   const liekRef = useRef<null | HTMLDivElement>(null)
+  // refs ends
 
   // 下载
   const handleDownload = () => {
@@ -204,6 +212,14 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     }
   }, [footerRef.current])
 
+  useEffect(() => {
+    if (imgBoxRef.current) {
+      const boxWidth = imgBoxRef.current.clientWidth
+
+      setImgBoxHeight((boxWidth / 3) * 4) // 使用3*4布局
+    }
+  }, [])
+
   return (
     <Portal>
       <Container>
@@ -219,9 +235,15 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
               <Image boxSize={"2.5rem"} src={"/assets/images/mainPage/likePrompt.svg"} alt="watnt-prompt" />
             </Prompt>
 
-            <Header ref={headerRef}>
-              <BackIcon onClick={close}>
-                <LeftOutlined style={{ fontSize: "1.22rem" }} />
+            <Header>
+              <BackIcon
+                onClick={e => {
+                  e.stopPropagation()
+
+                  close && close()
+                }}
+              >
+                <LeftOutlined style={{ fontSize: "1.38rem" }} />
               </BackIcon>
               <Text fontSize="1.1rem" fontWeight="bold" letterSpacing="0rem" textAlign="center">
                 CREAMODA
@@ -229,7 +251,16 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
             </Header>
 
             <Flex alignItems={"center"} justifyContent={"center"} p={"0.75rem"} position={"relative"} flexGrow={"1"}>
-              <Box position={"relative"}>
+              <Box
+                ref={imgBoxRef}
+                w={"100%"}
+                h={imgBoxHeight + "px"}
+                borderRadius={"0.5rem"}
+                border={"0.03rem solid rgba(182, 182, 182, 0.5)"}
+                boxShadow={"0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07)"}
+                position={"relative"}
+                overflow={"hidden"}
+              >
                 <StyledImg ref={currentImgRef} src={imgUrl} />
                 <NextImg ref={nextImgRef} src={imageList[imgIndex]}></NextImg>
                 <ButtonBox>
@@ -413,9 +444,8 @@ const Header = styled.header`
 const BackIcon = styled.div`
   z-index: 1;
   position: absolute;
-  width: 1.22rem;
-  top: 0.61rem;
-  left: 0.86rem;
+  width: 1.38rem;
+  left: 1rem;
 `
 
 const Bg = styled.div`
@@ -428,17 +458,10 @@ const Bg = styled.div`
 `
 const StyledImg = styled(Image)`
   z-index: 1;
-  box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
-  border-radius: 0.57rem;
-  border: 0.03rem solid rgba(182, 182, 182, 0.5);
   position: relative;
   transition: transform 0.5s ease;
 `
 const NextImg = styled(Image)`
-  box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
-  border-radius: 0.57rem;
-  border: 0.03rem solid rgba(182, 182, 182, 0.5);
-
   position: absolute;
   top: 0;
   z-index: 0;
@@ -494,7 +517,7 @@ const rotate360 = keyframes`
 
 const Carousel = styled.div`
   position: relative;
-  animation: ${rotate360} 2.5s infinite linear;
+  animation: ${rotate360} 1.5s infinite linear;
 `
 
 const Details = styled.section`
@@ -518,6 +541,7 @@ interface PlaceHolderType {
 }
 const PlaceHolder = styled.div<PlaceHolderType>`
   margin-top: ${props => props.height + 16 + "px"};
+  flex-shrink: 0;
 `
 
 const Footer = styled.div`
@@ -527,7 +551,7 @@ const Footer = styled.div`
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
-  padding: 0.56rem 0 1.56rem;
+  padding: 0.56rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
