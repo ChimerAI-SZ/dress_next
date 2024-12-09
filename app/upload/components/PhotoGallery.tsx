@@ -122,8 +122,8 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   }, [urlList, flied]) // 监听 urlList 和 flied 的变化
 
   return (
-    <Flex w="full" flexDirection={"column"}>
-      <Box h={"11rem"} overflow={"hidden"}>
+    <Flex w="full" flexDirection={"column"} alignItems="center">
+      <Box h={"11rem"} overflow={"hidden"} maxW="21rem">
         <Swiper
           onSlideChange={swiper => {
             setActiveIndex(swiper.activeIndex)
@@ -138,7 +138,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
         >
           {[...Array(totalPages)].map((_, pageIndex) => (
             <SwiperSlide key={pageIndex}>
-              <Grid templateColumns="repeat(4, 1fr)" gap={2} pt={"0.75rem"} position={"relative"}>
+              <Grid templateColumns="repeat(4, 1fr)" gap={2} pt={"0.75rem"} position={"relative"} w="100%" mx="auto">
                 {pageIndex === 0 && (
                   <Box position="relative">
                     <Input
