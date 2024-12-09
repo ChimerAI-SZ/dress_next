@@ -29,7 +29,7 @@ function Page() {
     }))
   }
   return (
-    <Container bg={"#f5f5f5"} h={"100vh"} position={"relative"} pt={4}>
+    <Container bg={"#f5f5f5"} h={"100%"} minH={"100vh"} position={"relative"} pt={4}>
       <Header></Header>
       <TypesClothing></TypesClothing>
       <UploadImage onParamsUpdate={handleParamsUpdate}></UploadImage>
