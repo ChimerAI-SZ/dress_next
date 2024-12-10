@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react"
-import ReactDOM from "react-dom"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 
 import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, For, Button, Show, Box } from "@chakra-ui/react"
+import { Loading } from "@components/Loading"
+
+import { fetchImageDetails } from "@lib/request/page"
+import { errorCaptureRes } from "@utils/index"
+import { Alert } from "@components/Alert"
 
 interface ImageViewerProps {
   close: () => void
@@ -23,42 +27,26 @@ const imageList = [
   "https://aimoda-ai.oss-us-east-1.aliyuncs.com/e824feb21c8d94d9df039992329da0bc642da97d070dc3f782f182abf93cc14f?x-oss-process=image/format,jpg"
 ]
 
-const detailList = [
-  {
-    label: "Culture",
-    img: "/assets/images/mainPage/Culture.png",
-    value:
-      "nspired by naturalism,this dress blends tropical botanical elements with modern design,embodying harmony between humans and nature,perfect for casual vacations"
-  },
-  {
-    label: "Material",
-    img: "/assets/images/mainPage/Material.png",
-    value: ["Lightweight and breathable", "Soft cotton"]
-  },
-  {
-    label: "Trend Style",
-    img: "/assets/images/mainPage/Trend_Style.png",
-    value: ["Botanical print", "Resort wear", "Vintage elegance", "Natural simplicity"]
-  },
-  {
-    label: "Silhoutte",
-    img: "/assets/images/mainPage/Silhoutte.png",
-    value:
-      "nspired by naturalism,this dress blends tropical botanical elements with modern design,embodying harmony between humans and nature,perfect for casual vacations"
-  }
-]
+interface DetailItem {
+  label: string
+  value: string | string[]
+  img: string
+}
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [imgBoxHeight, setImgBoxHeight] = useState<number>(500) // 预览的图片的容器高度，由宽度以比例3:4计算获得
+  const [isLoading, setIsLoading] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
 
   const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
 
-  const [detailText, setDetailText] = useState("details")
-  const [footerBtnText, setFooterBtnText] = useState("Start To Design")
+  const [detailText, setDetailText] = useState("details") // 底部详情的文本
+  const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
+
+  const [detailList, setDetailList] = useState<DetailItem[]>([])
 
   // refs begins
   const imgBoxRef = useRef<null | HTMLDivElement>(null)
@@ -85,6 +73,50 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
 
   // 加入收藏夹
   const handleAddToCart = () => {}
+
+  // 查看详情
+  const handleViewDetails = async () => {
+    try {
+      setIsLoading(true) // 开始加载
+      const [err, res] = await errorCaptureRes(fetchImageDetails, { image_url: imgUrl })
+      console.log(res)
+
+      if (err || (res && !res?.success)) {
+        Alert.open({
+          content: err.message ?? res.message
+        })
+      } else if (res?.success && res.result) {
+        const details: DetailItem[] = [
+          {
+            label: "Culture",
+            value: res.result.culture,
+            img: "/assets/images/mainPage/Culture.png"
+          },
+          {
+            label: "Material",
+            value: res.result.material.split(",").map((item: string) => item.trim()),
+            img: "/assets/images/mainPage/Material.svg"
+          },
+          {
+            label: "Trend Style",
+            value: res.result.trend.split(",").map((item: string) => item.trim()),
+            img: "/assets/images/mainPage/Trend_Style.svg"
+          },
+          {
+            label: "Silhoutte",
+            value: res.result.style,
+            img: "/assets/images/mainPage/Silhoutte.svg"
+          }
+        ]
+
+        setDetailList(details)
+      }
+    } catch (error) {
+      console.error("获取图片详情失败:", error)
+    } finally {
+      setIsLoading(false) // 结束加载
+    }
+  }
 
   const handleDislike = async () => {
     if (dislikeRef.current && currentImgRef.current && nextImgRef.current) {
@@ -134,6 +166,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     }
   }
 
+  // 点击喜欢按钮
   const handleLike = () => {
     if (liekRef.current && currentImgRef.current && nextImgRef.current) {
       const promptNode = liekRef.current
@@ -182,6 +215,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     }
   }
 
+  // 获取窗口尺寸
   const getWindowConfig = () => {
     let windowWidth = window.innerWidth
     let windowHeight = window.innerHeight
@@ -225,6 +259,10 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     <Portal>
       <Container>
         <Wrapper>
+          <Show when={isLoading}>
+            <Loading />
+          </Show>
+
           <Bg />
 
           <Content>
@@ -316,7 +354,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
               </Box>
             </Flex>
 
-            <DetailTip>
+            <DetailTip onClick={handleViewDetails}>
               <Text mr={"0.22rem"}>{detailText}</Text>
               <Box h={"1rem"} overflow={"hidden"} position={"relative"}>
                 <Carousel>
@@ -326,42 +364,48 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
               </Box>
             </DetailTip>
 
-            {/* <Details>
-              <For each={detailList}>
-                {(detail, index) => (
-                  <Detail key={detail.label}>
-                    <Flex alignItems={"center"} justifyContent={"flex-start"}>
-                      <Image boxSize={"1.44rem"} src={detail.img} />
-                      <Text color={"#171717"} fontWeight={"400"} fontSize={"0.75rem"}>
-                        {detail.label}
-                      </Text>
-                    </Flex>
-                    <Flex alignItems={"flex-start"} flexFlow={"row wrap"}>
-                      <Show
-                        when={Array.isArray(detail.value) && detail.value.length > 0}
-                        fallback={
-                          <Text fontSize={"0.75rem"} color={"#171717"} fontWeight={"400"}>
-                            {detail.value}
+            {/* 详情 */}
+            <Show when={detailList.length > 0}>
+              <Details>
+                <For each={detailList}>
+                  {(detail, index) => {
+                    debugger
+                    return (
+                      <Detail key={detail.label}>
+                        <Flex alignItems={"center"} justifyContent={"flex-start"}>
+                          <Image boxSize={"1.44rem"} src={detail.img} />
+                          <Text color={"#171717"} fontWeight={"400"} fontSize={"0.75rem"}>
+                            {detail.label}
                           </Text>
-                        }
-                      >
-                        <For each={detail.value as string[]}>
-                          {item => {
-                            return (
-                              <DetailItem>
-                                <Text fontSize={"0.75rem"} fontWeight={"400"} color={"#ee3939"}>
-                                  {item}
-                                </Text>
-                              </DetailItem>
-                            )
-                          }}
-                        </For>
-                      </Show>
-                    </Flex>
-                  </Detail>
-                )}
-              </For>
-            </Details> */}
+                        </Flex>
+                        <Flex alignItems={"flex-start"} flexFlow={"row wrap"}>
+                          <Show
+                            when={Array.isArray(detail.value) && detail.value.length > 0}
+                            fallback={
+                              <Text fontSize={"0.75rem"} color={"#171717"} fontWeight={"400"}>
+                                {detail.value}
+                              </Text>
+                            }
+                          >
+                            <For each={detail.value as string[]}>
+                              {item => {
+                                return (
+                                  <DetailItem>
+                                    <Text fontSize={"0.75rem"} fontWeight={"400"} color={"#ee3939"}>
+                                      {item}
+                                    </Text>
+                                  </DetailItem>
+                                )
+                              }}
+                            </For>
+                          </Show>
+                        </Flex>
+                      </Detail>
+                    )
+                  }}
+                </For>
+              </Details>
+            </Show>
 
             <PlaceHolder height={footerHeight} />
           </Content>
