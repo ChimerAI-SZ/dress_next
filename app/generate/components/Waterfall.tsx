@@ -44,7 +44,7 @@ const Waterfall = () => {
       const [err, res] = await errorCaptureRes(fetchHomePage, {
         limit: 10,
         offset: page * 10,
-        library: "show"
+        library: "show-new"
       })
 
       if (err || (res && !res?.success)) {

@@ -25,7 +25,7 @@ export const workflow2 = async (p: Params) => {
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 5,
     offset: Math.floor(Math.random() * 46),
-    library: "top_sales"
+    library: "show-new"
   })
   console.log(res.data)
   // const results = await Promise.allSettled([
@@ -109,7 +109,7 @@ export const workflow3 = async (p: Params) => {
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 5,
     offset: Math.floor(Math.random() * 45),
-    library: "top_sales"
+    library: "show-new"
   })
 
   console.log(res.data)
@@ -326,7 +326,7 @@ export const workflow4 = async (p: Params) => {
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 4,
     offset: Math.floor(Math.random() * 45),
-    library: "top_sales"
+    library: "show-new"
   })
   console.log(res.data)
   const results = await Promise.allSettled([
@@ -499,7 +499,7 @@ export const workflow5 = async (p: Params) => {
   const [err, res] = await errorCaptureRes(fetchHomePage, {
     limit: 4,
     offset: Math.floor(Math.random() * 45),
-    library: "top_sales"
+    library: "show-new"
   })
   console.log(5555555)
   console.log(res.data)

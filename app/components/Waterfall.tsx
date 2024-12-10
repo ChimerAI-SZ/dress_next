@@ -91,7 +91,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
       const [err, res] = await errorCaptureRes(fetchHomePage, {
         limit: NUMBER_OF_IMAGES_LOADED_EACH_TURN,
         offset: randomIndex,
-        library: "show"
+        library: "show-new"
       })
 
       if (err || (res && !res?.success)) {

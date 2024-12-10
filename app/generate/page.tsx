@@ -174,7 +174,7 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      // router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
     }
   }, [currentBarValue])
 
