@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import { Text, Box, Image, Flex } from "@chakra-ui/react"
 import Spline from "@splinetool/react-spline/next"
 import { Application } from "@splinetool/runtime"
-
+import { Toaster, toaster } from "@components/Toaster"
 import Header from "@components/Header"
 import PrintGeneration from "@img/upload/print-generation.svg"
 import Bg from "@img/generate/bg.png"
@@ -18,6 +18,7 @@ import { CircularProgressbarWithChildren, buildStyles } from "react-circular-pro
 import "react-circular-progressbar/dist/styles.css"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
 import { useDispatch, useSelector } from "react-redux"
+
 function Page() {
   const dispatch = useDispatch()
   const { workInfo, work, params, taskId, generateImage } = useSelector((state: any) => state.work)
@@ -35,6 +36,7 @@ function Page() {
   const [info, setInfo] = useState({ total_messages: 0, wait_time: 0 })
   const router = useRouter()
   const hasRunRef = useRef(false)
+
   const [barValue, setBarValue] = useState(() => {
     console.log(generateImage.length, taskId.length)
     if (generateImage.length === 0 && taskId.length === 0) {
@@ -65,7 +67,7 @@ function Page() {
   }
 
   if (params && Object.keys(params).length === 0 && imageList.length === 0 && taskId.length === 0) {
-    router.replace(`/`)
+    // router.replace(`/`)
   }
   useEffect(() => {
     if (taskId.length > 0 && imageList.length > 0) {
@@ -174,7 +176,7 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      // router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
     }
   }, [currentBarValue])
 
@@ -228,6 +230,7 @@ function Page() {
 
   return (
     <Box h="100vh" position={"relative"}>
+      <Toaster />
       <Box
         position={"absolute"}
         height="25rem"

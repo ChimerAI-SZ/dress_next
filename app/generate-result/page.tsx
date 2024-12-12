@@ -18,8 +18,8 @@ import { useDispatch } from "react-redux"
 import { setGenerateImage } from "@store/features/workSlice"
 
 // Components
-import LoginPrompt from "./components/LoginPrompt"
-import CollectionSuccessToast from "./components/CollectionSuccessToast"
+import LoginPrompt from "../../components/LoginPrompt"
+import CollectionSuccessToast from "../../components/CollectionSuccessToast"
 import ImageGallery from "./components/ImageGallery"
 import ActionButtons from "./components/ActionButtons"
 import CollectionSelector from "./components/CollectionSelector"
@@ -76,7 +76,7 @@ export default function GenerateResult() {
       return false
     }
     return true
-  }, [userId, router])
+  }, [userId])
 
   const handleDownload = useCallback((url: string) => {
     const link = document.createElement("a")
