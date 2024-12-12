@@ -49,6 +49,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
   const [detailList, setDetailList] = useState<DetailItem[]>([])
 
   // refs begins
+  const contentRef = useRef<null | HTMLDivElement>(null)
+
   const imgBoxRef = useRef<null | HTMLDivElement>(null)
   const currentImgRef = useRef<null | HTMLImageElement>(null)
   const nextImgRef = useRef<null | HTMLImageElement>(null)
@@ -95,21 +97,33 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
           {
             label: "Material",
             value: res.result.material.split(",").map((item: string) => item.trim()),
-            img: "/assets/images/mainPage/Material.svg"
+            img: "/assets/images/mainPage/Material.png"
           },
           {
             label: "Trend Style",
             value: res.result.trend.split(",").map((item: string) => item.trim()),
-            img: "/assets/images/mainPage/Trend_Style.svg"
+            img: "/assets/images/mainPage/Trend_Style.png"
           },
           {
             label: "Silhoutte",
             value: res.result.style,
-            img: "/assets/images/mainPage/Silhoutte.svg"
+            img: "/assets/images/mainPage/Silhoutte.png"
           }
         ]
 
         setDetailList(details)
+
+        // 添加延时以等待 DOM 更新
+        setTimeout(() => {
+          const contentElement = contentRef.current
+
+          if (contentElement) {
+            contentElement.scrollTo({
+              top: contentElement.scrollHeight,
+              behavior: "smooth"
+            })
+          }
+        }, 100)
       }
     } catch (error) {
       console.error("获取图片详情失败:", error)
@@ -118,102 +132,68 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     }
   }
 
-  const handleDislike = async () => {
-    if (dislikeRef.current && currentImgRef.current && nextImgRef.current) {
-      const promptNode = dislikeRef.current
+  const handleImageAction = (isLike: boolean) => {
+    // 切换图片就清空详情
+    setDetailList([])
+
+    const promptRef = isLike ? liekRef : dislikeRef
+
+    if (promptRef.current && currentImgRef.current && nextImgRef.current) {
+      const promptNode = promptRef.current
       const curImgNode = currentImgRef.current
       const nextImgNode = nextImgRef.current
 
+      // 显示提示动画
       promptNode.style.opacity = "1"
       promptNode.style.transform = "translate(-50%, -50px) scale(1.2)"
       promptNode.style.transition = "transform 0.5s ease"
 
       setTimeout(() => {
+        // 隐藏提示
         promptNode.style.opacity = "0"
         promptNode.style.transform = "translateX(-50%)"
 
+        // 移动图片
+        const moveDirection = isLike ? "110%" : "-110%"
         if (isFirstImgVisible) {
           curImgNode.style.zIndex = "1"
-          curImgNode.style.transform = "translateX(-110%)"
+          curImgNode.style.transform = `translateX(${moveDirection})`
 
           nextImgNode.style.opacity = "1"
           nextImgNode.style.transform = "unset"
         } else {
           nextImgNode.style.zIndex = "1"
-          nextImgNode.style.transform = "translateX(-110%)"
+          nextImgNode.style.transform = `translateX(${moveDirection})`
 
           curImgNode.style.opacity = "1"
           curImgNode.style.transform = "unset"
         }
 
+        // 重置图片位置
         setTimeout(() => {
           if (isFirstImgVisible) {
             curImgNode.style.opacity = "0"
             curImgNode.style.zIndex = "0"
-            curImgNode.style.transform = "unset"
+            curImgNode.style.transform = "scale(0.8)"
 
             nextImgNode.style.zIndex = "1"
           } else {
             nextImgNode.style.opacity = "0"
             nextImgNode.style.zIndex = "0"
-            nextImgNode.style.transform = "unset"
+            nextImgNode.style.transform = "scale(0.8)"
 
             curImgNode.style.zIndex = "1"
           }
+
           setIsFirstImgVisible(!isFirstImgVisible)
         }, 500)
       }, 800)
     }
   }
 
-  // 点击喜欢按钮
-  const handleLike = () => {
-    if (liekRef.current && currentImgRef.current && nextImgRef.current) {
-      const promptNode = liekRef.current
-      const curImgNode = currentImgRef.current
-      const nextImgNode = nextImgRef.current
-
-      promptNode.style.opacity = "1"
-      promptNode.style.transform = "translate(-50%, -50px) scale(1.2)"
-      promptNode.style.transition = "transform 0.5s ease"
-
-      setTimeout(() => {
-        promptNode.style.opacity = "0"
-        promptNode.style.transform = "translateX(-50%)"
-
-        if (isFirstImgVisible) {
-          curImgNode.style.zIndex = "1"
-          curImgNode.style.transform = "translateX(110%)"
-
-          nextImgNode.style.opacity = "1"
-          nextImgNode.style.transform = "unset"
-        } else {
-          nextImgNode.style.zIndex = "1"
-          nextImgNode.style.transform = "translateX(110%)"
-
-          curImgNode.style.opacity = "1"
-          curImgNode.style.transform = "unset"
-        }
-
-        setTimeout(() => {
-          if (isFirstImgVisible) {
-            curImgNode.style.opacity = "0"
-            curImgNode.style.zIndex = "0"
-            curImgNode.style.transform = "unset"
-
-            nextImgNode.style.zIndex = "1"
-          } else {
-            nextImgNode.style.opacity = "0"
-            nextImgNode.style.zIndex = "0"
-            nextImgNode.style.transform = "unset"
-
-            curImgNode.style.zIndex = "1"
-          }
-          setIsFirstImgVisible(!isFirstImgVisible)
-        }, 500)
-      }, 800)
-    }
-  }
+  // 更新原有的处理函数
+  const handleDislike = () => handleImageAction(false)
+  const handleLike = () => handleImageAction(true)
 
   // 获取窗口尺寸
   const getWindowConfig = () => {
@@ -249,7 +229,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
 
   useEffect(() => {
     if (imgBoxRef.current) {
-      const boxWidth = imgBoxRef.current.clientWidth
+      const boxWidth = imgBoxRef.current.clientWidth - 24
 
       setImgBoxHeight((boxWidth / 3) * 4) // 使用3*4布局
     }
@@ -265,7 +245,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
 
           <Bg />
 
-          <Content>
+          <Content ref={contentRef}>
             {/* 喜欢/不喜欢的提示元素 */}
             <Prompt ref={dislikeRef}>
               <Image boxSize={"2.5rem"} src={"/assets/images/mainPage/dislikePrompt.svg"} alt="dislike-prompt" />
@@ -274,102 +254,112 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
               <Image boxSize={"2.5rem"} src={"/assets/images/mainPage/likePrompt.svg"} alt="watnt-prompt" />
             </Prompt>
 
-            <Header>
-              <BackIcon
-                onClick={e => {
-                  e.stopPropagation()
+            <Flex
+              ref={imgBoxRef}
+              alignItems={"center"}
+              justifyContent={"center"}
+              flexDirection={"column"}
+              h={`calc(100% - ${footerHeight}px)`}
+              flexShrink={0}
+            >
+              {/* 头部 */}
+              <Header>
+                <BackIcon
+                  onClick={e => {
+                    e.stopPropagation()
 
-                  close && close()
-                }}
-              >
-                <LeftOutlined style={{ fontSize: "1.38rem" }} />
-              </BackIcon>
-              <Text fontSize="1.1rem" fontWeight="bold" letterSpacing="0rem" textAlign="center">
-                CREAMODA
-              </Text>
-            </Header>
+                    close && close()
+                  }}
+                >
+                  <LeftOutlined style={{ fontSize: "1.38rem" }} />
+                </BackIcon>
+                <Text fontSize="1.1rem" fontWeight="bold" letterSpacing="0rem" textAlign="center">
+                  CREAMODA
+                </Text>
+              </Header>
 
-            <Flex alignItems={"center"} justifyContent={"center"} p={"0.75rem"} position={"relative"} flexGrow={"1"}>
-              <Box
-                ref={imgBoxRef}
-                w={"100%"}
-                h={imgBoxHeight + "px"}
-                borderRadius={"0.5rem"}
-                border={"0.03rem solid rgba(182, 182, 182, 0.5)"}
-                boxShadow={"0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07)"}
-                position={"relative"}
-                overflow={"hidden"}
-              >
-                <StyledImg ref={currentImgRef} src={imgUrl} />
-                <NextImg ref={nextImgRef} src={imageList[imgIndex]}></NextImg>
-                <ButtonBox>
-                  <Flex>
-                    <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      boxSize={"2.5rem"}
-                      bg={"rgba(255, 255, 255, 0.7)"}
-                      borderRadius={"50%"}
-                      mr={"0.75rem"}
-                    >
+              {/* 图片预览区 */}
+              <Flex alignItems={"center"} justifyContent={"center"} p={"0.75rem"} position={"relative"} flexGrow={"1"}>
+                <Box
+                  w={"100%"}
+                  h={imgBoxHeight + "px"}
+                  borderRadius={"0.5rem"}
+                  border={"0.03rem solid rgba(182, 182, 182, 0.5)"}
+                  boxShadow={"0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07)"}
+                  position={"relative"}
+                  overflow={"hidden"}
+                >
+                  <StyledImg ref={currentImgRef} src={imgUrl} />
+                  <NextImg ref={nextImgRef} src={imageList[imgIndex]}></NextImg>
+                  <ButtonBox>
+                    <Flex>
+                      <Flex
+                        alignItems={"center"}
+                        justifyContent={"center"}
+                        boxSize={"2.5rem"}
+                        bg={"rgba(255, 255, 255, 0.7)"}
+                        borderRadius={"50%"}
+                        mr={"0.75rem"}
+                      >
+                        <Image
+                          boxSize={"1rem"}
+                          onClick={handleDownload}
+                          src={"/assets/images/mainPage/download.svg"}
+                          alt="dontWant-icon"
+                        />
+                      </Flex>
+                      <Flex
+                        alignItems={"center"}
+                        justifyContent={"center"}
+                        boxSize={"2.5rem"}
+                        bg={"rgba(255, 255, 255, 0.7)"}
+                        borderRadius={"50%"}
+                        mr={"0.75rem"}
+                      >
+                        <Image
+                          boxSize={"1rem"}
+                          onClick={handleAddToCart}
+                          src={"/assets/images/mainPage/AddToCart.svg"}
+                          alt="watnt-icon"
+                        />
+                      </Flex>
+                    </Flex>
+                    <Flex alignItems={"center"} justifyContent={"flex-start"}>
                       <Image
-                        boxSize={"1rem"}
-                        onClick={handleDownload}
-                        src={"/assets/images/mainPage/download.svg"}
+                        onClick={() => handleImageAction(false)}
+                        boxSize={"3.19rem"}
+                        mr={"1.13rem"}
+                        src={"/assets/images/mainPage/dontWant.svg"}
                         alt="dontWant-icon"
                       />
-                    </Flex>
-                    <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      boxSize={"2.5rem"}
-                      bg={"rgba(255, 255, 255, 0.7)"}
-                      borderRadius={"50%"}
-                      mr={"0.75rem"}
-                    >
                       <Image
-                        boxSize={"1rem"}
-                        onClick={handleAddToCart}
-                        src={"/assets/images/mainPage/AddToCart.svg"}
+                        onClick={() => handleImageAction(true)}
+                        boxSize={"3.19rem"}
+                        src={"/assets/images/mainPage/want.svg"}
                         alt="watnt-icon"
                       />
                     </Flex>
-                  </Flex>
-                  <Flex alignItems={"center"} justifyContent={"flex-start"}>
-                    <Image
-                      onClick={handleDislike}
-                      boxSize={"3.19rem"}
-                      mr={"1.13rem"}
-                      src={"/assets/images/mainPage/dontWant.svg"}
-                      alt="dontWant-icon"
-                    />
-                    <Image
-                      onClick={handleLike}
-                      boxSize={"3.19rem"}
-                      src={"/assets/images/mainPage/want.svg"}
-                      alt="watnt-icon"
-                    />
-                  </Flex>
-                </ButtonBox>
-              </Box>
-            </Flex>
+                  </ButtonBox>
+                </Box>
+              </Flex>
 
-            <DetailTip onClick={handleViewDetails}>
-              <Text mr={"0.22rem"}>{detailText}</Text>
-              <Box h={"1rem"} overflow={"hidden"} position={"relative"}>
-                <Carousel>
-                  <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
-                  <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
-                </Carousel>
-              </Box>
-            </DetailTip>
+              {/* 查看详情 */}
+              <DetailTip onClick={handleViewDetails}>
+                <Text mr={"0.22rem"}>{detailText}</Text>
+                <Box h={"1rem"} overflow={"hidden"} position={"relative"}>
+                  <Carousel>
+                    <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
+                    <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
+                  </Carousel>
+                </Box>
+              </DetailTip>
+            </Flex>
 
             {/* 详情 */}
             <Show when={detailList.length > 0}>
               <Details>
                 <For each={detailList}>
                   {(detail, index) => {
-                    debugger
                     return (
                       <Detail key={detail.label}>
                         <Flex alignItems={"center"} justifyContent={"flex-start"}>
@@ -405,9 +395,9 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
                   }}
                 </For>
               </Details>
-            </Show>
 
-            <PlaceHolder height={footerHeight} />
+              <PlaceHolder height={footerHeight} />
+            </Show>
           </Content>
 
           <Footer ref={footerRef}>
