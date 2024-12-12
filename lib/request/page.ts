@@ -14,3 +14,8 @@ export const fetchCollectionList = (params: { user_id: string }) => {
 export const fetchImageDetails = (params: { image_url: string }) => {
   return axios.post("/api/gpt/analyzing_clothing", params)
 }
+
+// 喜欢/不喜欢
+export const imageRate = (params: { image_url: string; user_uuid: string; action: "like" | "dislike" }) => {
+  return axios.post("/api/reactions/like_dislike", params)
+}

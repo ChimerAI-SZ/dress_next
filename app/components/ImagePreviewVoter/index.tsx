@@ -6,9 +6,11 @@ import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, For, Button, Show, Box } from "@chakra-ui/react"
 import { Loading } from "@components/Loading"
 
-import { fetchImageDetails } from "@lib/request/page"
-import { errorCaptureRes } from "@utils/index"
+import { fetchImageDetails, imageRate } from "@lib/request/page"
+import { errorCaptureRes, storage } from "@utils/index"
 import { Alert } from "@components/Alert"
+
+const userId = storage.get("user_id")
 
 interface ImageViewerProps {
   close: () => void
@@ -113,6 +115,9 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
 
         setDetailList(details)
 
+        setDetailText("More Details")
+        setFooterBtnText("Generate")
+
         // 添加延时以等待 DOM 更新
         setTimeout(() => {
           const contentElement = contentRef.current
@@ -132,9 +137,25 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
     }
   }
 
-  const handleImageAction = (isLike: boolean) => {
+  // 喜欢/不喜欢
+  const handleImageAction = async (isLike: boolean) => {
     // 切换图片就清空详情
     setDetailList([])
+
+    const [err, res] = await errorCaptureRes(imageRate, {
+      image_url: imgUrl,
+      // 没有用户id就随机生成一个
+      user_uuid: userId || Math.random().toString(36).substring(2, 18),
+      action: isLike ? "like" : "dislike"
+    })
+
+    if (err || (res && !res?.success)) {
+      Alert.open({
+        content: err.message ?? res.message
+      })
+
+      return
+    }
 
     const promptRef = isLike ? liekRef : dislikeRef
 
@@ -190,10 +211,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
       }, 800)
     }
   }
-
-  // 更新原有的处理函数
-  const handleDislike = () => handleImageAction(false)
-  const handleLike = () => handleImageAction(true)
 
   // 获取窗口尺寸
   const getWindowConfig = () => {
