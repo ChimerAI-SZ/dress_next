@@ -5,6 +5,7 @@ import { keyframes } from "@emotion/react"
 import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, For, Button, Show, Box } from "@chakra-ui/react"
 import { Loading } from "@components/Loading"
+import Footer from "./components/Footer"
 
 import { fetchImageDetails, imageRate } from "@lib/request/page"
 import { errorCaptureRes, storage } from "@utils/index"
@@ -420,16 +421,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
             </Show>
           </Content>
 
-          <Footer ref={footerRef}>
-            <StartBtnBox>
-              <Button width={"100%"} h={"2.5rem"} bgColor="#EE3939" borderRadius="1.25rem" onClick={() => {}}>
-                <Text fontWeight={"700"} lineHeight={"1.44rem"} color="#fff" fontSize="1rem">
-                  {footerBtnText}
-                </Text>
-                <Image src="/assets/images/mainPage/star.svg" alt="Profile" boxSize="12pt" cursor="pointer" />
-              </Button>
-            </StartBtnBox>
-          </Footer>
+          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => {}} />
         </Wrapper>
       </Container>
     </Portal>
@@ -597,40 +589,6 @@ interface PlaceHolderType {
 const PlaceHolder = styled.div<PlaceHolderType>`
   margin-top: ${props => props.height + 16 + "px"};
   flex-shrink: 0;
-`
-
-const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  padding: 0.56rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0rem -0.06rem 0.28rem 0rem rgba(214, 214, 214, 0.5);
-  border-radius: 0.75rem 0.75rem 0rem 0rem;
-  z-index: 2;
-`
-const StartBtnBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1.53rem;
-  width: 100%;
-
-  & > button {
-    position: relative;
-  }
-`
-const Blending = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 75%;
-  left: 50%;
-  transform: translateX(-50%);
 `
 
 export default ImageViewer
