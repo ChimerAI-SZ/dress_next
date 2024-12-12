@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 
@@ -138,79 +138,82 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
   }
 
   // 喜欢/不喜欢
-  const handleImageAction = async (isLike: boolean) => {
-    // 切换图片就清空详情
-    setDetailList([])
+  const handleImageAction = useCallback(
+    async (isLike: boolean) => {
+      // 切换图片就清空详情
+      setDetailList([])
 
-    const [err, res] = await errorCaptureRes(imageRate, {
-      image_url: imgUrl,
-      // 没有用户id就随机生成一个
-      user_uuid: userId || Math.random().toString(36).substring(2, 18),
-      action: isLike ? "like" : "dislike"
-    })
-
-    if (err || (res && !res?.success)) {
-      Alert.open({
-        content: err.message ?? res.message
+      const [err, res] = await errorCaptureRes(imageRate, {
+        image_url: imgUrl,
+        // 没有用户id就随机生成一个
+        user_uuid: userId || Math.random().toString(36).substring(2, 18),
+        action: isLike ? "like" : "dislike"
       })
 
-      return
-    }
+      if (err || (res && !res?.success)) {
+        Alert.open({
+          content: err.message ?? res.message
+        })
 
-    const promptRef = isLike ? liekRef : dislikeRef
+        return
+      }
 
-    if (promptRef.current && currentImgRef.current && nextImgRef.current) {
-      const promptNode = promptRef.current
-      const curImgNode = currentImgRef.current
-      const nextImgNode = nextImgRef.current
+      const promptRef = isLike ? liekRef : dislikeRef
 
-      // 显示提示动画
-      promptNode.style.opacity = "1"
-      promptNode.style.transform = "translate(-50%, -50px) scale(1.2)"
-      promptNode.style.transition = "transform 0.5s ease"
+      if (promptRef.current && currentImgRef.current && nextImgRef.current) {
+        const promptNode = promptRef.current
+        const curImgNode = currentImgRef.current
+        const nextImgNode = nextImgRef.current
 
-      setTimeout(() => {
-        // 隐藏提示
-        promptNode.style.opacity = "0"
-        promptNode.style.transform = "translateX(-50%)"
+        // 显示提示动画
+        promptNode.style.opacity = "1"
+        promptNode.style.transform = "translate(-50%, -50px) scale(1.2)"
+        promptNode.style.transition = "transform 0.5s ease"
 
-        // 移动图片
-        const moveDirection = isLike ? "110%" : "-110%"
-        if (isFirstImgVisible) {
-          curImgNode.style.zIndex = "1"
-          curImgNode.style.transform = `translateX(${moveDirection})`
-
-          nextImgNode.style.opacity = "1"
-          nextImgNode.style.transform = "unset"
-        } else {
-          nextImgNode.style.zIndex = "1"
-          nextImgNode.style.transform = `translateX(${moveDirection})`
-
-          curImgNode.style.opacity = "1"
-          curImgNode.style.transform = "unset"
-        }
-
-        // 重置图片位置
         setTimeout(() => {
+          // 隐藏提示
+          promptNode.style.opacity = "0"
+          promptNode.style.transform = "translateX(-50%)"
+
+          // 移动图片
+          const moveDirection = isLike ? "110%" : "-110%"
           if (isFirstImgVisible) {
-            curImgNode.style.opacity = "0"
-            curImgNode.style.zIndex = "0"
-            curImgNode.style.transform = "scale(0.8)"
-
-            nextImgNode.style.zIndex = "1"
-          } else {
-            nextImgNode.style.opacity = "0"
-            nextImgNode.style.zIndex = "0"
-            nextImgNode.style.transform = "scale(0.8)"
-
             curImgNode.style.zIndex = "1"
+            curImgNode.style.transform = `translateX(${moveDirection})`
+
+            nextImgNode.style.opacity = "1"
+            nextImgNode.style.transform = "unset"
+          } else {
+            nextImgNode.style.zIndex = "1"
+            nextImgNode.style.transform = `translateX(${moveDirection})`
+
+            curImgNode.style.opacity = "1"
+            curImgNode.style.transform = "unset"
           }
 
-          setIsFirstImgVisible(!isFirstImgVisible)
-        }, 500)
-      }, 800)
-    }
-  }
+          // 重置图片位置
+          setTimeout(() => {
+            if (isFirstImgVisible) {
+              curImgNode.style.opacity = "0"
+              curImgNode.style.zIndex = "0"
+              curImgNode.style.transform = "scale(0.8)"
+
+              nextImgNode.style.zIndex = "1"
+            } else {
+              nextImgNode.style.opacity = "0"
+              nextImgNode.style.zIndex = "0"
+              nextImgNode.style.transform = "scale(0.8)"
+
+              curImgNode.style.zIndex = "1"
+            }
+
+            setIsFirstImgVisible(!isFirstImgVisible)
+          }, 500)
+        }, 800)
+      }
+    },
+    [imgUrl, userId, isFirstImgVisible]
+  )
 
   // 获取窗口尺寸
   const getWindowConfig = () => {
