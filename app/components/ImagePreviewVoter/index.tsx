@@ -33,6 +33,8 @@ interface DetailItem {
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
   const [imgUrl, setImgUrl] = useState(initImgUrl)
+  const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
+
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [imgBoxHeight, setImgBoxHeight] = useState<number>(500) // 预览的图片的容器高度，由宽度以比例3:4计算获得
   const [isLoading, setIsLoading] = useState(false)
@@ -40,6 +42,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
 
   const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
+  const [nextIndex, setNextIndex] = useState(1) // 添加新的状态来追踪下一张要显示的图片索引
 
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
@@ -189,26 +192,35 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
           // 重置图片位置
           setTimeout(() => {
+            const nextIndex = (imgIndex + 1) % imgList.length
+
             if (isFirstImgVisible) {
               curImgNode.style.opacity = "0"
               curImgNode.style.zIndex = "0"
               curImgNode.style.transform = "scale(0.8)"
 
               nextImgNode.style.zIndex = "1"
+              // 更新当前显示的图片
+              setImgUrl(imgList[nextIndex].image_url)
             } else {
               nextImgNode.style.opacity = "0"
               nextImgNode.style.zIndex = "0"
               nextImgNode.style.transform = "scale(0.8)"
 
               curImgNode.style.zIndex = "1"
+              // 更新当前显示的图片
+              setNextImgUrl(imgList[nextIndex].image_url)
             }
+
+            // 更新下一张图片的索引
+            setImgIndex(nextIndex)
 
             setIsFirstImgVisible(!isFirstImgVisible)
           }, 500)
         }, 800)
       }
     },
-    [imgUrl, userId, isFirstImgVisible]
+    [imgUrl, userId, isFirstImgVisible, imgIndex, imgList]
   )
 
   // 获取窗口尺寸
@@ -306,7 +318,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
                   overflow={"hidden"}
                 >
                   <StyledImg ref={currentImgRef} src={imgUrl} />
-                  <NextImg ref={nextImgRef} src={imgList[imgIndex].url}></NextImg>
+                  <NextImg ref={nextImgRef} src={nextImgUrl} />
                   <ButtonBox>
                     <Flex>
                       <Flex
