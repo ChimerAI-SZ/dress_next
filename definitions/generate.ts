@@ -34,6 +34,7 @@ export interface ActionButtonsProps {
   onDownload: (url: string) => void
   onLike: (images: string[]) => void
   onAddToCart: () => void
+  selectImage: string
 }
 
 export interface CollectionSelectorProps {

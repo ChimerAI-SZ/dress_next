@@ -357,6 +357,7 @@ export default function GenerateResult() {
         onDownload={handleDownload}
         onLike={handleAddToCollection}
         onAddToCart={handleBatchAddToCart}
+        selectImage={selectImage}
       />
 
       {/* Dialogs */}
