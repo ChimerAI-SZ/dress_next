@@ -121,6 +121,14 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     }
   }, [urlList, flied]) // 监听 urlList 和 flied 的变化
 
+  // 在组件内添加一个处理 tags 的辅助函数
+  const formatTags = (tags: string) => {
+    if (!tags) return ""
+    const tagArray = tags.split(" ")
+    if (tagArray.length <= 2) return tags
+    return tagArray.slice(0, 2).join(" ")
+  }
+
   return (
     <Flex w="full" flexDirection={"column"} alignItems="center">
       <Box h={"11rem"} overflow={"hidden"} w="100%">
@@ -235,7 +243,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                           fontWeight="400"
                           textAlign={"center"}
                         >
-                          {item.tags}
+                          {formatTags(item.tags)}
                         </Text>
                       </Flex>
                     )}

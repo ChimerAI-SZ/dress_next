@@ -131,14 +131,24 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
   // 修改 textareaStyles
   const textareaStyles = {
     _focus: {
-      borderColor: "#EE3939",
+      borderColor: "transparent",
       boxShadow: "none",
-      outline: "none"
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
     },
     _hover: {
-      borderColor: "#EE3939",
+      borderColor: "transparent",
       boxShadow: "none",
-      outline: "none"
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
     },
     height: "2.4rem",
     minHeight: "2.4rem",
@@ -150,19 +160,25 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       border: "0.09rem solid #F5F5F5"
     },
     _focusVisible: {
-      border: "0.09rem solid #EE3939",
+      borderColor: "transparent",
       boxShadow: "none",
-      outline: "none"
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
     },
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
+    transition: "all 0.3s ease"
   }
 
   return (
     <Box
       alignItems="center"
       justifyContent="center"
-      mt="0.8rem"
+      mt="0.5rem"
       width="full"
       position="relative"
       bg={"#FFFFFF"}
@@ -233,8 +249,8 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           </Flex>
         ) : (
           <>
-            <Image src={UploadImage.src} boxSize={"10.13rem"} mt={"-1.5rem"} />
-            <Text fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.5rem"}>
+            <Image src={UploadImage.src} ml={"0.7rem"} boxSize={"9rem"} mt={"-2.55rem"} zIndex={5} />
+            <Text fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.58rem"}>
               Upload image
             </Text>
 
@@ -260,6 +276,10 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           placeholder="please enter your editing"
           width="full"
           background="#ffffff"
+          fontWeight="400"
+          fontSize="0.75rem"
+          textAlign="left"
+          textTransform="none"
           borderRadius="0.5rem"
           {...textareaStyles}
         />

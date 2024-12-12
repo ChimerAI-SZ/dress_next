@@ -5,14 +5,28 @@ import ArrowLeft from "@img/login/back.svg"
 import SelectMore from "@img/generate-result/select-more.svg"
 import Active from "@img/generate-result/active.svg"
 import { useRouter } from "next/navigation"
-function Page({ show, noTitle, cb }: { show?: boolean; noTitle?: boolean; cb?: (e: boolean) => void }) {
+function Page({
+  show,
+  noTitle,
+  cb,
+  open
+}: {
+  show?: boolean
+  noTitle?: boolean
+  cb?: (e: boolean) => void
+  open?: boolean
+}) {
   const [active, setActive] = useState(false)
   const router = useRouter()
   return (
     <Flex alignItems="center" justifyContent="center" mb={4} width="full" position="relative">
       <IconButton
         onClick={() => {
-          router.push("/")
+          if (open) {
+            cb && cb(false)
+          } else {
+            router.push("/")
+          }
         }}
         variant="ghost"
         aria-label="Back"
