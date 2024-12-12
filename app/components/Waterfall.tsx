@@ -277,6 +277,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
       {viewDetail && (
         <ImageViewer
           initImgUrl={selectedImg}
+          imgList={imageList}
           close={() => {
             setViewDetail(false)
 

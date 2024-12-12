@@ -3,9 +3,10 @@ import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 
 import { LeftOutlined } from "@ant-design/icons"
-import { Portal, Image, Flex, Text, For, Button, Show, Box } from "@chakra-ui/react"
+import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
 import { Loading } from "@components/Loading"
 import Footer from "./components/Footer"
+import Details from "./components/Details"
 
 import { fetchImageDetails, imageRate } from "@lib/request/page"
 import { errorCaptureRes, storage } from "@utils/index"
@@ -13,22 +14,16 @@ import { Alert } from "@components/Alert"
 
 const userId = storage.get("user_id")
 
+interface ImageItem {
+  image_url: string
+  ID: number
+  url: string
+}
 interface ImageViewerProps {
   close: () => void
   initImgUrl: string
+  imgList: ImageItem[]
 }
-const imageList = [
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/2a84acb8f69ac76c15f5c362ff0c7c7857b5cc236b6aad382c7e537a9f85b402?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/4c3a929276ed13d3842e117756c7ba893bbefe6f8ce0497c267b0edf3a31600b?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/1f42dcc517a499c5fa6d0fa9f5131017e5726d7dd9b1cd698077e61e453a283a?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/c569387de6ad3d3befb0e481f989dd8e9058ee964218ddac49bacbfc10cac4cd?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/f9d9bb8a6a68fd1cb43c924fe66dcb2a18f119818900ffb8955ce4397868717e?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/9904cf1444351471237b22c4ac94c24f3c471b5bd01206842b1e441477eb00a1?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/d07a997962030ffd8bcbbb19d803e966f71a7dc1c36a05b5561d796c7e9df21e?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/ac4487c5d7e8c65c48100b32b2b3a7e19bb1b136a8db31d5fd4988834ad5826c?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/c2bb048fef5e5eba5fb8c0c5116c0fed5158c7b5e2c5e5ea2e68a1ad2214aadf?x-oss-process=image/format,jpg",
-  "https://aimoda-ai.oss-us-east-1.aliyuncs.com/e824feb21c8d94d9df039992329da0bc642da97d070dc3f782f182abf93cc14f?x-oss-process=image/format,jpg"
-]
 
 interface DetailItem {
   label: string
@@ -36,7 +31,7 @@ interface DetailItem {
   img: string
 }
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [imgBoxHeight, setImgBoxHeight] = useState<number>(500) // 预览的图片的容器高度，由宽度以比例3:4计算获得
@@ -311,7 +306,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
                   overflow={"hidden"}
                 >
                   <StyledImg ref={currentImgRef} src={imgUrl} />
-                  <NextImg ref={nextImgRef} src={imageList[imgIndex]}></NextImg>
+                  <NextImg ref={nextImgRef} src={imgList[imgIndex].url}></NextImg>
                   <ButtonBox>
                     <Flex>
                       <Flex
@@ -378,46 +373,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl }) => {
 
             {/* 详情 */}
             <Show when={detailList.length > 0}>
-              <Details>
-                <For each={detailList}>
-                  {(detail, index) => {
-                    return (
-                      <Detail key={detail.label}>
-                        <Flex alignItems={"center"} justifyContent={"flex-start"}>
-                          <Image boxSize={"1.44rem"} src={detail.img} />
-                          <Text color={"#171717"} fontWeight={"400"} fontSize={"0.75rem"}>
-                            {detail.label}
-                          </Text>
-                        </Flex>
-                        <Flex alignItems={"flex-start"} flexFlow={"row wrap"}>
-                          <Show
-                            when={Array.isArray(detail.value) && detail.value.length > 0}
-                            fallback={
-                              <Text fontSize={"0.75rem"} color={"#171717"} fontWeight={"400"}>
-                                {detail.value}
-                              </Text>
-                            }
-                          >
-                            <For each={detail.value as string[]}>
-                              {item => {
-                                return (
-                                  <DetailItem>
-                                    <Text fontSize={"0.75rem"} fontWeight={"400"} color={"#ee3939"}>
-                                      {item}
-                                    </Text>
-                                  </DetailItem>
-                                )
-                              }}
-                            </For>
-                          </Show>
-                        </Flex>
-                      </Detail>
-                    )
-                  }}
-                </For>
-              </Details>
-
-              <PlaceHolder height={footerHeight} />
+              <Details detailList={detailList} footerHeight={footerHeight} />
             </Show>
           </Content>
 
@@ -565,30 +521,6 @@ const rotate360 = keyframes`
 const Carousel = styled.div`
   position: relative;
   animation: ${rotate360} 1.5s infinite linear;
-`
-
-const Details = styled.section`
-  z-index: 1;
-
-  padding: 0 1.33rem;
-`
-const Detail = styled.div`
-  margin-bottom: 1.11rem;
-`
-const DetailItem = styled.div`
-  background: #ffffff;
-  border-radius: 1.11rem;
-  border: 0.03rem solid #ee3939;
-  padding: 0.39rem 0.56rem;
-  margin-right: 0.75rem;
-  margin-bottom: 0.44rem;
-`
-interface PlaceHolderType {
-  height: number
-}
-const PlaceHolder = styled.div<PlaceHolderType>`
-  margin-top: ${props => props.height + 16 + "px"};
-  flex-shrink: 0;
 `
 
 export default ImageViewer
