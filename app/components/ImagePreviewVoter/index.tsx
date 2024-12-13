@@ -8,7 +8,7 @@ import { Loading } from "@components/Loading"
 import Footer from "./components/Footer"
 import Details from "./components/Details"
 
-import { fetchImageDetails, imageRate } from "@lib/request/page"
+import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { errorCaptureRes, storage } from "@utils/index"
 import { Alert } from "@components/Alert"
 
@@ -34,15 +34,16 @@ interface DetailItem {
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
+  const [allImages, setAllImages] = useState<ImageItem[]>(imgList) // 所有图片列表
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
-  const [imgBoxHeight, setImgBoxHeight] = useState<number>(500) // 预览的图片的容器高度，由宽度以比例3:4计算获得
   const [isLoading, setIsLoading] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
 
   const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
-  const [nextIndex, setNextIndex] = useState(1) // 添加新的状态来追踪下一张要显示的图片索引
+
+  const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
@@ -52,7 +53,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   // refs begins
   const contentRef = useRef<null | HTMLDivElement>(null)
 
-  const imgBoxRef = useRef<null | HTMLDivElement>(null)
   const currentImgRef = useRef<null | HTMLImageElement>(null)
   const nextImgRef = useRef<null | HTMLImageElement>(null)
 
@@ -136,11 +136,40 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
     }
   }
 
+  // 获取推荐图片
+  const getRecommendImages = async () => {
+    try {
+      const [err, res] = await errorCaptureRes(fetchRecommendImages, {
+        user_uuid: userId || Math.random().toString(36).substring(2, 18)
+      })
+
+      if (err || !res?.success) {
+        Alert.open({
+          content: err?.message ?? res?.message ?? "获取推荐图片失败"
+        })
+        return
+      }
+
+      if (res?.success && res.data?.length > 0) {
+        // 将新图片添加到列表末尾
+        setAllImages(prev => {
+          const insertIndex = (imgIndex + 2) % prev.length
+
+          return [...prev.slice(0, insertIndex), ...res.data, ...prev.slice(insertIndex)]
+        })
+      }
+    } catch (error) {
+      console.error("获取推荐图片失败:", error)
+    }
+  }
+
   // 喜欢/不喜欢
   const handleImageAction = useCallback(
     async (isLike: boolean) => {
       // 切换图片就清空详情
       setDetailList([])
+      setDetailText("details")
+      setFooterBtnText("Start To Design")
 
       const [err, res] = await errorCaptureRes(imageRate, {
         image_url: imgUrl,
@@ -155,6 +184,16 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
         })
 
         return
+      }
+
+      if (isLike) {
+        const newLikeCount = likeCount + 1
+        setLikeCount(newLikeCount)
+
+        // 每点赞5次获取新推荐
+        if (newLikeCount % 5 === 0) {
+          await getRecommendImages()
+        }
       }
 
       const promptRef = isLike ? liekRef : dislikeRef
@@ -192,7 +231,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
           // 重置图片位置
           setTimeout(() => {
-            const nextIndex = (imgIndex + 1) % imgList.length
+            const nextIndex = (imgIndex + 1) % allImages.length
 
             if (isFirstImgVisible) {
               curImgNode.style.opacity = "0"
@@ -201,7 +240,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
               nextImgNode.style.zIndex = "1"
               // 更新当前显示的图片
-              setImgUrl(imgList[nextIndex].image_url)
+              setImgUrl(allImages[nextIndex].image_url)
             } else {
               nextImgNode.style.opacity = "0"
               nextImgNode.style.zIndex = "0"
@@ -209,7 +248,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
               curImgNode.style.zIndex = "1"
               // 更新当前显示的图片
-              setNextImgUrl(imgList[nextIndex].image_url)
+              setNextImgUrl(allImages[nextIndex].image_url)
             }
 
             // 更新下一张图片的索引
@@ -220,7 +259,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
         }, 800)
       }
     },
-    [imgUrl, userId, isFirstImgVisible, imgIndex, imgList]
+    [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount]
   )
 
   // 获取窗口尺寸
@@ -255,14 +294,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
     }
   }, [footerRef.current])
 
-  useEffect(() => {
-    if (imgBoxRef.current) {
-      const boxWidth = imgBoxRef.current.clientWidth - 24
-
-      setImgBoxHeight((boxWidth / 3) * 4) // 使用3*4布局
-    }
-  }, [])
-
   return (
     <Portal>
       <Container>
@@ -283,7 +314,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             </Prompt>
 
             <Flex
-              ref={imgBoxRef}
               alignItems={"center"}
               justifyContent={"center"}
               flexDirection={"column"}
@@ -307,69 +337,59 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
               </Header>
 
               {/* 图片预览区 */}
-              <Flex alignItems={"center"} justifyContent={"center"} p={"0.75rem"} position={"relative"} flexGrow={"1"}>
-                <Box
-                  w={"100%"}
-                  h={imgBoxHeight + "px"}
-                  borderRadius={"0.5rem"}
-                  border={"0.03rem solid rgba(182, 182, 182, 0.5)"}
-                  boxShadow={"0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07)"}
-                  position={"relative"}
-                  overflow={"hidden"}
-                >
-                  <StyledImg ref={currentImgRef} src={imgUrl} />
-                  <NextImg ref={nextImgRef} src={nextImgUrl} />
-                  <ButtonBox>
-                    <Flex>
-                      <Flex
-                        alignItems={"center"}
-                        justifyContent={"center"}
-                        boxSize={"2.5rem"}
-                        bg={"rgba(255, 255, 255, 0.7)"}
-                        borderRadius={"50%"}
-                        mr={"0.75rem"}
-                      >
-                        <Image
-                          boxSize={"1rem"}
-                          onClick={handleDownload}
-                          src={"/assets/images/mainPage/download.svg"}
-                          alt="dontWant-icon"
-                        />
-                      </Flex>
-                      <Flex
-                        alignItems={"center"}
-                        justifyContent={"center"}
-                        boxSize={"2.5rem"}
-                        bg={"rgba(255, 255, 255, 0.7)"}
-                        borderRadius={"50%"}
-                        mr={"0.75rem"}
-                      >
-                        <Image
-                          boxSize={"1rem"}
-                          onClick={handleAddToCart}
-                          src={"/assets/images/mainPage/AddToCart.svg"}
-                          alt="watnt-icon"
-                        />
-                      </Flex>
-                    </Flex>
-                    <Flex alignItems={"center"} justifyContent={"flex-start"}>
+              <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0 0.75rem"} flexGrow={"1"}>
+                <StyledImg ref={currentImgRef} src={imgUrl} />
+                <NextImg ref={nextImgRef} src={nextImgUrl} />
+                <ButtonBox>
+                  <Flex>
+                    <Flex
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      boxSize={"2.5rem"}
+                      bg={"rgba(255, 255, 255, 0.7)"}
+                      borderRadius={"50%"}
+                      mr={"0.75rem"}
+                    >
                       <Image
-                        onClick={() => handleImageAction(false)}
-                        boxSize={"3.19rem"}
-                        mr={"1.13rem"}
-                        src={"/assets/images/mainPage/dontWant.svg"}
+                        boxSize={"1rem"}
+                        onClick={handleDownload}
+                        src={"/assets/images/mainPage/download.svg"}
                         alt="dontWant-icon"
                       />
+                    </Flex>
+                    <Flex
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      boxSize={"2.5rem"}
+                      bg={"rgba(255, 255, 255, 0.7)"}
+                      borderRadius={"50%"}
+                      mr={"0.75rem"}
+                    >
                       <Image
-                        onClick={() => handleImageAction(true)}
-                        boxSize={"3.19rem"}
-                        src={"/assets/images/mainPage/want.svg"}
+                        boxSize={"1rem"}
+                        onClick={handleAddToCart}
+                        src={"/assets/images/mainPage/AddToCart.svg"}
                         alt="watnt-icon"
                       />
                     </Flex>
-                  </ButtonBox>
-                </Box>
-              </Flex>
+                  </Flex>
+                  <Flex alignItems={"center"} justifyContent={"flex-start"}>
+                    <Image
+                      onClick={() => handleImageAction(false)}
+                      boxSize={"3.19rem"}
+                      mr={"1.13rem"}
+                      src={"/assets/images/mainPage/dontWant.svg"}
+                      alt="dontWant-icon"
+                    />
+                    <Image
+                      onClick={() => handleImageAction(true)}
+                      boxSize={"3.19rem"}
+                      src={"/assets/images/mainPage/want.svg"}
+                      alt="watnt-icon"
+                    />
+                  </Flex>
+                </ButtonBox>
+              </Box>
 
               {/* 查看详情 */}
               <DetailTip onClick={handleViewDetails}>
@@ -472,14 +492,30 @@ const Bg = styled.div`
   background: #fff;
 `
 const StyledImg = styled(Image)`
+  object-fit: cover;
   z-index: 1;
   position: relative;
   transition: transform 0.5s ease;
+  width: 100%;
+  height: 100%;
+
+  border-radius: 0.5rem;
+  border: 0.03rem solid rgba(182, 182, 182, 0.5);
+  box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
 `
 const NextImg = styled(Image)`
   position: absolute;
+  left: 0.75rem;
   top: 0;
   z-index: 0;
+
+  object-fit: cover;
+  width: calc(100% - 1.5rem);
+  height: 100%;
+
+  border-radius: 0.5rem;
+  border: 0.03rem solid rgba(182, 182, 182, 0.5);
+  box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
 
   transition: transform 0.5s ease;
   transform: scale(0.8);
@@ -497,7 +533,8 @@ const ButtonBox = styled.div`
   z-index: 1;
 
   width: 100%;
-  padding: 0 0.88rem;
+  padding: 0 1.63rem;
+  left: 0;
 `
 
 const DetailTip = styled.section`

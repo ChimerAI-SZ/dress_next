@@ -19,3 +19,7 @@ export const fetchImageDetails = (params: { image_url: string }) => {
 export const imageRate = (params: { image_url: string; user_uuid: string; action: "like" | "dislike" }) => {
   return axios.post("/api/reactions/like_dislike", params)
 }
+
+export const fetchRecommendImages = (params: { user_uuid: string }) => {
+  return axios.post("/api/reactions/recommend", params)
+}
