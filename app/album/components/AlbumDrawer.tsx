@@ -66,7 +66,7 @@ const AlbumDrawer: React.FC<AlbumDialogProps> = ({ type, collectionId, visible, 
           Alert.open({
             content: err.message ?? res.message
           })
-        } else if (res.success) {
+        } else if (res?.success) {
           close && close()
           onSuccess && onSuccess(res.data)
         }

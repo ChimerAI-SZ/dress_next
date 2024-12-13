@@ -12,6 +12,7 @@ import { fetchShoppingAdd, fetchAddImages, fetchRemoveImages, fetchCollectionsLi
 import ToastTest from "@components/ToastTest"
 import { useSearchParams, useRouter } from "next/navigation"
 import CollectionSuccessToast from "@components/CollectionSuccessToast"
+import { css, Global, keyframes } from "@emotion/react"
 // Types
 import { AlbumItem } from "@definitions/album"
 import { ImageListParams } from "@definitions/generate"
@@ -37,37 +38,17 @@ interface ImageItemProps {
   isLast: boolean
   lastImageRef: (node: HTMLDivElement) => void
 }
-
+const shimmer = keyframes`
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+`
 const ImageItem = ({ item, index, isLast, lastImageRef }: ImageItemProps) => {
-  // State
-  const [selectImage, setSelectImage] = useState("")
-  const [likeList, setLikeList] = useState<string[]>([])
-  const [active, setActive] = useState(false)
-  const [jionLike, setJionLike] = useState<string[]>([])
-
-  // Collection states
-  const [collectSuccessVisible, setCollectSuccessVisible] = useState(false)
-  const [collectionSelectorVisible, setCollectionSelectorVisible] = useState(false)
-  const [dialogVisible, setDialogVisible] = useState(false)
-  const [collectionList, setCollectionList] = useState<AlbumItem[]>([])
-  const [selectedCollection, setSelectedCollection] = useState<string[]>([])
-  const [phoneNumber, setPhoneNumber] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
-  const router = useRouter()
-  const [seletcImage, setSeletcImage] = useState("")
-  const [isOpen, setIsOpen] = useState(false)
-
-  // 添加一个状态来保存最近收藏的图片
-  const [recentCollectedImages, setRecentCollectedImages] = useState<string[]>([])
-
-  // 添加默认收藏夹 ID 的状态
-  const [defaultCollectionId, setDefaultCollectionId] = useState<number | null>(null)
-
-  // 添加一个新的状态来跟踪图片所在的收藏夹
-  const [imageCollections, setImageCollections] = useState<Map<string, number>>(new Map())
-
-  const [selectedCartImage, setSelectedCartImage] = useState("")
 
   useEffect(() => {
     setIsLoaded(false)
@@ -80,169 +61,7 @@ const ImageItem = ({ item, index, isLast, lastImageRef }: ImageItemProps) => {
       setShowPlaceholder(false)
     }, 300)
   }
-  const userId = storage.get("user_id")
-  console.log(userId)
-  const handleLoginPrompt = useCallback(() => {
-    if (!userId) {
-      toaster.create({
-        description: <LoginPrompt onLogin={() => router.push("/login")} />
-      })
-      return false
-    }
-    return true
-  }, [userId])
-  // 获取收藏夹列表和默认收藏夹 ID
-  const fetchCollections = useCallback(async () => {
-    const [err, res] = await errorCaptureRes(fetchCollectionsList, {
-      user_id: Number(userId)
-    })
 
-    if (err || (res && !res?.success)) {
-      Alert.open({
-        content: err?.message ?? res.message
-      })
-    } else if (res?.success) {
-      // 筛选出默认收藏夹
-      const defaultCollection = res.data.find((album: { is_default: boolean }) => album.is_default === true)
-      if (defaultCollection) {
-        setDefaultCollectionId(defaultCollection.collection_id)
-      }
-      setCollectionList(res.data)
-    }
-  }, [userId])
-
-  // 在组件加载时获取收藏夹列表
-  useEffect(() => {
-    console.log(userId)
-    if (userId) {
-      fetchCollections()
-    }
-  }, [userId])
-  // 修改 ToastTest 相关的处理函数
-
-  const openDialog = useCallback(() => {
-    setIsOpen(true)
-  }, [])
-  const handleAddToCart = useCallback(
-    async (images: string[], phone: string) => {
-      if (!handleLoginPrompt()) return
-
-      const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
-        user_id: Number(userId),
-        img_urls: images,
-        phone
-      })
-
-      if (err) {
-        Alert.open({ content: err.message })
-        return
-      }
-
-      if (res.success) {
-        Alert.open({ content: "Successfully added to cart" })
-      }
-    },
-    [handleLoginPrompt, userId]
-  )
-  const closeDialog = useCallback(() => {
-    setIsOpen(false)
-    setPhoneNumber("")
-  }, [])
-  const affirmDialog = useCallback(async () => {
-    await handleAddToCart([seletcImage], phoneNumber)
-    closeDialog()
-    // if (active) {
-    //   setLikeList([])
-    //   setActive(false)
-    // }
-  }, [handleAddToCart])
-  const handleAddToCollection = useCallback(
-    async (images: string[]) => {
-      if (!handleLoginPrompt()) return
-      if (!defaultCollectionId) {
-        Alert.open({ content: "Default collection not found" })
-        return
-      }
-
-      const [err, res] = await errorCaptureRes(fetchAddImages, {
-        user_id: userId,
-        image_urls: images,
-        collection_id: defaultCollectionId
-      })
-
-      if (err) {
-        Alert.open({ content: err.message })
-        return
-      }
-
-      if (res.success) {
-        setJionLike(prev => [...prev, ...images])
-        setRecentCollectedImages(images)
-        // 更新图片所在的收藏夹
-        const newImageCollections = new Map(imageCollections)
-        images.forEach(img => newImageCollections.set(img, defaultCollectionId))
-        setImageCollections(newImageCollections)
-
-        toaster.create({
-          description: (
-            <CollectionSuccessToast
-              onMoveTo={() => {
-                toaster.dismiss()
-                setCollectionSelectorVisible(true)
-              }}
-            />
-          )
-        })
-      }
-    },
-    [handleLoginPrompt, userId, defaultCollectionId, imageCollections]
-  )
-
-  const handleCollectionSelect = useCallback(
-    async (collections: string[]) => {
-      setSelectedCollection(collections)
-      const newCollectionId = Number(collections[0])
-
-      // 如果是移动最近收藏的图片到新收藏夹
-      if (recentCollectedImages.length > 0) {
-        const [err, res] = await errorCaptureRes(fetchAddImages, {
-          user_id: userId,
-          image_urls: recentCollectedImages,
-          collection_id: newCollectionId
-        })
-
-        if (err) {
-          Alert.open({ content: err.message })
-        } else if (res.success) {
-          // 更新图片所在的收藏夹
-          const newImageCollections = new Map(imageCollections)
-          recentCollectedImages.forEach(img => newImageCollections.set(img, newCollectionId))
-          setImageCollections(newImageCollections)
-
-          Alert.open({ content: "Successfully moved to new collection" })
-          setRecentCollectedImages([])
-        }
-      }
-      // 如果是批量选择的图片
-      else if (likeList.length > 0) {
-        const [err, res] = await errorCaptureRes(fetchAddImages, {
-          user_id: userId,
-          image_urls: likeList,
-          collection_id: Number(collections[0])
-        })
-
-        if (err) {
-          Alert.open({ content: err.message })
-        } else if (res.success) {
-          setJionLike(prev => [...prev, ...likeList])
-          setLikeList([])
-        }
-      }
-
-      setCollectionSelectorVisible(false)
-    },
-    [likeList, recentCollectedImages, userId, imageCollections]
-  )
   return (
     <Box
       key={`${item.ID}-${index}`}
@@ -264,29 +83,33 @@ const ImageItem = ({ item, index, isLast, lastImageRef }: ImageItemProps) => {
           left={0}
           width="100%"
           height="100%"
-          bg="gray.100"
-          borderRadius="0.63rem"
+          borderRadius="4px"
           opacity={isLoaded ? 0 : 1}
           transition="opacity 0.3s ease-in-out"
           zIndex={1}
-        />
+          bgGradient="linear(to-r, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%)"
+          backgroundSize="2000px 100%"
+          animation={`${shimmer} 1.5s linear infinite`}
+          boxShadow="inset 0 0 10px rgba(0,0,0,0.05)"
+        >
+          {/* 可选：添加一个图标占位符 */}
+          <Flex height="100%" justify="center" align="center" color="gray.300">
+            <svg
+              width="40px"
+              height="40px"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              opacity={0.5}
+              style={{ opacity: 0.5 }}
+            >
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+            </svg>
+          </Flex>
+        </Box>
       )}
       <Box position="relative" width="fit-content" display="flex" justifyContent="center" alignItems="center">
         <Box position="relative">
-          <ActionButtons
-            image={item.image_url}
-            liked={false}
-            onDownload={image => {
-              // 处理下载逻辑
-            }}
-            onLike={image => {
-              handleAddToCollection([image])
-            }}
-            onAddToCart={images => {
-              setSeletcImage(images)
-              setIsOpen(true)
-            }}
-          />
+          <ActionButtons image={item.image_url} />
           <Image
             border="0.03rem solid #CACACA"
             src={item.image_url}
@@ -300,14 +123,6 @@ const ImageItem = ({ item, index, isLast, lastImageRef }: ImageItemProps) => {
             zIndex={2}
           />
         </Box>
-        <ToastTest
-          isOpen={isOpen}
-          phoneNumber={phoneNumber}
-          onOpen={openDialog}
-          onClose={closeDialog}
-          affirmDialog={affirmDialog}
-          setPhoneNumber={setPhoneNumber}
-        />
       </Box>
     </Box>
   )

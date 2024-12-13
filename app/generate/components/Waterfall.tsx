@@ -5,7 +5,7 @@ import { Alert } from "@components/Alert"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 import Pages from "./Fullscreen"
-import { css, Global } from "@emotion/react"
+import { css, Global, keyframes } from "@emotion/react"
 
 interface Item {
   image_url: string
@@ -21,21 +21,33 @@ interface WaterfallImageProps {
   onClick: () => void
 }
 
+// 添加闪光动画效果
+const shimmer = keyframes`
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+`
+
 const WaterfallImage = React.memo(({ item, index, isLast, lastImageRef, onClick }: WaterfallImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
+
+  const handleImageLoad = useCallback(() => {
+    setIsLoaded(true)
+    const timer = setTimeout(() => {
+      setShowPlaceholder(false)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     setIsLoaded(false)
     setShowPlaceholder(true)
   }, [item.image_url])
-
-  const handleImageLoad = () => {
-    setIsLoaded(true)
-    setTimeout(() => {
-      setShowPlaceholder(false)
-    }, 300)
-  }
 
   return (
     <Box
@@ -58,12 +70,29 @@ const WaterfallImage = React.memo(({ item, index, isLast, lastImageRef, onClick 
           left={0}
           width="100%"
           height="100%"
-          bg="gray.100"
           borderRadius="4px"
           opacity={isLoaded ? 0 : 1}
           transition="opacity 0.3s ease-in-out"
           zIndex={1}
-        />
+          bgGradient="linear(to-r, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%)"
+          backgroundSize="2000px 100%"
+          animation={`${shimmer} 1.5s linear infinite`}
+          boxShadow="inset 0 0 10px rgba(0,0,0,0.05)"
+        >
+          {/* 可选：添加一个图标占位符 */}
+          <Flex height="100%" justify="center" align="center" color="gray.300">
+            <svg
+              width="40px"
+              height="40px"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              opacity={0.5}
+              style={{ opacity: 0.5 }}
+            >
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+            </svg>
+          </Flex>
+        </Box>
       )}
       <Image
         src={item.image_url}

@@ -75,7 +75,7 @@ function Page() {
 
     if (err || (res && !res?.success)) {
       Alert.open({
-        content: err.message ?? res.message
+        content: err?.message ?? res.message
       })
     } else if (res.success) {
       setInfo(pre => ({
@@ -330,7 +330,10 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      // if (condition) {
+
+      // }
+      // router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
     }
   }, [currentBarValue])
 
@@ -463,10 +466,10 @@ function Page() {
           {!info?.total_messages ? "You can check results anytime in history" : "people before you"}
         </Text>
       </Flex>
-      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"4.5rem"} px={"1rem"}>
+      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"3.6rem"} px={"1.1rem"}>
         While you wait
       </Text>
-      <Flex px={"1rem"}>
+      <Flex px={"1.1rem"}>
         <Text fontWeight="500" fontSize="1rem" color="#171717">
           Check out our amazing creations!
         </Text>
