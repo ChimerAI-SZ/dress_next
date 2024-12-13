@@ -124,8 +124,12 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   // 在组件内添加一个处理 tags 的辅助函数
   const formatTags = (tags: string) => {
     if (!tags) return ""
-    const tagArray = tags.split(" ")
-    if (tagArray.length <= 2) return tags
+    // 先清理特殊字符，只保留字母、数字、空格和中文字符
+    const cleanedTags = tags.replace(/[^\w\s\u4e00-\u9fff]/g, " ")
+    // 处理多个空格为单个空格
+    const normalizedTags = cleanedTags.replace(/\s+/g, " ").trim()
+    const tagArray = normalizedTags.split(" ")
+    if (tagArray.length <= 2) return normalizedTags
     return tagArray.slice(0, 2).join(" ")
   }
 

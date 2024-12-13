@@ -281,6 +281,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           textAlign="left"
           textTransform="none"
           borderRadius="0.5rem"
+          _placeholder={{ color: "#BFBFBF" }}
           {...textareaStyles}
         />
       </Flex>
