@@ -151,7 +151,13 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
         >
           {[...Array(totalPages)].map((_, pageIndex) => (
             <SwiperSlide key={pageIndex}>
-              <Grid templateColumns="repeat(4, 1fr)" gap="5% 2%" pt={"0.75rem"} position={"relative"} w="100%">
+              <Grid
+                templateColumns="repeat(4, 1fr)"
+                gap="0.75rem 0.75rem"
+                pt={"0.75rem"}
+                position={"relative"}
+                w="100%"
+              >
                 {pageIndex === 0 && (
                   <Box position="relative" w="100%" h="4.69rem">
                     <Input
@@ -237,15 +243,16 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                         width="full"
                         background={item.selected ? "rgba(213,32,32,0.85)" : "rgba(23,23,23,0.6)"}
                         borderRadius="0rem 0rem 0.4rem 0.4rem"
-                        px={"0.2rem"}
+                        py={"0.34rem"}
                       >
                         <Text
                           color="white"
                           fontSize="0.69rem"
-                          whiteSpace="normal"
-                          wordBreak="break-word"
                           fontWeight="400"
                           textAlign={"center"}
+                          textTransform="none"
+                          fontStyle="normal"
+                          lineHeight={"0.78rem"}
                         >
                           {formatTags(item.tags)}
                         </Text>
@@ -258,7 +265,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
           ))}
         </Swiper>
       </Box>
-      <Flex justifyContent="center" mt={1} mb={0.5} gap={2}>
+      <Flex justifyContent="center" mt={"0.75rem"} mb={"0.87rem"} gap={2}>
         {[...Array(totalPages)].map((_, index) => (
           <Box
             key={index}

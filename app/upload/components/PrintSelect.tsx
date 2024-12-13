@@ -17,14 +17,14 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       position="relative"
       bg={"#FFFFFF"}
       borderRadius={"0.5rem"}
-      py="0.66rem"
+      pt="0.66rem"
     >
       <Flex px="0.75rem">
         <Text fontWeight="600" fontSize="0.94rem" color="#171717">
           Print
         </Text>
       </Flex>
-      <Flex gap="0.75rem" px="0.75rem" overflowX={"auto"} overflowY={"hidden"}>
+      <Flex px="0.75rem" overflowX={"auto"} overflowY={"hidden"}>
         <PhotoGallery onParamsUpdate={onParamsUpdate}></PhotoGallery>
       </Flex>
     </Box>
