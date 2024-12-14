@@ -11,7 +11,7 @@ import { errorCaptureRes } from "@utils/index"
 
 import { Alert } from "@components/Alert"
 import ImageOverlay from "./ImageOverlay"
-import ImageViewer from "@components/ImageViewer"
+import ImageViewer from "./ImagePreviewVoter"
 import { setParams } from "@store/features/workSlice"
 import loadingIcon from "@img/mainPage/loading.svg"
 interface Item {
@@ -91,7 +91,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
       const [err, res] = await errorCaptureRes(fetchHomePage, {
         limit: NUMBER_OF_IMAGES_LOADED_EACH_TURN,
         offset: randomIndex,
-        library: "show"
+        library: "show-new"
       })
 
       if (err || (res && !res?.success)) {
@@ -274,31 +274,17 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         </Box>
       </Box>
 
-      <Show when={viewDetail}>
+      {viewDetail && (
         <ImageViewer
-          imgUrl={selectedImg}
+          initImgUrl={selectedImg}
+          imgList={imageList}
           close={() => {
             setViewDetail(false)
-            dispatch(setParams({}))
 
             forceUpdate()
           }}
-          footer={
-            <Button
-              w={"20.38rem"}
-              bgColor={"#ee3939"}
-              borderRadius={"40px"}
-              type="submit"
-              mx="1.53rem"
-              onClick={() => {
-                router.replace(`/generate`)
-              }}
-            >
-              Generate
-            </Button>
-          }
         />
-      </Show>
+      )}
     </>
   )
 }

@@ -1,22 +1,44 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Box, Flex, Text, Button, Image, Spinner, VStack } from "@chakra-ui/react"
+import { Box, Flex, Text, Button, Image, Spinner, Textarea, Input } from "@chakra-ui/react"
 import { toaster } from "@components/ui/toaster"
 
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload"
-import UploadImage from "@img/upload/upload-image.svg"
+import UploadImage from "@img/upload/upload-icon.png"
 import ReUpload from "@img/upload/re-upload.svg"
 import ImageGuide from "./ImageGuide"
 import { TypesClothingProps } from "@definitions/update"
 import ReactLoading from "react-loading"
 import { fetchUpdateNeedGuide } from "@lib/request/login"
 import { errorCaptureRes, storage } from "@utils/index"
-
+import { useSelector } from "react-redux"
 function Page({ onParamsUpdate }: TypesClothingProps) {
+  const { params } = useSelector((state: any) => state.work)
+
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
   const [showGuide, setShowGuide] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [text, setText] = useState("")
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const adjustHeight = () => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = "2.4rem"
+      const scrollHeight = textarea.scrollHeight
+      textarea.style.height = scrollHeight > 38 ? "3.2rem" : "2.4rem"
+    }
+  }
+
+  const handleChange = (e: { target: { value: any } }) => {
+    const inputText = e.target.value
+    if (inputText.length <= 200) {
+      setText(inputText)
+      onParamsUpdate({ text: inputText })
+      setTimeout(adjustHeight, 0)
+    }
+  }
 
   // 获取并更新新手引导状态
   const updateGuideStatus = async () => {
@@ -100,11 +122,66 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       onParamsUpdate(newParams)
     }
   }, [uploadProgress])
+
+  // 添加 useEffect 来设置初始高度
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "2.4rem"
+    }
+  }, []) // 仅在组件挂载时执行一次
+
+  // 修改 textareaStyles
+  const textareaStyles = {
+    _focus: {
+      borderColor: "transparent",
+      boxShadow: "none",
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
+    },
+    _hover: {
+      borderColor: "transparent",
+      boxShadow: "none",
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
+    },
+    height: "2.4rem",
+    minHeight: "2.4rem",
+    maxHeight: "3.2rem",
+    resize: "none",
+    overflow: "hidden",
+    border: "0.09rem solid #F5F5F5",
+    _active: {
+      border: "0.09rem solid #F5F5F5"
+    },
+    _focusVisible: {
+      borderColor: "transparent",
+      boxShadow: "none",
+      outline: "none",
+      background: `
+        linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+        linear-gradient(135deg, rgba(255, 144, 144, 1), rgba(254, 75, 163, 1)) border-box
+      `,
+      border: "0.09rem solid transparent"
+    },
+    display: "flex",
+    alignItems: "center",
+    transition: "all 0.3s ease"
+  }
+
+
   return (
     <Box
       alignItems="center"
       justifyContent="center"
-      mt="0.8rem"
+      mt="0.5rem"
       width="full"
       position="relative"
       bg={"#FFFFFF"}
@@ -116,7 +193,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       <Flex justifyContent={"space-between"} alignItems={"center"} py={"0.66rem"} pl={"0.1rem"}>
         <Flex>
           <Text fontWeight="500" fontSize="1rem" color="#171717">
-            Upload image
+            Outfit generation
           </Text>
           <Text font-weight="500" font-size="1rem" color="#EE3939">
             *
@@ -126,19 +203,20 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       </Flex>
       <Flex
         width="100%"
-        height="19.38rem"
-        background="#F5F5F5"
+        height="12.81rem"
+        background="#F9F9F9"
         borderRadius="0.5rem"
         alignItems="center"
         justifyContent="center"
         flexFlow="column"
+        onClick={handleUploadClick}
       >
         {isUploading ? (
           <ReactLoading type={"spinningBubbles"} color={"#747474"} height={"3.38rem"} width={"3.38rem"} />
-        ) : uploadedUrl ? (
+        ) : (uploadedUrl || params.loadOriginalImage) ? (
           <Flex h="100%" w="100%" justifyContent="center" alignItems="center" position="relative" overflow="hidden">
             <Image
-              src={uploadedUrl}
+              src={uploadedUrl || params.loadOriginalImage}
               alt="Background image"
               h="100%"
               w="100%"
@@ -149,7 +227,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
               left={0}
               zIndex={0}
             />
-            <Image src={uploadedUrl} alt="Foreground image" h="100%" objectFit="contain" zIndex={1} />
+            <Image src={uploadedUrl || params.loadOriginalImage} alt="Foreground image" h="100%" objectFit="contain" zIndex={1} />
             <Box as="label">
               <Image
                 src={ReUpload.src}
@@ -174,21 +252,10 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
           </Flex>
         ) : (
           <>
-            <Button
-              w="8.19rem"
-              h="2rem"
-              borderRadius="1rem"
-              bg="rgba(255,255,255,0.5)"
-              border="0.06rem solid #EE3939"
-              cursor="pointer"
-              gap={"0.2rem"}
-              onClick={handleUploadClick}
-            >
-              <Image src={UploadImage.src} w="1.13rem" h="1.13rem" />
-              <Text fontWeight="400" fontSize="0.88rem" color="#EE3939">
-                Upload image
-              </Text>
-            </Button>
+            <Image src={UploadImage.src} ml={"0.7rem"} boxSize={"9rem"} mt={"-2.55rem"} zIndex={5} />
+            <Text fontWeight="500" fontSize="0.88rem" color="#171717" mt={"-3.58rem"}>
+              Upload image
+            </Text>
 
             <input
               ref={fileInputRef}
@@ -203,6 +270,23 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
             </Text>
           </>
         )}
+      </Flex>
+      <Flex mt={"0.5rem"}>
+        <Textarea
+          ref={textareaRef}
+          value={text}
+          onChange={handleChange}
+          placeholder="please enter your editing"
+          width="full"
+          background="#ffffff"
+          fontWeight="400"
+          fontSize="0.75rem"
+          textAlign="left"
+          textTransform="none"
+          borderRadius="0.5rem"
+          _placeholder={{ color: "#BFBFBF" }}
+          {...textareaStyles}
+        />
       </Flex>
     </Box>
   )

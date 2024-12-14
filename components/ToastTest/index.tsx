@@ -43,7 +43,15 @@ const Component: React.FC<DialogComponentProps> = ({
             Would you mind if we connect you with our production team? We’ll follow up by phone and email to ensure
             everything’s perfect! Just share your number:
           </Text>
-          <Group mt={"0.75rem"} width="16.44rem" height="2.75rem" background=" #F5F5F5" borderRadius="0.5rem">
+          <Group
+            mt={"0.75rem"}
+            width="18.44rem"
+            height="3.5rem"
+            background=" #F5F5F5"
+            borderRadius="0.5rem"
+            px="0.8rem"
+            py="0 0.6rem"
+          >
             <PhoneInput
               className="shipping_address_phone_number"
               placeholder="Enter phone number"

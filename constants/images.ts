@@ -52,5 +52,9 @@ export const images = {
   ModalRight: "/assets/images/generate-result/modal-right.svg",
   ModalBack: "/assets/images/generate-result/modal-back.svg",
   addIcon: "/assets/images/album/addIcon.svg",
-  AllNo: "/assets/images/generate-result/all-no.svg"
+  AllNo: "/assets/images/generate-result/all-no.svg",
+  modalBack: "/assets/images/generate-result/modal-back.svg",
+  selected: "/assets/images/generate-result/selected.svg",
+  noSelect: "/assets/images/generate-result/no-select.svg",
+  close: "/assets/images/upload/close.svg"
 } as const

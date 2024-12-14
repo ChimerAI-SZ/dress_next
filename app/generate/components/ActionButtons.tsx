@@ -1,7 +1,7 @@
-"use client"
+import { Box, Flex, Image } from "@chakra-ui/react"
+import { images } from "@constants/images"
 
 import { useState, useEffect, useCallback } from "react"
-import { Box } from "@chakra-ui/react"
 import { Toaster, toaster } from "@components/Toaster"
 import Header from "@components/Header"
 import { Alert } from "@components/Alert"
@@ -18,15 +18,16 @@ import { useDispatch } from "react-redux"
 import { setGenerateImage } from "@store/features/workSlice"
 
 // Components
-import LoginPrompt from "../../components/LoginPrompt"
-import CollectionSuccessToast from "../../components/CollectionSuccessToast"
-import ImageGallery from "./components/ImageGallery"
-import ActionButtons from "./components/ActionButtons"
-import CollectionSelector from "./components/CollectionSelector"
-import CollectionDialog from "../album/components/AlbumDrawer"
+import LoginPrompt from "@components/LoginPrompt"
+import CollectionSuccessToast from "@components/CollectionSuccessToast"
+import CollectionSelector from "../../generate-result/components/CollectionSelector"
+import CollectionDialog from "../../album/components/AlbumDrawer"
 import ToastTest from "@components/ToastTest"
+interface ActionButtonsProps {
+  image: string
+}
 
-export default function GenerateResult() {
+export const ActionButtons = ({ image }: ActionButtonsProps) => {
   const dispatch = useDispatch()
   const router = useRouter()
   const userId = storage.get("user_id")
@@ -39,7 +40,7 @@ export default function GenerateResult() {
 
   // State
   const [imageList, setImageList] = useState<string[]>(JSON.parse(typedParams.imageList))
-  const [selectImage, setSelectImage] = useState(imageList[0])
+  const [selectImage, setSelectImage] = useState(image)
   const [likeList, setLikeList] = useState<string[]>([])
   const [originImage] = useState(typedParams.loadOriginalImage)
   const [isAllSelected, setIsAllSelected] = useState(false)
@@ -89,35 +90,50 @@ export default function GenerateResult() {
 
   // 获取收藏夹列表和默认收藏夹 ID
   const fetchCollections = useCallback(async () => {
+    console.log("Starting fetchCollections...")
+
     const [err, res] = await errorCaptureRes(fetchCollectionsList, {
       user_id: Number(userId)
     })
 
+    console.log("API response:", { err, res })
+
     if (err || (res && !res?.success)) {
+      console.error("Error fetching collections:", err || res.message)
       Alert.open({
         content: err?.message ?? res.message
       })
     } else if (res?.success) {
-      // 筛选出默认收藏夹
       const defaultCollection = res.data.find((album: { is_default: boolean }) => album.is_default === true)
+
       if (defaultCollection) {
         setDefaultCollectionId(defaultCollection.collection_id)
       }
       setCollectionList(res.data)
+      console.log("Collections loaded successfully:", res.data)
+      return defaultCollection.collection_id
     }
   }, [userId])
 
   // 在组件加载时获取收藏夹列表
-  useEffect(() => {
-    if (userId) {
-      fetchCollections()
-    }
-  }, [userId, fetchCollections])
-
+  // useEffect(() => {
+  //   console.log("Current userId:", userId)
+  //   if (userId) {
+  //     console.log("Fetching collections for userId:", userId)
+  //   } else {
+  //     console.log("No userId found, skipping fetchCollections")
+  //   }
+  // }, [userId, fetchCollections])
+  console.log("defaultCollection1111", defaultCollectionId)
   const handleAddToCollection = useCallback(
     async (images: string[]) => {
       if (!handleLoginPrompt()) return
-      if (!defaultCollectionId) {
+      let defaultId = defaultCollectionId
+      if (!defaultId) {
+        defaultId = await fetchCollections()
+      }
+
+      if (!defaultId) {
         Alert.open({ content: "Default collection not found" })
         return
       }
@@ -125,7 +141,7 @@ export default function GenerateResult() {
       const [err, res] = await errorCaptureRes(fetchAddImages, {
         user_id: userId,
         image_urls: images,
-        collection_id: defaultCollectionId
+        collection_id: defaultId
       })
 
       if (err) {
@@ -138,7 +154,7 @@ export default function GenerateResult() {
         setRecentCollectedImages(images)
         // 更新图片所在的收藏夹
         const newImageCollections = new Map(imageCollections)
-        images.forEach(img => newImageCollections.set(img, defaultCollectionId))
+        images.forEach(img => newImageCollections.set(img, defaultId))
         setImageCollections(newImageCollections)
 
         toaster.create({
@@ -211,15 +227,15 @@ export default function GenerateResult() {
   )
 
   // Effects
-  useEffect(() => {
-    dispatch(setGenerateImage([]))
-  }, [dispatch])
+  // useEffect(() => {
+  //   dispatch(setGenerateImage([]))
+  // }, [dispatch])
 
-  useEffect(() => {
-    if (active) {
-      setIsAllSelected(likeList.length === imageList.length && likeList.every(item => imageList.includes(item)))
-    }
-  }, [likeList, active, imageList])
+  // useEffect(() => {
+  //   if (active) {
+  //     setIsAllSelected(likeList.length === imageList.length && likeList.every(item => imageList.includes(item)))
+  //   }
+  // }, [likeList, active, imageList])
 
   const handleCollectionSuccess = (newCollection: AlbumItem) => {
     setCollectionList(prev => [...prev, newCollection])
@@ -319,55 +335,15 @@ export default function GenerateResult() {
     [active]
   )
 
-  // 添加批量加购函数
-  const handleBatchAddToCart = useCallback(() => {
-    if (likeList.length === 0) {
-      Alert.open({ content: "Please select images first" })
-      return
+  const handleLargeImageLike = (image: string) => {
+    if (jionLike.includes(image)) {
+      handleRemoveFromCollection(image)
+    } else {
+      handleAddToCollection([image])
     }
-    setIsOpen(true)
-  }, [likeList])
-
+  }
   return (
-    <Box h="100vh" position="relative" pt={4} px="1rem">
-      <Header show noTitle cb={setActive} />
-      <Toaster />
-
-      <ImageGallery
-        selectImage={selectImage}
-        originImage={originImage}
-        imageList={imageList}
-        active={active}
-        likeList={likeList}
-        jionLike={jionLike}
-        onSelect={setSelectImage}
-        onLike={setLikeList}
-        onDownload={handleDownload}
-        onCollect={image => handleAddToCollection([image])}
-        onUncollect={handleRemoveFromCollection}
-        onAddToCart={handleCartClick}
-      />
-
-      <ActionButtons
-        active={active}
-        isAllSelected={isAllSelected}
-        likeList={likeList}
-        imageList={imageList}
-        onSelectAll={handleSelectAll}
-        onDownload={handleDownload}
-        onLike={handleAddToCollection}
-        onAddToCart={handleBatchAddToCart}
-        selectImage={selectImage}
-      />
-
-      {/* Dialogs */}
-      <CollectionDialog
-        type="add"
-        visible={dialogVisible}
-        close={() => setDialogVisible(false)}
-        onSuccess={handleCollectionSuccess}
-      />
-
+    <>
       <CollectionSelector
         visible={collectionSelectorVisible}
         collections={collectionList}
@@ -379,7 +355,12 @@ export default function GenerateResult() {
           setDialogVisible(true)
         }}
       />
-
+      <CollectionDialog
+        type="add"
+        visible={dialogVisible}
+        close={() => setDialogVisible(false)}
+        onSuccess={handleCollectionSuccess}
+      />
       <ToastTest
         isOpen={isOpen}
         phoneNumber={phoneNumber}
@@ -388,6 +369,69 @@ export default function GenerateResult() {
         affirmDialog={affirmDialog}
         setPhoneNumber={setPhoneNumber}
       />
-    </Box>
+      <Toaster />
+
+      <Flex
+        position="absolute"
+        bottom={0}
+        right={0}
+        gap="1rem"
+        pb="0.87rem"
+        pr="0.87rem"
+        zIndex={20}
+        transition="opacity 0.2s"
+        _groupHover={{ opacity: 1 }}
+        borderRadius="0 0 0.63rem 0.63rem"
+        padding="2rem 0.87rem 0.87rem 0.87rem"
+        width="100%"
+        justifyContent="flex-end"
+        style={{ pointerEvents: "none" }}
+      >
+        <Flex
+          position="absolute"
+          bottom={0}
+          right="0"
+          gap="1rem"
+          pb="0.87rem"
+          pr="0.87rem"
+          zIndex={21}
+          style={{ pointerEvents: "auto" }}
+        >
+          <Box
+            onClick={e => {
+              e.stopPropagation()
+              handleDownload(selectImage)
+            }}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.1)" }}
+            transition="transform 0.2s"
+          >
+            <Image boxSize="2.25rem" src={images.Download} />
+          </Box>
+          <Box
+            onClick={e => {
+              e.stopPropagation()
+              handleLargeImageLike(selectImage)
+            }}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.1)" }}
+            transition="transform 0.2s"
+          >
+            <Image boxSize="2.25rem" src={jionLike.includes(selectImage) ? images.LikeTop : images.Like} />
+          </Box>
+          <Box
+            onClick={e => {
+              e.stopPropagation()
+              handleCartClick(selectImage)
+            }}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.1)" }}
+            transition="transform 0.2s"
+          >
+            <Image boxSize="2.25rem" src={images.Shop} />
+          </Box>
+        </Flex>
+      </Flex>
+    </>
   )
 }

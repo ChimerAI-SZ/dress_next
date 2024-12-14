@@ -13,8 +13,9 @@ import { setWorkInfo, setParams as setStoreParams, setTaskId, setWork } from "@s
 import { useDispatch, useSelector } from "react-redux"
 function Page() {
   const dispatch = useDispatch()
+  const { params: paramsState } = useSelector((state: any) => state.work)
   const [params, setParams] = useState<Params>({
-    loadOriginalImage: undefined,
+    loadOriginalImage: paramsState.loadOriginalImage,
     loadPrintingImage: undefined,
     backgroundColor: undefined,
     text: undefined,
@@ -29,27 +30,12 @@ function Page() {
     }))
   }
   return (
-    <Container bg={"#f5f5f5"} h={"100%"} position={"relative"} pt={4}>
+    <Container bg={"#f5f5f5"} h={"100%"} minH={"100vh"} position={"relative"} pt={4}>
       <Header></Header>
       <TypesClothing></TypesClothing>
       <UploadImage onParamsUpdate={handleParamsUpdate}></UploadImage>
-      <Flex alignItems="center" justifyContent="center" w="100%">
-        <Box
-          flex="1"
-          height="0.06rem"
-          bg="linear-gradient( 90deg,#f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
-        />
-        <Text fontWeight="400" fontSize="0.81rem" color=" #737373" mx={"0.75rem"}>
-          Advanced design
-        </Text>
-        <Box
-          flex="1"
-          height="0.06rem"
-          bg="linear-gradient(270deg, #f4f4f4 0%, #e3e3e3 14%, #cacaca 47%, #c4c4c4 87%, #c0c0c0 100%)"
-        />
-      </Flex>
       <PrintSelect onParamsUpdate={handleParamsUpdate}></PrintSelect>
-      <Fabric onParamsUpdate={handleParamsUpdate}></Fabric>
+      {/* <Fabric onParamsUpdate={handleParamsUpdate}></Fabric> */}
       <Box h="4.55rem"></Box>
       <Flex
         height="3.75rem"

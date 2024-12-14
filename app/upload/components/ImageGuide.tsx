@@ -5,7 +5,7 @@ import { Button, Flex, Text, Image, VStack, Box, Grid, useDisclosure } from "@ch
 import { DrawerActionTrigger, DrawerBackdrop, DrawerContent, DrawerRoot, DrawerTrigger } from "@components/ui/drawer"
 
 // 导入图片资源
-import ImageGuideIcon from "@img/upload/image-guide.svg"
+import ImageGuideIcon from "@img/upload/tips.png"
 import CloseIcon from "@img/upload/close.svg"
 import Index1 from "@img/upload/index-1.png"
 import Index2 from "@img/upload/index-2.png"
@@ -28,20 +28,11 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: "Print",
     images: [Index3.src, Index4.src]
-  },
-  {
-    title: "Fabric",
-    images: [Index5.src, Index6.src]
   }
 ]
 
 const GuideButton = memo(({ onClick }: { onClick?: () => void }) => (
-  <Button w="6.13rem" h="1.38rem" borderRadius="0.94rem" gap="0.25rem" onClick={onClick} _hover={{ opacity: 0.8 }}>
-    <Image src={ImageGuideIcon.src} w="0.75rem" h="0.75rem" alt="guide icon" />
-    <Text fontWeight="400" fontSize="0.75rem" color="white">
-      Image guide
-    </Text>
-  </Button>
+  <Image src={ImageGuideIcon.src} w="1.13rem" h="1.13rem" alt="guide icon" onClick={onClick} />
 ))
 
 const GuideSection = memo(({ title, images }: GuideSection) => (

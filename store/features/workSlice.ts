@@ -6,6 +6,8 @@ interface GlobalState {
   taskId: any[]
   work: number
   generateImage: any[]
+  stage: string
+  id: string
 }
 
 // 定义异步请求的类型
@@ -29,7 +31,9 @@ const workSlice = createSlice({
     params: {},
     taskId: [],
     work: 0,
-    generateImage: []
+    generateImage: [],
+    stage: "a",
+    id: ""
   } as GlobalState, // 类型声明
   reducers: {
     setWorkInfo: (state, action: PayloadAction<any>) => {
@@ -46,11 +50,17 @@ const workSlice = createSlice({
     },
     setGenerateImage: (state, action: PayloadAction<any[]>) => {
       state.generateImage = action.payload
+    },
+    setStage: (state, action: PayloadAction<string>) => {
+      state.stage = action.payload
+    },
+    setId: (state, action: PayloadAction<string>) => {
+      state.id = action.payload
     }
   }
 })
 
 // 导出 action 和 reducer
-export const { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } = workSlice.actions
+export const { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage, setStage, setId } = workSlice.actions
 
 export default workSlice.reducer

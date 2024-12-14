@@ -121,9 +121,21 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     }
   }, [urlList, flied]) // 监听 urlList 和 flied 的变化
 
+  // 在组件内添加一个处理 tags 的辅助函数
+  const formatTags = (tags: string) => {
+    if (!tags) return ""
+    // 先清理特殊字符，只保留字母、数字、空格和中文字符
+    const cleanedTags = tags.replace(/[^\w\s\u4e00-\u9fff]/g, " ")
+    // 处理多个空格为单个空格
+    const normalizedTags = cleanedTags.replace(/\s+/g, " ").trim()
+    const tagArray = normalizedTags.split(" ")
+    if (tagArray.length <= 2) return normalizedTags
+    return tagArray.slice(0, 2).join(" ")
+  }
+
   return (
-    <Flex w="full" flexDirection={"column"}>
-      <Box h={"11rem"} overflow={"hidden"}>
+    <Flex w="full" flexDirection={"column"} alignItems="center">
+      <Box h={"11rem"} overflow={"hidden"} w="100%">
         <Swiper
           onSlideChange={swiper => {
             setActiveIndex(swiper.activeIndex)
@@ -135,12 +147,19 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
               fetchData(swiper.activeIndex)
             }
           }}
+          style={{ height: "100%" }}
         >
           {[...Array(totalPages)].map((_, pageIndex) => (
             <SwiperSlide key={pageIndex}>
-              <Grid templateColumns="repeat(4, 1fr)" gap={2} pt={"0.75rem"} position={"relative"}>
+              <Grid
+                templateColumns="repeat(4, 1fr)"
+                gap="0.75rem 0.75rem"
+                pt={"0.75rem"}
+                position={"relative"}
+                w="100%"
+              >
                 {pageIndex === 0 && (
-                  <Box position="relative">
+                  <Box position="relative" w="100%" h="4.69rem">
                     <Input
                       type="file"
                       accept="image/*"
@@ -148,24 +167,26 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                       id={uniqueId}
                       onChange={e => handleImageChange(e)}
                     />
-                    <label htmlFor={uniqueId}>
-                      <Box
-                        w="4.69rem"
-                        h="4.69rem"
-                        borderRadius="0.5rem"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        background="#F5F5F5"
-                      >
-                        <Image src={Add.src} alt="Like" h="1.05rem" w="1.06rem" cursor="pointer" />
+                    <label htmlFor={uniqueId} style={{ width: "100%", height: "100%", display: "block" }}>
+                      <Box w="100%" h="100%" position="relative" borderRadius="0.5rem" background="#F5F5F5">
+                        <Flex
+                          position="absolute"
+                          top="0"
+                          left="0"
+                          right="0"
+                          bottom="0"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Image src={Add.src} alt="Like" h="1.05rem" w="1.06rem" cursor="pointer" />
+                        </Flex>
                       </Box>
                     </label>
                   </Box>
                 )}
                 {isUploading && pageIndex === 0 && (
                   <Box
-                    w="4.69rem"
+                    w="100%"
                     h="4.69rem"
                     borderRadius="0.5rem"
                     display="flex"
@@ -181,8 +202,8 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                   <GridItem
                     key={item.image_url + index}
                     position="relative"
-                    w="4.68rem"
-                    h="4.67rem"
+                    w="100%"
+                    h="4.69rem"
                     borderRadius="0.5rem"
                     onClick={() => handleSelectImage(item.image_url)}
                     border={item.selected ? "1px solid #dd4d4d" : "1px solid transparent"}
@@ -191,8 +212,8 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                     <Image
                       src={`${item.image_url}`}
                       alt={`Small Image ${index + 1}`}
-                      w="4.68rem"
-                      h="4.5rem"
+                      w="100%"
+                      h="100%"
                       objectFit="cover"
                       cursor="pointer"
                       borderRadius="0.5rem"
@@ -219,20 +240,21 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                         justify="center"
                         position="absolute"
                         bottom="0"
-                        w="full"
+                        width="full"
                         background={item.selected ? "rgba(213,32,32,0.85)" : "rgba(23,23,23,0.6)"}
                         borderRadius="0rem 0rem 0.4rem 0.4rem"
-                        px={"0.2rem"}
+                        py={"0.34rem"}
                       >
                         <Text
                           color="white"
                           fontSize="0.69rem"
-                          whiteSpace="normal"
-                          wordBreak="break-word"
                           fontWeight="400"
                           textAlign={"center"}
+                          textTransform="none"
+                          fontStyle="normal"
+                          lineHeight={"0.78rem"}
                         >
-                          {item.tags}
+                          {formatTags(item.tags)}
                         </Text>
                       </Flex>
                     )}
@@ -243,7 +265,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
           ))}
         </Swiper>
       </Box>
-      <Flex justifyContent="center" mt={4} gap={2}>
+      <Flex justifyContent="center" mt={"0.75rem"} mb={"0.87rem"} gap={2}>
         {[...Array(totalPages)].map((_, index) => (
           <Box
             key={index}

@@ -3,24 +3,46 @@ import { useState, useEffect, useRef } from "react"
 import { Text, Box, Image, Flex } from "@chakra-ui/react"
 import Spline from "@splinetool/react-spline/next"
 import { Application } from "@splinetool/runtime"
-
+import { Toaster, toaster } from "@components/Toaster"
 import Header from "@components/Header"
 import PrintGeneration from "@img/upload/print-generation.svg"
 import Bg from "@img/generate/bg.png"
 import Waterfall from "./components/Waterfall"
 import { useSearchParams, useRouter } from "next/navigation"
-import { workflow2, workflow3, workflow4, workflow5, workflow1_6 } from "./workflow/workflow"
+import {
+  workflow2,
+  workflow3,
+  workflow4,
+  workflow5,
+  workflow1_6,
+  workflow11,
+  workflow21,
+  workflow31,
+  workflow41,
+  workflow51,
+  workflow61,
+  workflow111,
+  workflow222,
+  workflow333,
+  workflow444,
+  workflow666,
+  workflow555,
+  workflow1_7,
+  workflow1_8,
+  workflow1_9
+} from "./workflow/workflow"
 import { getQuery } from "@lib/request/generate"
 import { fetchUtilWait } from "@lib/request/generate"
 import { errorCaptureRes } from "@utils/index"
 import { Alert } from "@components/Alert"
 import { CircularProgressbarWithChildren, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage } from "@store/features/workSlice"
+import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage, setStage } from "@store/features/workSlice"
 import { useDispatch, useSelector } from "react-redux"
+
 function Page() {
   const dispatch = useDispatch()
-  const { workInfo, work, params, taskId, generateImage } = useSelector((state: any) => state.work)
+  const { workInfo, work, params, taskId, generateImage, stage } = useSelector((state: any) => state.work)
   const [currentBarValue, setCurrentBarValue] = useState(() => {
     if (generateImage.length === 0 && taskId.length === 0 && work === 0) {
       return 0
@@ -30,11 +52,14 @@ function Page() {
       return 100 - taskId.length * 12.5
     }
   })
+  const searchParams = useSearchParams()
+  const id = searchParams.get("id")
   const [imageList, setImageList] = useState<string[]>(generateImage)
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(null)
   const [info, setInfo] = useState({ total_messages: 0, wait_time: 0 })
   const router = useRouter()
   const hasRunRef = useRef(false)
+
   const [barValue, setBarValue] = useState(() => {
     console.log(generateImage.length, taskId.length)
     if (generateImage.length === 0 && taskId.length === 0) {
@@ -53,7 +78,7 @@ function Page() {
 
     if (err || (res && !res?.success)) {
       Alert.open({
-        content: err.message ?? res.message
+        content: err?.message ?? res.message
       })
     } else if (res.success) {
       setInfo(pre => ({
@@ -65,9 +90,10 @@ function Page() {
   }
 
   if (params && Object.keys(params).length === 0 && imageList.length === 0 && taskId.length === 0) {
-    router.replace(`/`)
+    // router.replace(`/`)
   }
   useEffect(() => {
+    console.log("gggg", stage, id)
     if (taskId.length > 0 && imageList.length > 0) {
       hasRunRef.current = true
     }
@@ -77,8 +103,11 @@ function Page() {
       Object.keys(params).length !== 0 &&
       taskId.length === 0 &&
       imageList.length === 0 &&
-      work === 0
+      work === 0 &&
+      (!id || stage === "a")
     ) {
+      dispatch(setStage("a"))
+
       const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = params
       console.log(
         loadPrintingImage,
@@ -86,11 +115,11 @@ function Page() {
         text?.trim(),
         loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()
       )
-      if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
-        console.log(222)
-        dispatch(setWork(2))
-        dispatch(setParams(params))
-        workflow2(params).then(newTaskIDs => {
+      console.log(loadPrintingImage, text?.trim(), !loadFabricImage)
+      if (!loadPrintingImage && text?.trim()) {
+        console.log(17)
+        dispatch(setWork(17))
+        workflow1_7(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
@@ -98,10 +127,10 @@ function Page() {
             dispatch(setWork(0))
           }
         })
-      } else if (!loadPrintingImage && text?.trim() && !loadFabricImage) {
-        console.log(3)
-        dispatch(setWork(3))
-        workflow3(params).then(newTaskIDs => {
+      } else if (loadPrintingImage && text?.trim()) {
+        console.log(18)
+        dispatch(setWork(18))
+        workflow1_8(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
@@ -109,27 +138,14 @@ function Page() {
             dispatch(setWork(0))
           }
         })
-      } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
-        console.log(4)
-        dispatch(setWork(4))
-        workflow4(params).then(newTaskIDs => {
+      } else if (loadPrintingImage && !text?.trim()) {
+        console.log(19)
+        dispatch(setWork(19))
+        workflow1_9(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
             dispatch(setTaskId(newTaskIDs))
-
-            dispatch(setWork(0))
-          }
-        })
-      } else if (loadPrintingImage && text?.trim() && loadFabricImage) {
-        console.log(555)
-        dispatch(setWork(5))
-        workflow5(params).then(newTaskIDs => {
-          console.log("workflow")
-          if (newTaskIDs) {
-            setTaskIDs(newTaskIDs)
-            dispatch(setTaskId(newTaskIDs))
-
             dispatch(setWork(0))
           }
         })
@@ -138,6 +154,185 @@ function Page() {
         dispatch(setWork(1))
         workflow1_6(params).then(newTaskIDs => {
           console.log("workflow")
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      }
+      hasRunRef.current = true
+      // if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
+      //   console.log(222)
+      //   dispatch(setWork(2))
+      //   dispatch(setParams(params))
+      //   workflow2(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
+      //   console.log(4)
+      //   dispatch(setWork(4))
+      //   workflow4(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else if (loadPrintingImage && text?.trim() && loadFabricImage) {
+      //   console.log(555)
+      //   dispatch(setWork(5))
+      //   workflow5(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else {
+      //   console.log(111666)
+      //   dispatch(setWork(1))
+      //   workflow1_6(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // }
+    } else if (
+      !hasRunRef.current &&
+      params &&
+      Object.keys(params).length !== 0 &&
+      taskId.length === 0 &&
+      imageList.length === 0 &&
+      work === 0 &&
+      id
+    ) {
+      if (id === "11" && stage === "b") {
+        dispatch(setWork(11))
+        workflow11(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "21" && stage === "b") {
+        dispatch(setWork(21))
+        workflow21(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "31" && stage === "b") {
+        dispatch(setWork(31))
+        workflow31(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "41" && stage === "b") {
+        dispatch(setWork(41))
+        workflow41(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "51" && stage === "b") {
+        dispatch(setWork(51))
+        workflow51(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "61" && stage === "b") {
+        dispatch(setWork(61))
+        workflow61(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "11" && stage === "c") {
+        dispatch(setWork(111))
+        workflow111(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "21" && stage === "c") {
+        dispatch(setWork(222))
+        workflow222(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "31" && stage === "c") {
+        dispatch(setWork(333))
+        workflow333(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "41" && stage === "c") {
+        dispatch(setWork(444))
+        workflow444(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "51" && stage === "c") {
+        dispatch(setWork(555))
+        workflow555(params).then(newTaskIDs => {
+          console.log(id, stage)
+          if (newTaskIDs) {
+            setTaskIDs(newTaskIDs)
+            dispatch(setTaskId(newTaskIDs))
+            dispatch(setWork(0))
+          }
+        })
+      } else if (id === "61" && stage === "c") {
+        dispatch(setWork(666))
+        workflow666(params).then(newTaskIDs => {
+          console.log(id, stage)
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
             dispatch(setTaskId(newTaskIDs))
@@ -174,7 +369,18 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+
+      // 获取 Waterfall 组件的预览状态
+      const previewElement = document.querySelector('[data-preview-open="true"]')
+      if (!previewElement) {
+        // 只有在没有预览打开的情况下才跳转
+        router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      } else {
+        // 如果预览窗口打开，将参数保存到 URL，但不跳转
+        router.replace(`/generate?loadOriginalImage=${newImage}&imageList=${imageListParam}`, {
+          scroll: false
+        })
+      }
     }
   }, [currentBarValue])
 
@@ -228,6 +434,7 @@ function Page() {
 
   return (
     <Box h="100vh" position={"relative"}>
+      <Toaster />
       <Box
         position={"absolute"}
         height="25rem"
@@ -306,10 +513,10 @@ function Page() {
           {!info?.total_messages ? "You can check results anytime in history" : "people before you"}
         </Text>
       </Flex>
-      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"4.5rem"} px={"1rem"}>
+      <Text fontWeight="500" fontSize="1rem" color="#171717" mt={"3.6rem"} px={"1.1rem"}>
         While you wait
       </Text>
-      <Flex px={"1rem"}>
+      <Flex px={"1.1rem"}>
         <Text fontWeight="500" fontSize="1rem" color="#171717">
           Check out our amazing creations!
         </Text>
