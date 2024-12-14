@@ -331,13 +331,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
                 >
                   <LeftOutlined style={{ fontSize: "1.38rem" }} />
                 </BackIcon>
-                <Text fontSize="1.1rem" fontWeight="bold" letterSpacing="0rem" textAlign="center">
-                  CREAMODA
-                </Text>
+                <Image h={"1rem"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
               </Header>
 
               {/* 图片预览区 */}
-              <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0 0.75rem"} flexGrow={"1"}>
+              <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0.75rem"} flexGrow={"1"}>
                 <StyledImg ref={currentImgRef} src={imgUrl} />
                 <NextImg ref={nextImgRef} src={nextImgUrl} />
                 <ButtonBox>
@@ -475,6 +473,9 @@ const Header = styled.header`
   justify-content: center;
   z-index: 1;
   flex-shrink: 0;
+
+  height: 2.75rem;
+  width: 100%;
 `
 const BackIcon = styled.div`
   z-index: 1;
@@ -499,21 +500,21 @@ const StyledImg = styled(Image)`
   width: 100%;
   height: 100%;
 
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
 `
 const NextImg = styled(Image)`
   position: absolute;
   left: 0.75rem;
-  top: 0;
+  top: 0.75rem;
   z-index: 0;
 
   object-fit: cover;
   width: calc(100% - 1.5rem);
-  height: 100%;
+  height: calc(100% - 1.5rem);
 
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
 
@@ -551,8 +552,11 @@ const DetailTip = styled.section`
   align-items: center;
   justify-content: center;
 
-  height: 2.5rem;
+  height: 1.38rem;
   flex-shrink: 0;
+
+  padding: 0.38rem 0 1.13rem;
+  box-sizing: content-box;
 
   & img {
     width: 1rem;
