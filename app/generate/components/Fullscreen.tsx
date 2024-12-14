@@ -24,7 +24,7 @@ interface Item {
 
 interface FullscreenProps {
   open: boolean
-  setOpen: (open: boolean) => void
+  setOpen: () => void
   selectedImage: Item | null
   imageList: Item[]
   onLoadMore: () => void
@@ -225,7 +225,7 @@ export default function Pages({
         <Header
           open={open}
           cb={() => {
-            setOpen(false)
+            setOpen()
           }}
         />
         <Box

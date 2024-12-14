@@ -13,8 +13,9 @@ import { setWorkInfo, setParams as setStoreParams, setTaskId, setWork } from "@s
 import { useDispatch, useSelector } from "react-redux"
 function Page() {
   const dispatch = useDispatch()
+  const { params: paramsState } = useSelector((state: any) => state.work)
   const [params, setParams] = useState<Params>({
-    loadOriginalImage: undefined,
+    loadOriginalImage: paramsState.loadOriginalImage,
     loadPrintingImage: undefined,
     backgroundColor: undefined,
     text: undefined,

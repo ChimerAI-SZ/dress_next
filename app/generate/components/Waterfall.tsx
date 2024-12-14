@@ -6,6 +6,7 @@ import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 import Pages from "./Fullscreen"
 import { css, Global, keyframes } from "@emotion/react"
+import { useRouter, useSearchParams } from "next/navigation"
 
 interface Item {
   image_url: string
@@ -34,20 +35,31 @@ const shimmer = keyframes`
 const WaterfallImage = React.memo(({ item, index, isLast, lastImageRef, onClick }: WaterfallImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
+  const imageRef = useRef<HTMLImageElement>(null)
 
   const handleImageLoad = useCallback(() => {
     setIsLoaded(true)
     const timer = setTimeout(() => {
       setShowPlaceholder(false)
-    }, 300)
+    }, 500)
 
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
+  const handleImageError = useCallback(() => {
     setIsLoaded(false)
     setShowPlaceholder(true)
-  }, [item.image_url])
+  }, [])
+
+  useEffect(() => {
+    // 检查图片是否已经加载完成
+    if (imageRef.current?.complete) {
+      handleImageLoad()
+    } else {
+      setIsLoaded(false)
+      setShowPlaceholder(true)
+    }
+  }, [item.image_url, handleImageLoad])
 
   return (
     <Box
@@ -72,7 +84,7 @@ const WaterfallImage = React.memo(({ item, index, isLast, lastImageRef, onClick 
           height="100%"
           borderRadius="4px"
           opacity={isLoaded ? 0 : 1}
-          transition="opacity 0.3s ease-in-out"
+          transition="opacity 0.5s ease-in-out"
           zIndex={1}
           bgGradient="linear(to-r, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%)"
           backgroundSize="2000px 100%"
@@ -95,14 +107,16 @@ const WaterfallImage = React.memo(({ item, index, isLast, lastImageRef, onClick 
         </Box>
       )}
       <Image
+        ref={imageRef}
         src={item.image_url}
         alt={`Image ${index + 1}`}
         width="100%"
         style={{ display: "block" }}
         borderRadius="4px"
         onLoad={handleImageLoad}
+        onError={handleImageError}
         opacity={isLoaded ? 1 : 0}
-        transition="opacity 0.3s ease-in-out"
+        transition="opacity 0.5s ease-in-out"
         zIndex={2}
       />
     </Box>
@@ -142,6 +156,9 @@ const Waterfall: React.FC = () => {
 
   const hasFetched = useRef(false)
   const observer = useRef<IntersectionObserver | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const hasCheckedRedirect = useRef(false)
 
   const fetchData = useCallback(
     async (callback?: () => void) => {
@@ -201,6 +218,19 @@ const Waterfall: React.FC = () => {
     [loading, hasMore, fetchData]
   )
 
+  useEffect(() => {
+    if (hasCheckedRedirect.current) return
+
+    const newImage = searchParams.get('loadOriginalImage')
+    const imageList = searchParams.get('imageList')
+
+    if (newImage && imageList && !open) {
+      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageList}`)
+    }
+
+    hasCheckedRedirect.current = true
+  }, [searchParams, router, open])
+
   const handleImageClick = useCallback((item: Item) => {
     setSelectedImage(item)
     setOpen(true)
@@ -210,10 +240,19 @@ const Waterfall: React.FC = () => {
     fetchData()
   }, [fetchData])
 
+  const handleClose = useCallback(() => {
+    setOpen(false)
+    const newImage = searchParams.get('loadOriginalImage')
+    const imageList = searchParams.get('imageList')
+    if (newImage && imageList) {
+      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageList}`)
+    }
+  }, [router, searchParams])
+
   return (
     <>
       <Global styles={masonryStyles} />
-      <Box>
+      <Box data-preview-open={open}>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="my-masonry-grid"
@@ -239,7 +278,7 @@ const Waterfall: React.FC = () => {
       </Box>
       <Pages
         open={open}
-        setOpen={setOpen}
+        setOpen={handleClose}
         selectedImage={selectedImage}
         imageList={imageList}
         onLoadMore={handleLoadMore}

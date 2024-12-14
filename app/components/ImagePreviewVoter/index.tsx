@@ -410,7 +410,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             </Show>
           </Content>
 
-          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => { router.replace(`/generate`) }} />
+          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => { router.replace(`/upload`) }} />
         </Wrapper>
       </Container>
     </Portal>

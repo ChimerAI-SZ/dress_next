@@ -369,10 +369,18 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      // if (condition) {
 
-      // }
-      router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      // 获取 Waterfall 组件的预览状态
+      const previewElement = document.querySelector('[data-preview-open="true"]')
+      if (!previewElement) {
+        // 只有在没有预览打开的情况下才跳转
+        router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      } else {
+        // 如果预览窗口打开，将参数保存到 URL，但不跳转
+        router.replace(`/generate?loadOriginalImage=${newImage}&imageList=${imageListParam}`, {
+          scroll: false
+        })
+      }
     }
   }, [currentBarValue])
 
