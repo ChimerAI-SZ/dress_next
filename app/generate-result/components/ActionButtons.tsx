@@ -82,7 +82,9 @@ export default function ActionButtons({
     } else if (stage === "c") {
       dispatch(setStage("a"))
     }
-    dispatch(setId(key.toString()))
+    if (key) {
+      dispatch(setId(key.toString()))
+    }
     dispatch(setStoreParams(params))
     router.replace(`/generate?id=${key}`)
   }

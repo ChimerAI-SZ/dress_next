@@ -7,6 +7,17 @@ const userId = storage.get("user_id")
 export const searchImage = (params: string) => {
   return axios.get(`/api/proxy?image_url=${params}`)
 }
+
+// 图片+文字+GPT
+export const imageAndTextGpt = (params: object) => {
+  return server.post("/v1/image_and_text_gpt", {
+    userUUID: userId || "1a23a131.5",
+    batchSize: 1,
+    positivePrompt: (params as any).text,
+    ...params
+  })
+}
+
 // B1 全维度保持80%(77s)
 export const dressVariation20PCT = (params: object) => {
   return server.post("/v1/dress_variation_20PCT", {

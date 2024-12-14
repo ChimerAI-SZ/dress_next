@@ -11,7 +11,7 @@ import Details from "./components/Details"
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { errorCaptureRes, storage } from "@utils/index"
 import { Alert } from "@components/Alert"
-
+import { useRouter } from "next/navigation"
 const userId = storage.get("user_id")
 
 interface ImageItem {
@@ -32,6 +32,7 @@ interface DetailItem {
 }
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
+  const router = useRouter()
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
   const [allImages, setAllImages] = useState<ImageItem[]>(imgList) // 所有图片列表
@@ -75,7 +76,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   }
 
   // 加入收藏夹
-  const handleAddToCart = () => {}
+  const handleAddToCart = () => { }
 
   // 查看详情
   const handleViewDetails = async () => {
@@ -409,7 +410,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             </Show>
           </Content>
 
-          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => {}} />
+          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => { router.replace(`/generate`) }} />
         </Wrapper>
       </Container>
     </Portal>
