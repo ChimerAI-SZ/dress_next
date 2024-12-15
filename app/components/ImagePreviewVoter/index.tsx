@@ -7,10 +7,10 @@ import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
 import { Loading } from "@components/Loading"
 import Footer from "./components/Footer"
 import Details from "./components/Details"
+import { Alert } from "@components/Alert"
 
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { errorCaptureRes, storage } from "@utils/index"
-import { Alert } from "@components/Alert"
 
 const userId = storage.get("user_id")
 
@@ -65,13 +65,40 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   // refs ends
 
   // 下载
-  const handleDownload = () => {
-    const link = document.createElement("a")
-    link.href = imgUrl
-    link.download = "" // 有些浏览器不允许设置下载名称，可以留空或尝试设置文件名
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async () => {
+    try {
+      // 先获取图片数据
+      const response = await fetch(imgUrl)
+      const blob = await response.blob()
+
+      // 创建 URL 对象
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "图片.jpg" // 设置下载文件名
+
+      document.body.appendChild(link)
+      link.click()
+
+      // 清理
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(link)
+
+      Alert.open({
+        content: "Download Successfully",
+        type: "success",
+        customIcon: "/assets/images/mainPage/successIcon.png",
+        containerStyle: {
+          width: "60vw"
+        }
+      })
+    } catch (error) {
+      // 下载失败提示
+      Alert.open({
+        content: "Failed to download the image, \n Please try again."
+      })
+    }
   }
 
   // 加入收藏夹
