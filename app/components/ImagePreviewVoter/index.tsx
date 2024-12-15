@@ -44,6 +44,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
+  const [isRating, setIsRating] = useState(false) // 防止重复点击喜欢/不喜欢按钮，但是不需要进入loading状态，所以设置一个独立的state
   const [active, setActive] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
@@ -167,7 +168,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
     try {
       setIsLoading(true) // 开始加载
       const [err, res] = await errorCaptureRes(fetchImageDetails, { image_url: imgUrl })
-      console.log(res)
 
       if (err || (res && !res?.success)) {
         Alert.open({
@@ -251,6 +251,10 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   // 喜欢/不喜欢
   const handleImageAction = useCallback(
     async (isLike: boolean) => {
+      // 添加一个状态防止重复点击
+      if (isRating) return
+      setIsRating(true)
+
       // 切换图片就清空详情
       setDetailList([])
       setDetailText("details")
@@ -267,7 +271,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
         Alert.open({
           content: err.message ?? res.message
         })
-
+        setIsRating(false)
         return
       }
 
@@ -340,11 +344,13 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             setImgIndex(nextIndex)
 
             setIsFirstImgVisible(!isFirstImgVisible)
+
+            setIsRating(false) // 等动画都执行完了再设置为false
           }, 500)
         }, 800)
       }
     },
-    [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount]
+    [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount, isRating]
   )
 
   // 修改 ToastTest 相关的处理函数
