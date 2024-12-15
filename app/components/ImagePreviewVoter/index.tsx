@@ -16,6 +16,7 @@ import Details from "./components/Details"
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
+import next from "next"
 
 const userId = storage.get("user_id")
 
@@ -435,8 +436,13 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
               {/* 图片预览区 */}
               <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0.75rem"} flexGrow={"1"}>
-                <StyledImg ref={currentImgRef} src={imgUrl} />
-                <NextImg ref={nextImgRef} src={nextImgUrl} />
+                <StyledImg ref={currentImgRef} style={{ "--bg-image": `url(${imgUrl})` } as React.CSSProperties}>
+                  <img src={imgUrl} />
+                </StyledImg>
+
+                <NextImg ref={nextImgRef} style={{ "--bg-image": `url(${nextImgUrl})` } as React.CSSProperties}>
+                  <img src={nextImgUrl} />
+                </NextImg>
                 <ButtonBox>
                   <Flex>
                     <Flex
@@ -611,36 +617,78 @@ const Bg = styled.div`
   right: 0;
   background: #fff;
 `
-const StyledImg = styled(Image)`
-  object-fit: cover;
-  z-index: 1;
+const StyledImg = styled.div`
   position: relative;
-  transition: transform 0.5s ease;
   width: 100%;
   height: 100%;
-
   border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.5s ease;
+
+  // 模糊背景层
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    transform: scale(1.1); // 稍微放大一点避免边缘出现空白
+  }
+
+  // 实际图片
+  img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+  }
 `
-const NextImg = styled(Image)`
+
+const NextImg = styled.div`
   position: absolute;
   left: 0.75rem;
   top: 0.75rem;
-  z-index: 0;
-
-  object-fit: cover;
   width: calc(100% - 1.5rem);
   height: calc(100% - 1.5rem);
-
   border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
-
+  overflow: hidden;
   transition: transform 0.5s ease;
   transform: scale(0.8);
   z-index: 0;
   opacity: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    transform: scale(1.1);
+  }
+
+  img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+  }
 `
 const ButtonBox = styled.div`
   display: flex;
