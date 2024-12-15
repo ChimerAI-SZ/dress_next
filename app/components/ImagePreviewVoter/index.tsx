@@ -225,7 +225,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   const getRecommendImages = async () => {
     try {
       const [err, res] = await errorCaptureRes(fetchRecommendImages, {
-        user_uuid: userId || Math.random().toString(36).substring(2, 18)
+        user_uuid: userId ?? localStorage.getItem("random_user_id")
       })
 
       if (err || !res?.success) {
@@ -259,7 +259,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
       const [err, res] = await errorCaptureRes(imageRate, {
         image_url: imgUrl,
         // 没有用户id就随机生成一个
-        user_uuid: userId || Math.random().toString(36).substring(2, 18),
+        user_uuid: userId ?? localStorage.getItem("random_user_id"),
         action: isLike ? "like" : "dislike"
       })
 
@@ -376,6 +376,16 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
       setFooterHeight(footerRef.current.clientHeight)
     }
   }, [footerRef.current])
+  useEffect(() => {
+    if (!userId) {
+      // 没有登录 localstorage 也没有随机id，往 localstorage 里都存一个随机id
+      if (!localStorage.getItem("random_user_id")) {
+        const randomUserId = Math.random().toString(36).substring(2, 18) // 如果 userId 不存在的话，会用到这个随机的id
+
+        localStorage.setItem("random_user_id", randomUserId)
+      }
+    }
+  }, [])
 
   return (
     <Portal>
