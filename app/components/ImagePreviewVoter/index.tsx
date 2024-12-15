@@ -5,12 +5,16 @@ import { useRouter } from "next/navigation"
 
 import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
+import { Toaster, toaster } from "@components/Toaster"
 import { Loading } from "@components/Loading"
+import { Alert } from "@components/Alert"
+import LoginPrompt from "@components/LoginPrompt"
+import ToastTest from "@components/ToastTest"
 import Footer from "./components/Footer"
 import Details from "./components/Details"
-import { Alert } from "@components/Alert"
 
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
+import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
 
 const userId = storage.get("user_id")
@@ -40,17 +44,20 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
+  const [active, setActive] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
-
   const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
-
   const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
 
   const [detailList, setDetailList] = useState<DetailItem[]>([])
+
+  // 添加 ToastTest 相关的状态
+  const [isOpen, setIsOpen] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("")
 
   // refs begins
   const contentRef = useRef<null | HTMLDivElement>(null)
@@ -103,8 +110,57 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
     }
   }
 
+  // Handlers
+  const handleLoginPrompt = useCallback(() => {
+    if (!userId) {
+      toaster.create({
+        description: <LoginPrompt onLogin={() => router.push("/login")} />
+      })
+      return false
+    }
+    return true
+  }, [userId])
+
   // 加入收藏夹
-  const handleAddToCart = () => {}
+  const handleAddToCart = useCallback(
+    async (images: string[], phone: string) => {
+      if (!handleLoginPrompt()) return
+
+      const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
+        user_id: Number(userId),
+        img_urls: images,
+        phone
+      })
+
+      if (err) {
+        Alert.open({
+          content: "Failed to add to cart, \n Please try again."
+        })
+
+        return
+      }
+
+      if (res.success) {
+        Alert.open({
+          content: "Add to cart successfully",
+          type: "success",
+          customIcon: "/assets/images/mainPage/successIcon.png",
+          containerStyle: {
+            width: "60vw"
+          }
+        })
+      }
+    },
+    [handleLoginPrompt, userId]
+  )
+
+  // 添加一个新的函数来处理购物车点击
+  const handleCartClick = useCallback(() => {
+    if (active) {
+      return
+    }
+    setIsOpen(true)
+  }, [active])
 
   // 查看详情
   const handleViewDetails = async () => {
@@ -291,29 +347,27 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
     [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount]
   )
 
-  // 获取窗口尺寸
-  const getWindowConfig = () => {
-    let windowWidth = window.innerWidth
-    let windowHeight = window.innerHeight
-
-    if (typeof windowWidth !== "number") {
-      if (document.compatMode === "CSS1Compat") {
-        windowWidth = document.documentElement.clientWidth
-        windowHeight = document.documentElement.clientHeight
-      } else {
-        windowWidth = document.body.clientWidth
-        windowHeight = document.body.clientHeight
-      }
-    }
-    return {
-      windowWidth: windowWidth,
-      windowHeight: windowHeight
-    }
-  }
-
-  useEffect(() => {
-    console.log(getWindowConfig())
+  // 修改 ToastTest 相关的处理函数
+  const openDialog = useCallback(() => {
+    setIsOpen(true)
   }, [])
+
+  const closeDialog = useCallback(() => {
+    setIsOpen(false)
+    setPhoneNumber("")
+  }, [])
+
+  const affirmDialog = useCallback(async () => {
+    const imagesToAdd = [allImages[imgIndex].image_url]
+
+    await handleAddToCart(imagesToAdd, phoneNumber)
+
+    closeDialog()
+
+    if (active) {
+      setActive(false)
+    }
+  }, [handleAddToCart, active, phoneNumber, closeDialog])
 
   useEffect(() => {
     // 获取底部按钮区的高度，用于占位块
@@ -394,7 +448,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
                     >
                       <Image
                         boxSize={"1rem"}
-                        onClick={handleAddToCart}
+                        onClick={e => {
+                          e.stopPropagation()
+
+                          handleCartClick()
+                        }}
                         src={"/assets/images/mainPage/AddToCart.svg"}
                         alt="watnt-icon"
                       />
@@ -443,6 +501,16 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
               router.replace(`/upload`)
             }}
           />
+
+          <ToastTest
+            isOpen={isOpen}
+            phoneNumber={phoneNumber}
+            onOpen={openDialog}
+            onClose={closeDialog}
+            affirmDialog={affirmDialog}
+            setPhoneNumber={setPhoneNumber}
+          />
+          <Toaster />
         </Wrapper>
       </Container>
     </Portal>
