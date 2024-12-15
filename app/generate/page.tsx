@@ -26,7 +26,10 @@ import {
   workflow333,
   workflow444,
   workflow666,
-  workflow555
+  workflow555,
+  workflow1_7,
+  workflow1_8,
+  workflow1_9
 } from "./workflow/workflow"
 import { getQuery } from "@lib/request/generate"
 import { fetchUtilWait } from "@lib/request/generate"
@@ -112,11 +115,11 @@ function Page() {
         text?.trim(),
         loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()
       )
-      if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
-        console.log(222)
-        dispatch(setWork(2))
-        dispatch(setParams(params))
-        workflow2(params).then(newTaskIDs => {
+      console.log(loadPrintingImage, text?.trim(), !loadFabricImage)
+      if (!loadPrintingImage && text?.trim()) {
+        console.log(17)
+        dispatch(setWork(17))
+        workflow1_7(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
@@ -124,10 +127,10 @@ function Page() {
             dispatch(setWork(0))
           }
         })
-      } else if (!loadPrintingImage && text?.trim() && !loadFabricImage) {
-        console.log(3)
-        dispatch(setWork(3))
-        workflow3(params).then(newTaskIDs => {
+      } else if (loadPrintingImage && text?.trim()) {
+        console.log(18)
+        dispatch(setWork(18))
+        workflow1_8(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
@@ -135,27 +138,14 @@ function Page() {
             dispatch(setWork(0))
           }
         })
-      } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
-        console.log(4)
-        dispatch(setWork(4))
-        workflow4(params).then(newTaskIDs => {
+      } else if (loadPrintingImage && !text?.trim()) {
+        console.log(19)
+        dispatch(setWork(19))
+        workflow1_9(params).then(newTaskIDs => {
           console.log("workflow")
           if (newTaskIDs) {
             setTaskIDs(newTaskIDs)
             dispatch(setTaskId(newTaskIDs))
-
-            dispatch(setWork(0))
-          }
-        })
-      } else if (loadPrintingImage && text?.trim() && loadFabricImage) {
-        console.log(555)
-        dispatch(setWork(5))
-        workflow5(params).then(newTaskIDs => {
-          console.log("workflow")
-          if (newTaskIDs) {
-            setTaskIDs(newTaskIDs)
-            dispatch(setTaskId(newTaskIDs))
-
             dispatch(setWork(0))
           }
         })
@@ -171,6 +161,55 @@ function Page() {
           }
         })
       }
+      hasRunRef.current = true
+      // if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
+      //   console.log(222)
+      //   dispatch(setWork(2))
+      //   dispatch(setParams(params))
+      //   workflow2(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
+      //   console.log(4)
+      //   dispatch(setWork(4))
+      //   workflow4(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else if (loadPrintingImage && text?.trim() && loadFabricImage) {
+      //   console.log(555)
+      //   dispatch(setWork(5))
+      //   workflow5(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // } else {
+      //   console.log(111666)
+      //   dispatch(setWork(1))
+      //   workflow1_6(params).then(newTaskIDs => {
+      //     console.log("workflow")
+      //     if (newTaskIDs) {
+      //       setTaskIDs(newTaskIDs)
+      //       dispatch(setTaskId(newTaskIDs))
+      //       dispatch(setWork(0))
+      //     }
+      //   })
+      // }
     } else if (
       !hasRunRef.current &&
       params &&
@@ -330,10 +369,18 @@ function Page() {
       dispatch(setGenerateImage([]))
       dispatch(setWork(0))
       dispatch(setTaskId([]))
-      // if (condition) {
 
-      // }
-      // router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      // 获取 Waterfall 组件的预览状态
+      const previewElement = document.querySelector('[data-preview-open="true"]')
+      if (!previewElement) {
+        // 只有在没有预览打开的情况下才跳转
+        router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageListParam}`)
+      } else {
+        // 如果预览窗口打开，将参数保存到 URL，但不跳转
+        router.replace(`/generate?loadOriginalImage=${newImage}&imageList=${imageListParam}`, {
+          scroll: false
+        })
+      }
     }
   }, [currentBarValue])
 

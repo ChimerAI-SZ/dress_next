@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
+import { useRouter } from "next/navigation"
 
 import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
@@ -32,6 +33,7 @@ interface DetailItem {
 }
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
+  const router = useRouter()
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
   const [allImages, setAllImages] = useState<ImageItem[]>(imgList) // 所有图片列表
@@ -434,7 +436,13 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             </Show>
           </Content>
 
-          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => {}} />
+          <Footer
+            ref={footerRef}
+            footerBtnText={footerBtnText}
+            onButtonClick={() => {
+              router.replace(`/upload`)
+            }}
+          />
         </Wrapper>
       </Container>
     </Portal>

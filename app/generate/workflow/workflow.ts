@@ -9,11 +9,13 @@ import {
   TransferAAndBPlus,
   TransferAAndBVITG,
   TransferAAndBSTANDARD,
-  searchImage
+  searchImage,
+  imageAndTextGpt
 } from "@lib/request/workflow" // B1 全维度保持80%(77s)
 import { getQuery, fetchAddBatch } from "@lib/request/generate"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
+import { CloudCog } from "lucide-react"
 
 export const workflow2 = async (p: Params) => {
   const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
@@ -1094,6 +1096,7 @@ export const workflow222 = async (p: Params) => {
     { ...p, loadFabricImage: newFabricImage },
     { ...p, loadFabricImage: newFabricImage },
     { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
     { ...p, loadFabricImage: newFabricImage }
   ]
 
@@ -1931,6 +1934,298 @@ export const workflow666 = async (p: Params) => {
       console.error("请求失败：", err)
     })
 
+  const taskIDs = successfulResults.map(result => result.value.data.taskID)
+  return taskIDs
+}
+
+export const workflow1_7 = async (p: Params) => {
+  const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
+  const newFabricImage =
+    loadFabricImage === ""
+      ? "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg"
+      : loadFabricImage
+
+
+  // 根据 searchImage 的结果决定调用哪些接口
+  const apiCalls = [
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage }),
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage }),
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage }),
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage }),
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage }),
+    imageAndTextGpt({ ...p, loadFabricImage: newFabricImage })
+  ]
+
+  const results = await Promise.allSettled(apiCalls)
+
+  // 构建对应的请求参数数组
+  const requestParams = [
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage }
+  ]
+
+
+  // 过滤出成功的结果
+  const successfulResults = results.filter(result => result.status === "fulfilled")
+
+  // 提取每个成功结果中的 taskID 和请求参数
+  const taskDetails = successfulResults.map((result, index) => {
+    const taskID = result.value.data.taskID
+    const params = requestParams[index]
+
+    return {
+      task_id: taskID,
+      task_info: JSON.stringify(params)
+    }
+  })
+
+  const job_id = uuidv4()
+  const newObj = {
+    job_id: job_id,
+    tasks: taskDetails
+  }
+
+  // 调用 fetchAddBatch 请求接口
+  fetchAddBatch(newObj)
+    .then(() => {
+      // 这里可以根据需要处理请求成功后的回调
+    })
+    .catch(err => {
+      console.error("请求失败：", err)
+    })
+
+  const taskIDs = successfulResults.map(result => result.value.data.taskID)
+  return taskIDs
+}
+
+export const workflow1_8 = async (p: Params) => {
+  console.log(888)
+  const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
+  const newFabricImage = "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg"
+  const apiCalls = [
+    imageAndTextGpt({ ...p, }),
+    imageAndTextGpt({ ...p, }),
+    imageAndTextGpt({ ...p, }),
+    imageAndTextGpt({ ...p, }),
+    imageAndTextGpt({ ...p, }),
+    imageAndTextGpt({ ...p, })
+  ]
+
+  const results = await Promise.allSettled(apiCalls)
+  const midImage: any[] = []
+  const successfulResults = results.filter(result => result.status === "fulfilled")
+  let midTaskIDs = successfulResults.map(result => result.value.data.taskID)
+  return new Promise<string[]>((resolve, reject) => {
+    const interval = setInterval(async () => {
+      for (let index = 0; index < midTaskIDs.length; index++) {
+        const taskID = midTaskIDs[index]
+        try {
+          const resultData: any = await getQuery({ taskID })
+          const { result, success, message } = resultData || {}
+          if (success) {
+            console.log(`Task ${taskID} completed`)
+            midTaskIDs = midTaskIDs.filter(id => id !== taskID)
+            midImage.push(result.res)
+          } else {
+            console.log(`Task ${taskID} still in progress`)
+          }
+          if (message !== "Task is running") {
+            midTaskIDs = midTaskIDs.filter(id => id !== taskID)
+          }
+        } catch (error) {
+          console.error(`Error fetching result for task ${taskID}:`, error)
+        }
+      }
+
+      if (midTaskIDs.length === 0) {
+        clearInterval(interval)
+
+        const requestParams = [
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[0], loadFabricImage: newFabricImage
+          },
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[1], loadFabricImage: newFabricImage
+          },
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[2], loadFabricImage: newFabricImage
+          },
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[3], loadFabricImage: newFabricImage
+          },
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[4], loadFabricImage: newFabricImage
+          },
+          {
+            ...p,
+            loadPrintingImage: loadPrintingImage,
+            loadOriginalImage: midImage[5], loadFabricImage: newFabricImage
+          }
+        ]
+        console.log(requestParams)
+
+        // 执行所有请求
+        const results = await Promise.allSettled(requestParams.map(params => dressPrintingTryon(params)))
+
+        // 过滤出成功的结果
+        const successfulResults = results.filter(result => result.status === "fulfilled")
+
+        // 提取每个成功结果中的 taskID 和请求参数
+        const taskDetails = successfulResults.map((result, index) => {
+          const taskID = result.value.data.taskID // 从成功的结果中提取 taskID
+
+          // 获取对应的请求参数
+          const params = requestParams[index]
+
+          return {
+            task_id: taskID,
+            task_info: JSON.stringify(params) // 将请求参数对象转换为 JSON 字符串
+          }
+        })
+        const job_id = uuidv4()
+        // 构造新的请求体对象
+        const newObj = {
+          job_id: job_id,
+          tasks: taskDetails
+        }
+
+        // 调用 fetchAddBatch 请求接口
+        fetchAddBatch(newObj)
+          .then(() => {
+            // 这里可以根据需要处理请求成功后的回调
+          })
+          .catch(err => {
+            // 处理请求失败的情况
+            console.error("请求失败：", err)
+          })
+        const taskIDs = successfulResults.map(result => result.value.data.taskID)
+        resolve(taskIDs)
+
+        // const results = await Promise.allSettled([
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[0],
+        //     loadFabricImage: newFabricImage
+        //   }),
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[1],
+        //     loadOriginalImage: res.data[0].image_url,
+        //     loadFabricImage: newFabricImage
+        //   }),
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[2],
+        //     loadOriginalImage: res.data[1].image_url,
+        //     loadFabricImage: newFabricImage
+        //   }),
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[3],
+        //     loadOriginalImage: res.data[2].image_url,
+        //     loadFabricImage: newFabricImage
+        //   }),
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[4],
+        //     loadOriginalImage: res.data[3].image_url,
+        //     loadFabricImage: newFabricImage
+        //   }),
+        //   dressPrintingTryon({
+        //     ...p,
+        //     loadPrintingImage: midImage[5],
+        //     loadOriginalImage: res.data[4].image_url,
+        //     loadFabricImage: newFabricImage
+        //   })
+        // ])
+        // const successfulResults = results.filter(result => result.status === "fulfilled")
+        // const failedResults = results.filter(result => result.status === "rejected")
+
+        // const taskIDs = successfulResults.map(result => result.value.data.taskID)
+        // console.log("Successful task IDs:", taskIDs)
+
+        // failedResults.forEach(result => {
+        //   console.error("Failure:", result.reason)
+        //   if (result.reason.code === "ERR_NETWORK") {
+        //     console.error("Network Error:", result.reason.message)
+        //   }
+        // })
+
+        // resolve(taskIDs)
+      }
+    }, 15000)
+  })
+}
+
+export const workflow1_9 = async (p: Params) => {
+  const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
+  const newFabricImage = "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg"
+  console.log(222)
+  const [err, res] = await errorCaptureRes(fetchHomePage, {
+    limit: 5,
+    offset: Math.floor(Math.random() * 46),
+    library: "show-new"
+  })
+  console.log(res.data)
+
+
+  // 存储每次请求的参数
+  const requestParams = [
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url },
+    { ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[1].image_url },
+    { ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[2].image_url },
+    { ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[3].image_url },
+    { ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[4].image_url }
+  ]
+
+  // 执行所有请求
+  const results = await Promise.allSettled(requestParams.map(params => dressPrintingTryon(params)))
+  console.log("results", results)
+  // 过滤出成功的结果
+  const successfulResults = results.filter(result => result.status === "fulfilled")
+  // 提取每个成功结果中的 taskID 和请求参数
+  const taskDetails = successfulResults.map((result, index) => {
+    const taskID = result?.value.data.taskID // 从成功的结果中提取 taskID
+
+    // 获取对应的请求参数
+    const params = requestParams[index]
+
+    return {
+      task_id: taskID,
+      task_info: JSON.stringify(params) // 将请求参数对象转换为 JSON 字符串
+    }
+  })
+  const job_id = uuidv4()
+  // 构造新的请求体对象
+  const newObj = {
+    job_id: job_id,
+    tasks: taskDetails
+  }
+
+  // 调用 fetchAddBatch 请求接口
+  fetchAddBatch(newObj)
+    .then(() => {
+      // 这里可以根据需要处理请求成功后的回调
+    })
+    .catch(err => {
+      // 处理请求失败的情况
+      console.error("请求失败：", err)
+    })
   const taskIDs = successfulResults.map(result => result.value.data.taskID)
   return taskIDs
 }

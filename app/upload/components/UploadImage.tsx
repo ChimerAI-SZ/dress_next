@@ -11,8 +11,10 @@ import { TypesClothingProps } from "@definitions/update"
 import ReactLoading from "react-loading"
 import { fetchUpdateNeedGuide } from "@lib/request/login"
 import { errorCaptureRes, storage } from "@utils/index"
-
+import { useSelector } from "react-redux"
 function Page({ onParamsUpdate }: TypesClothingProps) {
+  const { params } = useSelector((state: any) => state.work)
+
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
   const [showGuide, setShowGuide] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -174,6 +176,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
     transition: "all 0.3s ease"
   }
 
+
   return (
     <Box
       alignItems="center"
@@ -210,10 +213,10 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
       >
         {isUploading ? (
           <ReactLoading type={"spinningBubbles"} color={"#747474"} height={"3.38rem"} width={"3.38rem"} />
-        ) : uploadedUrl ? (
+        ) : (uploadedUrl || params.loadOriginalImage) ? (
           <Flex h="100%" w="100%" justifyContent="center" alignItems="center" position="relative" overflow="hidden">
             <Image
-              src={uploadedUrl}
+              src={uploadedUrl || params.loadOriginalImage}
               alt="Background image"
               h="100%"
               w="100%"
@@ -224,7 +227,7 @@ function Page({ onParamsUpdate }: TypesClothingProps) {
               left={0}
               zIndex={0}
             />
-            <Image src={uploadedUrl} alt="Foreground image" h="100%" objectFit="contain" zIndex={1} />
+            <Image src={uploadedUrl || params.loadOriginalImage} alt="Foreground image" h="100%" objectFit="contain" zIndex={1} />
             <Box as="label">
               <Image
                 src={ReUpload.src}
