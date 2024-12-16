@@ -41,7 +41,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   const router = useRouter()
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
-  const [allImages, setAllImages] = useState<ImageItem[]>(imgList) // 所有图片列表
+  const [allImages, setAllImages] = useState<ImageItem[]>(imgList.filter(item => item.image_url !== initImgUrl)) // 所有图片列表
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
