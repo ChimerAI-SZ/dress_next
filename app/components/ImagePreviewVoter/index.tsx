@@ -16,7 +16,6 @@ import Details from "./components/Details"
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
-import next from "next"
 
 const userId = storage.get("user_id")
 
@@ -59,6 +58,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
   const [imgIndex, setImgIndex] = useState(imgList.slice(initIndex).findIndex(item => item.image_url === initImgUrl)) // 模拟喜欢/不喜欢用的图片下标，
   const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
+  const [showUpIcon, setShowUpIcon] = useState(true) // details 图标展示轮播
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
 
@@ -425,6 +425,14 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
     }
   }, [imgList.length])
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setShowUpIcon(prev => !prev)
+    }, 500)
+
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <Portal>
       <Container>
@@ -534,8 +542,24 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
                 <Text mr={"0.22rem"}>{detailText}</Text>
                 <Box h={"1rem"} overflow={"hidden"} position={"relative"}>
                   <Carousel>
-                    <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
-                    <Image src={"/assets/images/mainPage/details.png"} alt="detail-icon" />
+                    <Image
+                      src={"/assets/images/mainPage/details_up.png"}
+                      alt="detail-icon"
+                      style={{
+                        position: "absolute",
+                        opacity: showUpIcon ? 1 : 0,
+                        transition: "opacity 0.3s ease-in-out"
+                      }}
+                    />
+                    <Image
+                      src={"/assets/images/mainPage/details_down.png"}
+                      alt="detail-icon"
+                      style={{
+                        position: "absolute",
+                        opacity: showUpIcon ? 0 : 1,
+                        transition: "opacity 0.3s ease-in-out"
+                      }}
+                    />
                   </Carousel>
                 </Box>
               </DetailTip>
@@ -741,38 +765,21 @@ const DetailTip = styled.section`
   font-size: 0.93rem;
   font-weight: 600;
   line-height: 1rem;
-
-  font-variation-settings: "opsz" auto;
-  font-feature-settings: "kern" on;
   color: #171717;
-
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-
   height: 1.38rem;
   flex-shrink: 0;
-
   padding: 0.38rem 0 1.13rem;
   box-sizing: content-box;
-
-  & img {
-    width: 1rem;
-  }
-`
-const rotate360 = keyframes`
-  0% {
-    transform: translateY(-50%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
 `
 
 const Carousel = styled.div`
   position: relative;
-  animation: ${rotate360} 1.5s infinite linear;
+  height: 1rem;
+  width: 1rem;
 `
 
 export default ImageViewer
