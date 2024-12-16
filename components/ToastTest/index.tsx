@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react"
 import { Group, Flex, Image, Text } from "@chakra-ui/react"
 import { Button } from "@components/ui/button"
 import { DialogContent, DialogRoot } from "@components/ui/dialog"
+import { CountryCode } from "libphonenumber-js/core"
 
 import "react-phone-number-input/style.css"
 import PhoneInput from "react-phone-number-input"
@@ -25,6 +27,15 @@ const Component: React.FC<DialogComponentProps> = ({
   setPhoneNumber,
   affirmDialog
 }) => {
+  const [userCountry, setUserCountry] = useState<CountryCode | undefined>(undefined)
+
+  useEffect(() => {
+    const language = navigator.language || navigator.languages[0]
+    const country = (language.split("-")[1] || "US") as CountryCode
+
+    setUserCountry(country)
+  }, [])
+
   return (
     <DialogRoot open={isOpen} placement="center" motionPreset="slide-in-bottom">
       <DialogContent width="20.44rem">
@@ -56,6 +67,7 @@ const Component: React.FC<DialogComponentProps> = ({
               className="shipping_address_phone_number"
               placeholder="Enter phone number"
               value={phoneNumber}
+              defaultCountry={userCountry}
               onChange={value => {
                 setPhoneNumber(value as any)
               }}

@@ -19,5 +19,7 @@ export interface AlertProps {
   content: string // 文字内容
   iconVisible?: boolean // 是否展示图标
   customIcon?: string // 自定义图标 src
+  type?: "default" | "success" // 添加type属性
   duration?: number // alert存在时间 默认3000毫秒
+  containerStyle?: React.CSSProperties // 添加这个属性
 }

@@ -1,17 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
+import { useRouter } from "next/navigation"
 
 import { LeftOutlined } from "@ant-design/icons"
 import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
+import { Toaster, toaster } from "@components/Toaster"
 import { Loading } from "@components/Loading"
+import { Alert } from "@components/Alert"
+import LoginPrompt from "@components/LoginPrompt"
+import ToastTest from "@components/ToastTest"
 import Footer from "./components/Footer"
 import Details from "./components/Details"
 
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
+import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
-import { Alert } from "@components/Alert"
-import { useRouter } from "next/navigation"
+import next from "next"
+
 const userId = storage.get("user_id")
 
 interface ImageItem {
@@ -39,17 +45,21 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
+  const [isRating, setIsRating] = useState(false) // 防止重复点击喜欢/不喜欢按钮，但是不需要进入loading状态，所以设置一个独立的state
+  const [active, setActive] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
-
   const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
-
   const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
 
   const [detailList, setDetailList] = useState<DetailItem[]>([])
+
+  // 添加 ToastTest 相关的状态
+  const [isOpen, setIsOpen] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("")
 
   // refs begins
   const contentRef = useRef<null | HTMLDivElement>(null)
@@ -66,24 +76,99 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   // refs ends
 
   // 下载
-  const handleDownload = () => {
-    const link = document.createElement("a")
-    link.href = imgUrl
-    link.download = "" // 有些浏览器不允许设置下载名称，可以留空或尝试设置文件名
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async () => {
+    try {
+      // 先获取图片数据
+      const response = await fetch(imgUrl)
+      const blob = await response.blob()
+
+      // 创建 URL 对象
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "图片.jpg" // 设置下载文件名
+
+      document.body.appendChild(link)
+      link.click()
+
+      // 清理
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(link)
+
+      Alert.open({
+        content: "Download Successfully",
+        type: "success",
+        customIcon: "/assets/images/mainPage/successIcon.png",
+        containerStyle: {
+          width: "60vw"
+        }
+      })
+    } catch (error) {
+      // 下载失败提示
+      Alert.open({
+        content: "Failed to download the image, \n Please try again."
+      })
+    }
   }
 
+  // Handlers
+  const handleLoginPrompt = useCallback(() => {
+    if (!userId) {
+      toaster.create({
+        description: <LoginPrompt onLogin={() => router.push("/login")} />
+      })
+      return false
+    }
+    return true
+  }, [userId])
+
   // 加入收藏夹
-  const handleAddToCart = () => { }
+  const handleAddToCart = useCallback(
+    async (images: string[], phone: string) => {
+      if (!handleLoginPrompt()) return
+
+      const [err, res] = await errorCaptureRes(fetchShoppingAdd, {
+        user_id: Number(userId),
+        img_urls: images,
+        phone
+      })
+
+      if (err) {
+        Alert.open({
+          content: "Failed to add to cart, \n Please try again."
+        })
+
+        return
+      }
+
+      if (res.success) {
+        Alert.open({
+          content: "Add to cart successfully",
+          type: "success",
+          customIcon: "/assets/images/mainPage/successIcon.png",
+          containerStyle: {
+            width: "60vw"
+          }
+        })
+      }
+    },
+    [handleLoginPrompt, userId]
+  )
+
+  // 添加一个新的函数来处理购物车点击
+  const handleCartClick = useCallback(() => {
+    if (active) {
+      return
+    }
+    setIsOpen(true)
+  }, [active])
 
   // 查看详情
   const handleViewDetails = async () => {
     try {
       setIsLoading(true) // 开始加载
       const [err, res] = await errorCaptureRes(fetchImageDetails, { image_url: imgUrl })
-      console.log(res)
 
       if (err || (res && !res?.success)) {
         Alert.open({
@@ -141,7 +226,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   const getRecommendImages = async () => {
     try {
       const [err, res] = await errorCaptureRes(fetchRecommendImages, {
-        user_uuid: userId || Math.random().toString(36).substring(2, 18)
+        user_uuid: userId ?? localStorage.getItem("random_user_id")
       })
 
       if (err || !res?.success) {
@@ -167,6 +252,10 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   // 喜欢/不喜欢
   const handleImageAction = useCallback(
     async (isLike: boolean) => {
+      // 添加一个状态防止重复点击
+      if (isRating) return
+      setIsRating(true)
+
       // 切换图片就清空详情
       setDetailList([])
       setDetailText("details")
@@ -175,7 +264,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
       const [err, res] = await errorCaptureRes(imageRate, {
         image_url: imgUrl,
         // 没有用户id就随机生成一个
-        user_uuid: userId || Math.random().toString(36).substring(2, 18),
+        user_uuid: userId ?? localStorage.getItem("random_user_id"),
         action: isLike ? "like" : "dislike"
       })
 
@@ -183,7 +272,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
         Alert.open({
           content: err.message ?? res.message
         })
-
+        setIsRating(false)
         return
       }
 
@@ -256,36 +345,36 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             setImgIndex(nextIndex)
 
             setIsFirstImgVisible(!isFirstImgVisible)
+
+            setIsRating(false) // 等动画都执行完了再设置为false
           }, 500)
         }, 800)
       }
     },
-    [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount]
+    [imgUrl, userId, isFirstImgVisible, imgIndex, allImages, likeCount, isRating]
   )
 
-  // 获取窗口尺寸
-  const getWindowConfig = () => {
-    let windowWidth = window.innerWidth
-    let windowHeight = window.innerHeight
-
-    if (typeof windowWidth !== "number") {
-      if (document.compatMode === "CSS1Compat") {
-        windowWidth = document.documentElement.clientWidth
-        windowHeight = document.documentElement.clientHeight
-      } else {
-        windowWidth = document.body.clientWidth
-        windowHeight = document.body.clientHeight
-      }
-    }
-    return {
-      windowWidth: windowWidth,
-      windowHeight: windowHeight
-    }
-  }
-
-  useEffect(() => {
-    console.log(getWindowConfig())
+  // 修改 ToastTest 相关的处理函数
+  const openDialog = useCallback(() => {
+    setIsOpen(true)
   }, [])
+
+  const closeDialog = useCallback(() => {
+    setIsOpen(false)
+    setPhoneNumber("")
+  }, [])
+
+  const affirmDialog = useCallback(async () => {
+    const imagesToAdd = [allImages[imgIndex].image_url]
+
+    await handleAddToCart(imagesToAdd, phoneNumber)
+
+    closeDialog()
+
+    if (active) {
+      setActive(false)
+    }
+  }, [handleAddToCart, active, phoneNumber, closeDialog])
 
   useEffect(() => {
     // 获取底部按钮区的高度，用于占位块
@@ -294,6 +383,16 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
       setFooterHeight(footerRef.current.clientHeight)
     }
   }, [footerRef.current])
+  useEffect(() => {
+    if (!userId) {
+      // 没有登录 localstorage 也没有随机id，往 localstorage 里都存一个随机id
+      if (!localStorage.getItem("random_user_id")) {
+        const randomUserId = Math.random().toString(36).substring(2, 18) // 如果 userId 不存在的话，会用到这个随机的id
+
+        localStorage.setItem("random_user_id", randomUserId)
+      }
+    }
+  }, [])
 
   return (
     <Portal>
@@ -332,15 +431,18 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
                 >
                   <LeftOutlined style={{ fontSize: "1.38rem" }} />
                 </BackIcon>
-                <Text fontSize="1.1rem" fontWeight="bold" letterSpacing="0rem" textAlign="center">
-                  CREAMODA
-                </Text>
+                <Image h={"1rem"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
               </Header>
 
               {/* 图片预览区 */}
-              <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0 0.75rem"} flexGrow={"1"}>
-                <StyledImg ref={currentImgRef} src={imgUrl} />
-                <NextImg ref={nextImgRef} src={nextImgUrl} />
+              <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0.75rem"} flexGrow={"1"}>
+                <StyledImg ref={currentImgRef} style={{ "--bg-image": `url(${imgUrl})` } as React.CSSProperties}>
+                  <img src={imgUrl} />
+                </StyledImg>
+
+                <NextImg ref={nextImgRef} style={{ "--bg-image": `url(${nextImgUrl})` } as React.CSSProperties}>
+                  <img src={nextImgUrl} />
+                </NextImg>
                 <ButtonBox>
                   <Flex>
                     <Flex
@@ -368,7 +470,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
                     >
                       <Image
                         boxSize={"1rem"}
-                        onClick={handleAddToCart}
+                        onClick={e => {
+                          e.stopPropagation()
+
+                          handleCartClick()
+                        }}
                         src={"/assets/images/mainPage/AddToCart.svg"}
                         alt="watnt-icon"
                       />
@@ -410,7 +516,23 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             </Show>
           </Content>
 
-          <Footer ref={footerRef} footerBtnText={footerBtnText} onButtonClick={() => { router.replace(`/upload`) }} />
+          <Footer
+            ref={footerRef}
+            footerBtnText={footerBtnText}
+            onButtonClick={() => {
+              router.replace(`/upload`)
+            }}
+          />
+
+          <ToastTest
+            isOpen={isOpen}
+            phoneNumber={phoneNumber}
+            onOpen={openDialog}
+            onClose={closeDialog}
+            affirmDialog={affirmDialog}
+            setPhoneNumber={setPhoneNumber}
+          />
+          <Toaster />
         </Wrapper>
       </Container>
     </Portal>
@@ -476,6 +598,9 @@ const Header = styled.header`
   justify-content: center;
   z-index: 1;
   flex-shrink: 0;
+
+  height: 2.75rem;
+  width: 100%;
 `
 const BackIcon = styled.div`
   z-index: 1;
@@ -492,36 +617,78 @@ const Bg = styled.div`
   right: 0;
   background: #fff;
 `
-const StyledImg = styled(Image)`
-  object-fit: cover;
-  z-index: 1;
+const StyledImg = styled.div`
   position: relative;
-  transition: transform 0.5s ease;
   width: 100%;
   height: 100%;
-
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.5s ease;
+
+  // 模糊背景层
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    transform: scale(1.1); // 稍微放大一点避免边缘出现空白
+  }
+
+  // 实际图片
+  img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+  }
 `
-const NextImg = styled(Image)`
+
+const NextImg = styled.div`
   position: absolute;
   left: 0.75rem;
-  top: 0;
-  z-index: 0;
-
-  object-fit: cover;
+  top: 0.75rem;
   width: calc(100% - 1.5rem);
-  height: 100%;
-
-  border-radius: 0.5rem;
+  height: calc(100% - 1.5rem);
+  border-radius: 0.75rem;
   border: 0.03rem solid rgba(182, 182, 182, 0.5);
   box-shadow: 0rem 0.11rem 0.89rem 0rem rgba(0, 0, 0, 0.07);
-
+  overflow: hidden;
   transition: transform 0.5s ease;
   transform: scale(0.8);
   z-index: 0;
   opacity: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    transform: scale(1.1);
+  }
+
+  img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+  }
 `
 const ButtonBox = styled.div`
   display: flex;
@@ -552,8 +719,11 @@ const DetailTip = styled.section`
   align-items: center;
   justify-content: center;
 
-  height: 2.5rem;
+  height: 1.38rem;
   flex-shrink: 0;
+
+  padding: 0.38rem 0 1.13rem;
+  box-sizing: content-box;
 
   & img {
     width: 1rem;

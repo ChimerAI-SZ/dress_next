@@ -164,9 +164,9 @@ function Dashboard() {
           as="header"
           justify="space-between"
           align="center"
-          h={"8vh"}
+          h={"2.75rem"}
           px={"1rem"}
-          mb={"3rem"}
+          mb={"1.75rem"}
           position="sticky"
           top={0}
           bg="white"
@@ -175,7 +175,7 @@ function Dashboard() {
           background={"transparent"}
           transition={"background-color 0.3s"}
         >
-          <Image w={"150px"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
+          <Image h={"1rem"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
 
           <Flex gap="0.5rem">
             <For each={headerIconList}>
@@ -186,7 +186,7 @@ function Dashboard() {
                     key={item.key}
                     src={item.imgUrl}
                     alt={`${item.key}-icon`}
-                    boxSize="22pt"
+                    boxSize="1.38rem"
                     cursor="pointer"
                   />
                 )
@@ -198,14 +198,17 @@ function Dashboard() {
         {/* Upload Button */}
         <StartBtnBox>
           <Button
-            width={"90vw"}
+            w={"90vw"}
+            h={"2.75rem"}
+            border={"0.03rem solid rgba(255,0,0,0.1)"}
             colorScheme="blackAlpha"
-            border={"3px solid #f2d9da"}
             bgColor="#EE3939"
             color="white"
             py="1.75rem"
             fontSize="1.3rem"
             letterSpacing="0.02rem"
+            mt={1}
+            borderRadius={"2.5rem"}
             onClick={() => {
               console.log(taskId.length, work, currentBarValue)
               if (taskId.length !== 0 || work !== 0 || currentBarValue !== 100) {
@@ -219,9 +222,6 @@ function Dashboard() {
                 router.replace("/upload")
               }
             }}
-            mt={1}
-            mb={4}
-            borderRadius="40px"
           >
             Start To Design
             <Image src="/assets/images/mainPage/star.svg" alt="Profile" boxSize="12pt" cursor="pointer" />
@@ -304,22 +304,22 @@ const Blending = styled.div`
 const MainSection = styled.section`
   padding: 1rem 1rem 0rem 1rem;
   background: linear-gradient(to bottom, #faf1f2, #fff 30vh, #fff);
-  border: 2px solid #fff;
-  border-radius: 16pt;
-  margin-top: 24px;
-  border-top-width: 1px;
-  margin-bottom: -40px;
+  border: 0.09rem solid #fff;
+  border-radius: 1.13rem;
+  margin-top: 1.81rem;
+  border-top-width: 0.045rem;
+  margin-bottom: -1.25rem;
 `
 const Title = styled.div`
   font-weight: 600;
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: #171717;
   text-align: left;
   font-style: normal;
 `
 const SubTitle = styled.div`
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 0.81rem;
   color: #666666;
   text-align: left;
   font-style: normal;
