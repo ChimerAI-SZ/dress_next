@@ -1,13 +1,13 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Text, Box, Image, Flex } from "@chakra-ui/react"
-import Spline from "@splinetool/react-spline/next"
-import { Application } from "@splinetool/runtime"
+import dynamic from "next/dynamic"
 import { Toaster, toaster } from "@components/Toaster"
 import Header from "@components/Header"
 import PrintGeneration from "@img/upload/print-generation.svg"
 import Bg from "@img/generate/bg.png"
-import Waterfall from "./components/Waterfall"
+import Spline from "@splinetool/react-spline/next"
+import { Application } from "@splinetool/runtime"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
   workflow2,
@@ -39,6 +39,11 @@ import { CircularProgressbarWithChildren, buildStyles } from "react-circular-pro
 import "react-circular-progressbar/dist/styles.css"
 import { setWorkInfo, setParams, setTaskId, setWork, setGenerateImage, setStage } from "@store/features/workSlice"
 import { useDispatch, useSelector } from "react-redux"
+
+const Waterfall = dynamic(() => import("./components/Waterfall"), {
+  loading: () => <Box px="1rem" mt="0.75rem"></Box>,
+  ssr: false
+})
 
 function Page() {
   const dispatch = useDispatch()
@@ -384,7 +389,7 @@ function Page() {
     }
   }, [currentBarValue])
 
-  const getImage = async (taskID: string) => {
+  const getImage = useCallback(async (taskID: string) => {
     try {
       const resultData: any = await getQuery({ taskID })
       const { result, success, message } = resultData || {}
@@ -392,35 +397,35 @@ function Page() {
       if (success) {
         setImageList(pre => [...pre, result.res])
         setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
-      } else {
-        console.log(`Task ${taskID} still in progress`)
-      }
-      if (message !== "Task is running") {
+      } else if (message !== "Task is running") {
         setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
       }
     } catch (err) {
       setTaskIDs(prevIDs => prevIDs.filter(id => id !== taskID))
     }
-  }
+  }, [])
   useEffect(() => {
     const interval = setInterval(() => {
       if (taskIDs.length > 0) {
-        taskIDs.forEach(taskID => {
-          getImage(taskID)
+        Promise.all(taskIDs.map(taskID => getImage(taskID))).then(() => {
+          if (taskIDs.length === 0) {
+            fetchData()
+          }
         })
-      } else {
-        fetchData()
       }
     }, 5000)
+
     if (taskIDs.length > 0 || generateImage.length > 0) {
-      setBarValue(100 - taskIDs.length * 9.5)
+      const newBarValue = 100 - taskIDs.length * 9.5
+      if (Math.abs(barValue - newBarValue) > 1) {
+        setBarValue(newBarValue)
+      }
     }
+
     dispatch(setGenerateImage(imageList))
     dispatch(setTaskId(taskIDs))
-    return () => {
-      console.log("Cleaning up interval")
-      clearInterval(interval)
-    }
+
+    return () => clearInterval(interval)
   }, [taskIDs])
 
   useEffect(() => {
@@ -447,13 +452,15 @@ function Page() {
         {splineComponent}
         <Image
           src={Bg.src}
+          loading="lazy"
           position={"absolute"}
           zIndex={0}
           height="25rem"
           objectFit="cover"
           w={"full"}
           top={0}
-        ></Image>
+          alt="Background"
+        />
       </Box>
       <Box pt={4}></Box>
       <Header noTitle={true}></Header>
@@ -495,11 +502,14 @@ function Page() {
               m={"0.1rem"}
             >
               <Image
+                src={params?.loadOriginalImage}
+                loading="lazy"
+                decoding="async"
                 boxSize={"7.13rem"}
                 borderRadius="full"
-                src={params?.loadOriginalImage}
                 border="0.06rem solid #fffeff"
-              ></Image>
+                alt="Original Image"
+              />
             </Flex>
           </CircularProgressbarWithChildren>
         </Box>
