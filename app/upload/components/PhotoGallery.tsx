@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useId } from "react"
+import React, { useState, useEffect, useId, memo, useCallback } from "react"
 import { Box, Flex, Text, Grid, GridItem, Image, Input } from "@chakra-ui/react"
 import ReactLoading from "react-loading"
 import useAliyunOssUpload from "@hooks/useAliyunOssUpload"
@@ -15,7 +15,13 @@ import { TypesClothingProps } from "@definitions/update"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 
-const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
+// 添加图片预加载
+const preloadImage = (src: string) => {
+  const img = document.createElement("img")
+  img.src = src
+}
+
+const PatternSelector = memo(({ onParamsUpdate, flied }: TypesClothingProps) => {
   const [total, setTotal] = useState(0)
   const { uploadToOss, isUploading, uploadProgress, uploadedUrl } = useAliyunOssUpload()
   const uniqueId = useId()
@@ -85,41 +91,22 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
   useEffect(() => {
     fetchData()
   }, [])
-  const handleSelectImage = (url: string) => {
+  const handleSelectImage = useCallback((url: string) => {
     setUrlList(prevList => {
-      return prevList.map(item => {
-        if (item.image_url === url) {
-          // 如果该项已经被选中，点击时取消选中
-          const updatedItem = { ...item, selected: !item.selected }
-
-          return updatedItem
-        } else {
-          // 其他项都取消选中
-          return { ...item, selected: false }
-        }
-      })
+      return prevList.map(item => ({
+        ...item,
+        selected: item.image_url === url ? !item.selected : false
+      }))
     })
-  }
+  }, [])
 
   // 使用 useEffect 来处理状态更新
   useEffect(() => {
     const selectedItem = urlList.find(item => item.selected)
-
-    if (selectedItem) {
-      // 如果某项被选中，更新参数
-      if (flied) {
-        onParamsUpdate({ loadFabricImage: selectedItem.image_url })
-      } else {
-        onParamsUpdate({ loadPrintingImage: selectedItem.image_url })
-      }
-    } else {
-      if (flied) {
-        onParamsUpdate({ loadFabricImage: "" })
-      } else {
-        onParamsUpdate({ loadPrintingImage: "" })
-      }
-    }
-  }, [urlList, flied]) // 监听 urlList 和 flied 的变化
+    onParamsUpdate({
+      [flied ? "loadFabricImage" : "loadPrintingImage"]: selectedItem?.image_url || undefined
+    })
+  }, [urlList, flied, onParamsUpdate])
 
   // 在组件内添加一个处理 tags 的辅助函数
   const formatTags = (tags: string) => {
@@ -132,6 +119,82 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
     if (tagArray.length <= 2) return normalizedTags
     return tagArray.slice(0, 2).join(" ")
   }
+
+  // 预加载下一页图片
+  useEffect(() => {
+    if (urlList.length > 0) {
+      const nextPageImages = urlList.slice(itemsPerPage, itemsPerPage * 2)
+      nextPageImages.forEach(item => {
+        preloadImage(item.image_url)
+      })
+    }
+  }, [urlList, itemsPerPage])
+
+  // 优化图片渲染
+  const renderImage = useCallback(
+    ({ item, index }: { item: any; index: number }) => (
+      <GridItem
+        key={item.image_url + index}
+        position="relative"
+        w="100%"
+        h="4.69rem"
+        borderRadius="0.5rem"
+        onClick={() => handleSelectImage(item.image_url)}
+        border={item.selected ? "1px solid #dd4d4d" : "1px solid transparent"}
+        zIndex={33}
+      >
+        <Image
+          src={`${item.image_url}/resize,w_200`}
+          alt={`Small Image ${index + 1}`}
+          w="100%"
+          h="100%"
+          objectFit="cover"
+          borderRadius="0.5rem"
+        />
+        {item.tags === "upload" ? (
+          <Image
+            src={Delete.src}
+            alt={`Delete ${index + 1}`}
+            w="1rem"
+            h="1rem"
+            position="absolute"
+            top={"-0.5rem"}
+            right={"-0.5rem"}
+            zIndex={22}
+            cursor="pointer"
+            onClick={e => {
+              e.stopPropagation()
+              handleImageDelete(item.image_url)
+            }}
+          />
+        ) : (
+          <Flex
+            align="center"
+            justify="center"
+            position="absolute"
+            bottom="0"
+            width="full"
+            background={item.selected ? "rgba(213,32,32,0.85)" : "rgba(23,23,23,0.6)"}
+            borderRadius="0rem 0rem 0.4rem 0.4rem"
+            py={"0.34rem"}
+          >
+            <Text
+              color="white"
+              fontSize="0.69rem"
+              fontWeight="400"
+              textAlign={"center"}
+              textTransform="none"
+              fontStyle="normal"
+              lineHeight={"0.78rem"}
+            >
+              {formatTags(item.tags)}
+            </Text>
+          </Flex>
+        )}
+      </GridItem>
+    ),
+    [handleSelectImage]
+  )
 
   return (
     <Flex w="full" flexDirection={"column"} alignItems="center">
@@ -178,7 +241,7 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                           alignItems="center"
                           justifyContent="center"
                         >
-                          <Image src={Add.src} alt="Like" h="1.05rem" w="1.06rem" cursor="pointer" />
+                          <Image src={Add.src} alt="Add image" h="1.05rem" w="1.06rem" cursor="pointer" />
                         </Flex>
                       </Box>
                     </label>
@@ -198,68 +261,9 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
                   </Box>
                 )}
 
-                {urlList.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map((item, index) => (
-                  <GridItem
-                    key={item.image_url + index}
-                    position="relative"
-                    w="100%"
-                    h="4.69rem"
-                    borderRadius="0.5rem"
-                    onClick={() => handleSelectImage(item.image_url)}
-                    border={item.selected ? "1px solid #dd4d4d" : "1px solid transparent"}
-                    zIndex={33}
-                  >
-                    <Image
-                      src={`${item.image_url}`}
-                      alt={`Small Image ${index + 1}`}
-                      w="100%"
-                      h="100%"
-                      objectFit="cover"
-                      cursor="pointer"
-                      borderRadius="0.5rem"
-                    />
-                    {item.tags === "upload" ? (
-                      <Image
-                        src={Delete.src}
-                        alt={`Small Image ${index + 1}`}
-                        w="1rem"
-                        h="1rem"
-                        position="absolute"
-                        top={"-0.5rem"}
-                        right={"-0.5rem"}
-                        zIndex={22}
-                        cursor={"pointer"}
-                        onClick={e => {
-                          e.stopPropagation()
-                          handleImageDelete(item.image_url)
-                        }}
-                      />
-                    ) : (
-                      <Flex
-                        align="center"
-                        justify="center"
-                        position="absolute"
-                        bottom="0"
-                        width="full"
-                        background={item.selected ? "rgba(213,32,32,0.85)" : "rgba(23,23,23,0.6)"}
-                        borderRadius="0rem 0rem 0.4rem 0.4rem"
-                        py={"0.34rem"}
-                      >
-                        <Text
-                          color="white"
-                          fontSize="0.69rem"
-                          fontWeight="400"
-                          textAlign={"center"}
-                          textTransform="none"
-                          fontStyle="normal"
-                          lineHeight={"0.78rem"}
-                        >
-                          {formatTags(item.tags)}
-                        </Text>
-                      </Flex>
-                    )}
-                  </GridItem>
-                ))}
+                {urlList
+                  .slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage)
+                  .map((item, index) => renderImage({ item, index }))}
               </Grid>
             </SwiperSlide>
           ))}
@@ -279,6 +283,6 @@ const PatternSelector = ({ onParamsUpdate, flied }: TypesClothingProps) => {
       </Flex>
     </Flex>
   )
-}
+})
 
 export default PatternSelector

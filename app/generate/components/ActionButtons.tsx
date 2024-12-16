@@ -296,7 +296,7 @@ export const ActionButtons = ({ image }: ActionButtonsProps) => {
         return
       }
 
-      if (res.success) {
+      if (res?.success) {
         Alert.open({ content: "Successfully added to cart" })
       }
     },
