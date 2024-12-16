@@ -1,7 +1,9 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Box, Image, Flex, Text } from "@chakra-ui/react"
 import { images } from "@constants/images"
+import { getWidthImageUrl, preloadImages } from "@utils/image"
 
 interface ImageGalleryProps {
   selectImage: string
@@ -32,6 +34,22 @@ export default function ImageGallery({
   onUncollect,
   onAddToCart
 }: ImageGalleryProps): JSX.Element {
+  const [imagesLoaded, setImagesLoaded] = useState(false)
+
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        await preloadImages(imageList.map(url => getWidthImageUrl(url, 200)))
+        await preloadImages(imageList)
+        setImagesLoaded(true)
+      } catch (error) {
+        console.error("Failed to preload images:", error)
+      }
+    }
+
+    loadImages()
+  }, [imageList])
+
   const handleThumbnailClick = (item: string) => {
     if (active) {
       if (likeList.includes(item)) {
@@ -64,7 +82,12 @@ export default function ImageGallery({
           border="0.03rem solid #CACACA"
           overflow="hidden"
         >
-          <Image h="100%" w="21.44rem" objectFit="cover" src={selectImage} />
+          <Image
+            h="100%"
+            w="21.44rem"
+            objectFit="cover"
+            src={imagesLoaded ? selectImage : getWidthImageUrl(selectImage, 200)}
+          />
           {!active && selectImage !== originImage && (
             <Flex position="absolute" bottom={0} right="0" gap="1rem" pb="0.87rem" pr="0.87rem">
               <Box onClick={() => onDownload(selectImage)}>
@@ -133,7 +156,7 @@ export default function ImageGallery({
               height="7.92rem"
               width="5.94rem"
               objectFit="cover"
-              src={item}
+              src={getWidthImageUrl(item, 200)}
               borderRadius="0.45rem"
               onClick={() => handleThumbnailClick(item)}
             />
