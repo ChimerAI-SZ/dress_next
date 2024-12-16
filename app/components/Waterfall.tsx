@@ -40,20 +40,20 @@ const breakpointColumnsObj = {
   500: 2
 }
 
-import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 
 const NUMBER_OF_IMAGES_LOADED_EACH_TURN = 10 //每次加载的图片数量
-const MAXIMUN_NUMBER_OF_IMAGES = 50 //每次加载的图片数量
 
 const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setViewDetail: (value: boolean) => void }) => {
-  const router = useRouter()
   const dispatch = useDispatch()
 
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
   const [imageList, setImageList] = useState<Item[]>([])
   const [page, setPage] = useState(0)
+
+  // 图库里一共有多少张
+  const [totalImagesCount, setTotalImagesCount] = useState<number>(50)
 
   const [usedIndexes, setUsedIndexes] = useState(new Set())
 
@@ -76,7 +76,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
 
         do {
           // 生成一个随机索引
-          index = Math.floor(Math.random() * (MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN))
+          index = Math.floor(Math.random() * (totalImagesCount - NUMBER_OF_IMAGES_LOADED_EACH_TURN))
           // 检查接下来的4个索引是否可用
           availableIndexes = Array.from({ length: NUMBER_OF_IMAGES_LOADED_EACH_TURN }, (_, i) => index + i).every(
             i => !usedIndexes.has(i)
@@ -99,6 +99,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           content: err.message ?? res.message
         })
       } else if (res.success && res.data?.length > 0) {
+        setTotalImagesCount(res.total)
         const newImages = res.data.slice().sort(() => Math.random() - 0.5)
 
         // 下拉刷新的话重置imglist
@@ -118,7 +119,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           }
 
           // 由于是随机开始查询的，如果剩下可用的图片已经没有两倍的单次请求数量的，重置。
-          if (newSet.size >= MAXIMUN_NUMBER_OF_IMAGES - NUMBER_OF_IMAGES_LOADED_EACH_TURN * 2) {
+          if (newSet.size >= totalImagesCount - NUMBER_OF_IMAGES_LOADED_EACH_TURN * 2) {
             return new Set()
           }
 
