@@ -66,7 +66,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
   const fetchData = useCallback(
-    async (refreshType: "pullDown" | "pullUp" = "pullUp", callback?: () => void) => {
+    async (refreshType: "pullDown" | "pullUp" = "pullUp", callback?: (newImages: Item[]) => void) => {
       if (loading || !hasMore) return // 避免重复请求
       setLoading(true)
 
@@ -126,7 +126,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
           return newSet
         })
 
-        callback && callback()
+        callback && callback(newImages)
       }
 
       setLoading(false)
@@ -279,6 +279,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         <ImageViewer
           initImgUrl={selectedImg}
           imgList={imageList}
+          fetchData={fetchData}
           close={() => {
             setViewDetail(false)
 
