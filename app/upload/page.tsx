@@ -1,16 +1,29 @@
 "use client"
-import { useState } from "react"
+import dynamic from "next/dynamic"
+import { Suspense, useCallback, useMemo, useState, memo } from "react"
 import { Container, Text, Flex, Box, Button } from "@chakra-ui/react"
 import Header from "../../components/Header"
-import TypesClothing from "./components/TypesClothing"
-import UploadImage from "./components/UploadImage"
-import PrintSelect from "./components/PrintSelect"
-import Fabric from "./components/Fabric"
-import Link from "next/link"
 import { Params } from "@definitions/update"
 import { useRouter } from "next/navigation"
 import { setWorkInfo, setParams as setStoreParams, setTaskId, setWork } from "@store/features/workSlice"
 import { useDispatch, useSelector } from "react-redux"
+
+// 动态导入组件
+const TypesClothing = dynamic(() => import("./components/TypesClothing"), {
+  loading: () => <Box h="7.81rem" bg="#FFFFFF" borderRadius="0.5rem" />,
+  ssr: false
+})
+
+const UploadImage = dynamic(() => import("./components/UploadImage"), {
+  loading: () => <Box h="12.81rem" bg="#FFFFFF" borderRadius="0.5rem" />,
+  ssr: false
+})
+
+const PrintSelect = dynamic(() => import("./components/PrintSelect"), {
+  loading: () => <Box h="11rem" bg="#FFFFFF" borderRadius="0.5rem" />,
+  ssr: false
+})
+
 function Page() {
   const dispatch = useDispatch()
   const { params: paramsState } = useSelector((state: any) => state.work)
@@ -22,64 +35,83 @@ function Page() {
     loadFabricImage: undefined
   })
   const router = useRouter()
-  // 通过回调函数传递数据
-  const handleParamsUpdate = (newParams: Params) => {
+
+  // 使用 useCallback 优化回调函数
+  const handleParamsUpdate = useCallback((newParams: Params) => {
     setParams((prev: Params) => ({
       ...prev,
       ...newParams
     }))
-  }
+  }, [])
+
+  // 使用 useMemo 优化按钮渲染逻辑
+  const generateButton = useMemo(() => {
+    const buttonProps = {
+      width: "20.38rem",
+      height: "2.5rem",
+      borderRadius: "1.25rem"
+    }
+
+    if (params?.loadOriginalImage) {
+      return (
+        <Button
+          onClick={() => {
+            dispatch(setStoreParams(params))
+            router.replace("/generate")
+          }}
+          colorScheme="teal"
+          background="#EE3939"
+          {...buttonProps}
+        >
+          Generate
+        </Button>
+      )
+    }
+
+    return (
+      <Button colorScheme="teal" background="rgba(238,57,57,0.5)" {...buttonProps}>
+        Generate
+      </Button>
+    )
+  }, [params?.loadOriginalImage, dispatch, router])
+
   return (
-    <Container bg={"#f5f5f5"} h={"100%"} minH={"100vh"} position={"relative"} pt={4}>
-      <Header></Header>
-      <TypesClothing></TypesClothing>
-      <UploadImage onParamsUpdate={handleParamsUpdate}></UploadImage>
-      <PrintSelect onParamsUpdate={handleParamsUpdate}></PrintSelect>
-      {/* <Fabric onParamsUpdate={handleParamsUpdate}></Fabric> */}
-      <Box h="4.55rem"></Box>
+    <Container bg="#f5f5f5" h="100%" minH="100vh" position="relative" pt={4}>
+      <Header />
+
+      <Suspense fallback={<Box h="7.81rem" bg="#FFFFFF" borderRadius="0.5rem" />}>
+        <TypesClothing />
+      </Suspense>
+
+      <Suspense fallback={<Box h="12.81rem" bg="#FFFFFF" borderRadius="0.5rem" />}>
+        <UploadImage onParamsUpdate={handleParamsUpdate} />
+      </Suspense>
+
+      <Suspense fallback={<Box h="11rem" bg="#FFFFFF" borderRadius="0.5rem" />}>
+        <PrintSelect onParamsUpdate={handleParamsUpdate} />
+      </Suspense>
+
+      <Box h="4.55rem" />
+
       <Flex
         height="3.75rem"
         position="fixed"
-        bottom="0"
+        bottom={0}
         zIndex={111}
-        bg={"#fff"}
+        bg="#fff"
         maxW="100vw"
-        w={"full"}
-        alignItems={"center"}
-        justifyContent={"center"}
+        w="full"
+        alignItems="center"
+        justifyContent="center"
         left="50%"
         transform="translateX(-50%)"
         borderRadius="0.75rem 0.75rem 0rem 0rem"
         boxShadow="0rem -0.06rem 0.31rem 0rem rgba(214,214,214,0.5)"
       >
-        {params?.loadOriginalImage ? (
-          <Button
-            onClick={() => {
-              dispatch(setStoreParams(params))
-              router.replace("/generate")
-            }}
-            colorScheme="teal"
-            width="20.38rem"
-            height="2.5rem"
-            background="#EE3939"
-            borderRadius="1.25rem"
-          >
-            Generate
-          </Button>
-        ) : (
-          <Button
-            colorScheme="teal"
-            width="20.38rem"
-            height="2.5rem"
-            background="rgba(238,57,57,0.5)"
-            borderRadius="1.25rem"
-          >
-            Generate
-          </Button>
-        )}
+        {generateButton}
       </Flex>
     </Container>
   )
 }
 
-export default Page
+export default memo(Page)

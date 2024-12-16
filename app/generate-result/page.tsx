@@ -120,7 +120,7 @@ export default function GenerateResult() {
       const [err, res] = await errorCaptureRes(fetchAddImages, {
         user_id: userId,
         image_urls: images,
-        collection_id: defaultCollectionId
+        collection_id: collectionId
       })
 
       if (err) {
