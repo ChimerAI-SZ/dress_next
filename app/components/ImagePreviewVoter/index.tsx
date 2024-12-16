@@ -29,6 +29,7 @@ interface ImageViewerProps {
   close: () => void
   initImgUrl: string
   imgList: ImageItem[]
+  fetchData: () => void
 }
 
 interface DetailItem {
@@ -36,12 +37,18 @@ interface DetailItem {
   value: string | string[]
   img: string
 }
+// 每多少个like去调用recommend接口
+const RECOMMEND_INTERVAL = 5
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, fetchData }) => {
+  // 找到初始图片在列表中的索引
+  const initIndex = imgList.findIndex(item => item.image_url === initImgUrl)
+
   const router = useRouter()
+
   const [imgUrl, setImgUrl] = useState(initImgUrl)
-  const [nextImgUrl, setNextImgUrl] = useState(imgList.filter(item => item.image_url !== initImgUrl)[0]?.image_url)
-  const [allImages, setAllImages] = useState<ImageItem[]>(imgList.filter(item => item.image_url !== initImgUrl)) // 所有图片列表
+  const [nextImgUrl, setNextImgUrl] = useState(imgList[initIndex + 1]?.image_url)
+  const [allImages, setAllImages] = useState<ImageItem[]>(imgList.slice(initIndex))
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
@@ -49,7 +56,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
   const [active, setActive] = useState(false)
 
   const [isFirstImgVisible, setIsFirstImgVisible] = useState(true) // 标记 curImg 和 nextImg 目前正在看哪张图
-  const [imgIndex, setImgIndex] = useState(0) // 模拟喜欢/不喜欢用的图片下标，
+  const [imgIndex, setImgIndex] = useState(imgList.slice(initIndex).findIndex(item => item.image_url === initImgUrl)) // 模拟喜欢/不喜欢用的图片下标，
   const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
@@ -272,16 +279,26 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
         Alert.open({
           content: err.message ?? res.message
         })
+
         setIsRating(false)
+
         return
+      }
+
+      // 检查是否需要获取更多图片
+      const remainingImages = allImages.length - (imgIndex + 1)
+
+      // 如果剩余图片数量不足以凑齐5个like，就获取更多图片
+      if (remainingImages < (isLike ? RECOMMEND_INTERVAL - likeCount - 1 : RECOMMEND_INTERVAL - likeCount)) {
+        fetchData()
       }
 
       if (isLike) {
         const newLikeCount = likeCount + 1
         setLikeCount(newLikeCount)
 
-        // 每点赞5次获取新推荐
-        if (newLikeCount % 5 === 0) {
+        // 每点赞一定次也获取新推荐
+        if (newLikeCount % RECOMMEND_INTERVAL === 0) {
           await getRecommendImages()
         }
       }
@@ -330,7 +347,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
               nextImgNode.style.zIndex = "1"
               // 更新当前显示的图片
-              setImgUrl(allImages[nextIndex].image_url)
+              setImgUrl(allImages[nextIndex + 1].image_url)
             } else {
               nextImgNode.style.opacity = "0"
               nextImgNode.style.zIndex = "0"
@@ -338,7 +355,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
 
               curImgNode.style.zIndex = "1"
               // 更新当前显示的图片
-              setNextImgUrl(allImages[nextIndex].image_url)
+              setNextImgUrl(allImages[nextIndex + 1].image_url)
             }
 
             // 更新下一张图片的索引
@@ -393,6 +410,20 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
       }
     }
   }, [])
+
+  useEffect(() => {
+    // 找到allImages最后一张图片在imgList中的位置
+    const lastImageIndex = imgList.findIndex(img => img.image_url === allImages[allImages.length - 1]?.image_url)
+
+    if (lastImageIndex !== -1 && lastImageIndex < imgList.length - 1) {
+      // 将lastImageIndex之后的图片添加到allImages
+      const newImages = imgList.slice(lastImageIndex)
+      setAllImages(prev => {
+        console.log([...prev, ...newImages])
+        return [...prev, ...newImages]
+      })
+    }
+  }, [imgList.length])
 
   return (
     <Portal>
@@ -520,7 +551,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList })
             ref={footerRef}
             footerBtnText={footerBtnText}
             onButtonClick={() => {
-              router.replace(`/upload`)
+              // router.replace(`/upload`)
+              console.log(allImages[imgIndex].image_url, "allImages")
             }}
           />
 
