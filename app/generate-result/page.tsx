@@ -100,24 +100,19 @@ export default function GenerateResult() {
     } else if (res?.success) {
       // 筛选出默认收藏夹
       const defaultCollection = res.data.find((album: { is_default: boolean }) => album.is_default === true)
+      setCollectionList(res.data)
       if (defaultCollection) {
         setDefaultCollectionId(defaultCollection.collection_id)
+        return defaultCollection.collection_id
       }
-      setCollectionList(res.data)
     }
   }, [userId])
-
-  // 在组件加载时获取收藏夹列表
-  useEffect(() => {
-    if (userId) {
-      fetchCollections()
-    }
-  }, [userId, fetchCollections])
 
   const handleAddToCollection = useCallback(
     async (images: string[]) => {
       if (!handleLoginPrompt()) return
-      if (!defaultCollectionId) {
+      const collectionId = defaultCollectionId || (await fetchCollections())
+      if (!collectionId) {
         Alert.open({ content: "Default collection not found" })
         return
       }
@@ -138,7 +133,7 @@ export default function GenerateResult() {
         setRecentCollectedImages(images)
         // 更新图片所在的收藏夹
         const newImageCollections = new Map(imageCollections)
-        images.forEach(img => newImageCollections.set(img, defaultCollectionId))
+        images.forEach(img => newImageCollections.set(img, collectionId))
         setImageCollections(newImageCollections)
 
         toaster.create({
