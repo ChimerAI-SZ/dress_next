@@ -1,21 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "@emotion/styled"
-import { keyframes } from "@emotion/react"
 import { useRouter } from "next/navigation"
 
-import { LeftOutlined } from "@ant-design/icons"
-import { Portal, Image, Flex, Text, Show, Box } from "@chakra-ui/react"
+import { Portal, Image, Flex, Show, Box } from "@chakra-ui/react"
 import { Toaster, toaster } from "@components/Toaster"
 import { Loading } from "@components/Loading"
 import { Alert } from "@components/Alert"
 import LoginPrompt from "@components/LoginPrompt"
 import ToastTest from "@components/ToastTest"
+
 import Footer from "./components/Footer"
 import Details from "./components/Details"
+import Header from "./components/Header"
+import DetailTips from "./components/DetailTips"
 
 import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request/page"
 import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
+import useImageActions from "@hooks/useImageActions"
 
 const userId = storage.get("user_id")
 
@@ -58,7 +60,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
   const [imgIndex, setImgIndex] = useState(imgList.slice(initIndex).findIndex(item => item.image_url === initImgUrl)) // 模拟喜欢/不喜欢用的图片下标，
   const [likeCount, setLikeCount] = useState(0) //点赞计数器
 
-  const [showUpIcon, setShowUpIcon] = useState(true) // details 图标展示轮播
   const [detailText, setDetailText] = useState("details") // 底部详情的文本
   const [footerBtnText, setFooterBtnText] = useState("Start To Design") // 底部按钮的文本
 
@@ -82,42 +83,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
   const liekRef = useRef<null | HTMLDivElement>(null)
   // refs ends
 
-  // 下载
-  const handleDownload = async () => {
-    try {
-      // 先获取图片数据
-      const response = await fetch(imgUrl)
-      const blob = await response.blob()
-
-      // 创建 URL 对象
-      const url = window.URL.createObjectURL(blob)
-
-      const link = document.createElement("a")
-      link.href = url
-      link.download = "图片.jpg" // 设置下载文件名
-
-      document.body.appendChild(link)
-      link.click()
-
-      // 清理
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(link)
-
-      Alert.open({
-        content: "Download Successfully",
-        type: "success",
-        customIcon: "/assets/images/mainPage/successIcon.png",
-        containerStyle: {
-          width: "60vw"
-        }
-      })
-    } catch (error) {
-      // 下载失败提示
-      Alert.open({
-        content: "Failed to download the image, \n Please try again."
-      })
-    }
-  }
+  const { handleDownload } = useImageActions(userId ?? "")
 
   // Handlers
   const handleLoginPrompt = useCallback(() => {
@@ -174,6 +140,9 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
   // 查看详情
   const handleViewDetails = async () => {
     try {
+      // 如果已经获取过详情，就不再获取
+      if (detailList.length > 0) return
+
       setIsLoading(true) // 开始加载
       const [err, res] = await errorCaptureRes(fetchImageDetails, { image_url: imgUrl })
 
@@ -425,14 +394,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
     }
   }, [imgList.length])
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setShowUpIcon(prev => !prev)
-    }, 500)
-
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <Portal>
       <Container>
@@ -460,18 +421,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
               flexShrink={0}
             >
               {/* 头部 */}
-              <Header>
-                <BackIcon
-                  onClick={e => {
-                    e.stopPropagation()
-
-                    close && close()
-                  }}
-                >
-                  <LeftOutlined style={{ fontSize: "1.38rem" }} />
-                </BackIcon>
-                <Image h={"1rem"} src={"/assets/images/logo-CREAMODA.png"} alt="creamoda-logo" />
-              </Header>
+              <Header close={close} />
 
               {/* 图片预览区 */}
               <Box w={"100%"} position={"relative"} overflow={"hidden"} p={"0.75rem"} flexGrow={"1"}>
@@ -494,7 +444,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
                     >
                       <Image
                         boxSize={"1rem"}
-                        onClick={handleDownload}
+                        onClick={() => handleDownload(allImages[imgIndex].image_url)}
                         src={"/assets/images/mainPage/download.svg"}
                         alt="dontWant-icon"
                       />
@@ -538,31 +488,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
               </Box>
 
               {/* 查看详情 */}
-              <DetailTip onClick={handleViewDetails}>
-                <Text mr={"0.22rem"}>{detailText}</Text>
-                <Box h={"1rem"} overflow={"hidden"} position={"relative"}>
-                  <Carousel>
-                    <Image
-                      src={"/assets/images/mainPage/details_up.png"}
-                      alt="detail-icon"
-                      style={{
-                        position: "absolute",
-                        opacity: showUpIcon ? 1 : 0,
-                        transition: "opacity 0.3s ease-in-out"
-                      }}
-                    />
-                    <Image
-                      src={"/assets/images/mainPage/details_down.png"}
-                      alt="detail-icon"
-                      style={{
-                        position: "absolute",
-                        opacity: showUpIcon ? 0 : 1,
-                        transition: "opacity 0.3s ease-in-out"
-                      }}
-                    />
-                  </Carousel>
-                </Box>
-              </DetailTip>
+              <DetailTips detailText={detailText} handleViewDetails={handleViewDetails} />
             </Flex>
 
             {/* 详情 */}
@@ -644,25 +570,6 @@ const Prompt = styled.div`
   transition: transform 0.5s ease;
 
   opacity: 0;
-`
-
-const Header = styled.header`
-  padding: 1rem;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  flex-shrink: 0;
-
-  height: 2.75rem;
-  width: 100%;
-`
-const BackIcon = styled.div`
-  z-index: 1;
-  position: absolute;
-  width: 1.38rem;
-  left: 1rem;
 `
 
 const Bg = styled.div`
@@ -759,27 +666,6 @@ const ButtonBox = styled.div`
   width: 100%;
   padding: 0 1.63rem;
   left: 0;
-`
-
-const DetailTip = styled.section`
-  font-size: 0.93rem;
-  font-weight: 600;
-  line-height: 1rem;
-  color: #171717;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1.38rem;
-  flex-shrink: 0;
-  padding: 0.38rem 0 1.13rem;
-  box-sizing: content-box;
-`
-
-const Carousel = styled.div`
-  position: relative;
-  height: 1rem;
-  width: 1rem;
 `
 
 export default ImageViewer
