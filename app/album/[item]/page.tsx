@@ -141,43 +141,6 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
 
   // 下载图片
   const handleDownload = (defaultUrls?: string[]) => {
-    // const downloadImage = (urls: string[]) => {
-    //   urls.forEach((url, index) => {
-    //     // 创建一个新的 iframe 元素
-    //     let iframe = document.createElement("iframe")
-
-    //     // 将 iframe 的 'src' 属性设置为文件的 URL
-    //     iframe.src = url
-
-    //     // 设置 iframe 的 'id' 以便稍后移除
-    //     iframe.id = "download_iframe_" + index
-
-    //     // 将 iframe 设置为隐藏
-    //     iframe.style.display = "none"
-
-    //     // 将 iframe 添加到页面中
-    //     document.body.appendChild(iframe)
-    //   })
-
-    //   // 一段时间后移除这些 iframe
-    //   setTimeout(() => {
-    //     urls.forEach((url, index) => {
-    //       let iframe = document.getElementById("download_iframe_" + index)
-    //       if (iframe) {
-    //         document.body.removeChild(iframe)
-    //       }
-    //     })
-    //   }, 5000)
-
-    //   // const link = document.createElement("a")
-    //   // link.href = url?.split("?")[0]
-    //   // link.download = url.split("/").pop() || "download" // 提取文件名，如果没有文件名则使用 'download'
-    //   // document.body.appendChild(link)
-    //   // link.click()
-    //   // document.body.removeChild(link)
-    //   // saveAs(url, "image.png")
-    // }
-
     const downloadImage = (imageUrls: string[]) => {
       const download = (index: number) => {
         if (index < imageUrls.length) {

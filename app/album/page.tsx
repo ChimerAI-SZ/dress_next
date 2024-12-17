@@ -35,7 +35,15 @@ function Page() {
             content: err.message ?? res.message
           })
         } else {
-          setAlbumList(res?.data)
+          setAlbumList(
+            res?.data?.sort((a: AlbumItem, b: AlbumItem) => {
+              if (a.is_default && !b.is_default) return -1
+              if (!a.is_default && b.is_default) return 1
+              if (a.title === "Likes" && b.title !== "Likes") return -1
+              if (a.title !== "Likes" && b.title === "Likes") return 1
+              return 0
+            })
+          )
           dispatch(setList(res?.data))
         }
       }

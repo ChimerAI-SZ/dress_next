@@ -48,7 +48,12 @@ const Header: React.FC<AlbumDetailHeaderProps> = ({
             src={selectMode ? fullSelectionActiveIcon.src : fullSelectionIcon.src}
             alt=""
           />
-          <Show when={!collectionList.find((item: any) => item.collection_id + "" === collectionId)?.is_default}>
+          <Show
+            when={(() => {
+              const currentAlbum = collectionList.find((item: any) => item.collection_id + "" === collectionId)
+              return !currentAlbum?.is_default && currentAlbum?.title !== "Likes"
+            })()}
+          >
             <MenuRoot
               onSelect={({ value }) => {
                 handleIconClick(value)
