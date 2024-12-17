@@ -273,7 +273,6 @@ function Page() {
   }
 
   useEffect(() => {
-    // fetchCollectionList
     queryData()
   }, [])
 

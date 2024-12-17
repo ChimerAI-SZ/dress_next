@@ -6,14 +6,17 @@ import { css, Global, keyframes } from "@emotion/react"
 
 import { Box, Flex, Spinner, Image, Show, Button } from "@chakra-ui/react"
 
-import { fetchHomePage } from "@lib/request/page"
-import { errorCaptureRes } from "@utils/index"
+import { fetchHomePage, fetchLikedList } from "@lib/request/page"
+import { errorCaptureRes, storage } from "@utils/index"
+import { LikedItem } from "@definitions/mainPage"
 
 import { Alert } from "@components/Alert"
 import ImageOverlay from "./ImageOverlay"
 import ImageViewer from "./ImagePreviewVoter"
+
 import { setParams } from "@store/features/workSlice"
 import loadingIcon from "@img/mainPage/loading.svg"
+
 interface Item {
   image_url: string
   ID: number
@@ -43,9 +46,12 @@ const breakpointColumnsObj = {
 import { useDispatch } from "react-redux"
 
 const NUMBER_OF_IMAGES_LOADED_EACH_TURN = 10 //每次加载的图片数量
+const userId = storage.get("user_id")
 
 const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setViewDetail: (value: boolean) => void }) => {
   const dispatch = useDispatch()
+
+  const [likedList, setLikedList] = useState<LikedItem[]>([])
 
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
@@ -158,6 +164,27 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
     setSelectedImg(src)
   }
 
+  const queryLikedList = async () => {
+    const uuid = userId === null ? localStorage.getItem("random_user_id") : userId
+
+    if (uuid) {
+      const [err, res] = await errorCaptureRes(fetchLikedList, {
+        user_uuid: uuid,
+        library: "show-new"
+      })
+
+      if (err || (res && !res?.success)) {
+        Alert.open({
+          content: err.message ?? res.message
+        })
+      } else if (res.data?.length > 0) {
+        const likedList = res.data.filter((item: LikedItem) => item.liked)
+
+        setLikedList(likedList)
+      }
+    }
+  }
+
   useEffect(() => {
     if (!hasFetchedOnce.current) {
       fetchData() // 只在第一次进入页面时请求
@@ -235,6 +262,17 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
     }
   }, [containerRef.current])
 
+  useEffect(() => {
+    const randomUserId = localStorage.getItem("random_user_id") ?? Math.random().toString(36).substring(2, 18) // 如果 userId 不存在的话，会用到这个随机的id
+
+    if (!userId && !localStorage.getItem("random_user_id")) {
+      // 没有登录 localstorage 也没有随机id，往 localstorage 里都存一个随机id
+      localStorage.setItem("random_user_id", randomUserId)
+    }
+
+    queryLikedList()
+  }, [])
+
   return (
     <>
       <Global styles={masonryStyles} />
@@ -276,6 +314,8 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
 
       {viewDetail && (
         <ImageViewer
+          likedList={likedList}
+          setLikedList={setLikedList}
           initImgUrl={selectedImg}
           imgList={imageList}
           fetchData={fetchData}

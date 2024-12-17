@@ -13,6 +13,7 @@ import { setParams, setTaskId, setWork, setGenerateImage } from "@store/features
 import Waterfall from "./components/Waterfall"
 import GenStatus from "./components/GenStatus"
 import ErrorModal from "./components/ErrorModal"
+
 // header 右侧按钮
 const headerIconList = [
   {
@@ -111,6 +112,7 @@ function Dashboard() {
       dispatch(setTaskId(taskId.filter((id: string) => id !== taskID)))
     }
   }
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (taskIDs.length > 0) {

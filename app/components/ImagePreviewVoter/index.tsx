@@ -19,6 +19,7 @@ import { errorCaptureRes, storage } from "@utils/index"
 import useImageActions from "@hooks/useImageActions"
 import { setParams } from "@store/features/workSlice"
 import { useDispatch } from "react-redux"
+import { LikedItem } from "@definitions/mainPage"
 const userId = storage.get("user_id")
 
 interface ImageItem {
@@ -31,6 +32,8 @@ interface ImageViewerProps {
   initImgUrl: string
   imgList: ImageItem[]
   fetchData: () => void
+  likedList: LikedItem[]
+  setLikedList: (value: LikedItem[]) => void
 }
 
 interface DetailItem {
@@ -41,7 +44,14 @@ interface DetailItem {
 // 每多少个like去调用recommend接口
 const RECOMMEND_INTERVAL = 5
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, fetchData }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({
+  close,
+  initImgUrl,
+  imgList,
+  fetchData,
+  likedList,
+  setLikedList
+}) => {
   // 找到初始图片在列表中的索引
   const initIndex = imgList.findIndex(item => item.image_url === initImgUrl)
 
@@ -239,21 +249,31 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
       setDetailText("details")
       setFooterBtnText("Start To Design")
 
-      const [err, res] = await errorCaptureRes(imageRate, {
-        image_url: imgUrl,
-        // 没有用户id就随机生成一个
-        user_uuid: userId ?? localStorage.getItem("random_user_id"),
-        action: isLike ? "like" : "dislike"
-      })
+      // 如果是喜欢操作且图片已在likedList中,则不调用接口
+      const isImageLiked = likedList.some(item => item.image_url === allImages[imgIndex].image_url)
 
-      if (err || (res && !res?.success)) {
-        Alert.open({
-          content: err.message ?? res.message
+      if (!(isLike && isImageLiked)) {
+        const [err, res] = await errorCaptureRes(imageRate, {
+          image_url: allImages[imgIndex].image_url,
+          // 没有用户id就随机生成一个
+          user_uuid: userId ?? localStorage.getItem("random_user_id"),
+          action: isLike ? "like" : "dislike"
         })
 
-        setIsRating(false)
+        if (err || (res && !res?.success)) {
+          Alert.open({
+            content: err.message ?? res.message
+          })
 
-        return
+          setIsRating(false)
+
+          return
+        }
+
+        // 如果是喜欢操作且图片不在likedList中,添加到likedList
+        if (isLike && !isImageLiked) {
+          setLikedList([...likedList, { image_url: allImages[imgIndex].image_url, liked: true }])
+        }
       }
 
       // 检查是否需要获取更多图片

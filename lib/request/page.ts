@@ -7,8 +7,8 @@ export const fetchHomePage = (params: object) => {
   return axios.post("/api/image/list", params)
 }
 
-export const fetchCollectionList = (params: { user_id: string }) => {
-  return axios.post("/api/image/list", params)
+export const fetchLikedList = (params: { user_uuid: string; library: string }) => {
+  return axios.post("/api/image/list_with_like", params)
 }
 
 export const fetchImageDetails = (params: { image_url: string }) => {
