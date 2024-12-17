@@ -660,7 +660,7 @@ const ButtonBox = styled.div`
   justify-content: space-between;
 
   position: absolute;
-  bottom: 1.25rem;
+  bottom: 2rem;
 
   z-index: 1;
 
