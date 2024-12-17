@@ -204,11 +204,13 @@ function Dashboard() {
             colorScheme="blackAlpha"
             bgColor="#EE3939"
             color="white"
-            py="1.75rem"
-            fontSize="1.3rem"
+            fontSize="1rem"
+            fontWeight={"700"}
+            lineHeight={"1.44rem"}
             letterSpacing="0.02rem"
             mt={1}
             borderRadius={"2.5rem"}
+            boxSizing={"border-box"}
             onClick={() => {
               console.log(taskId.length, work, currentBarValue)
               if (taskId.length !== 0 || work !== 0 || currentBarValue !== 100) {
