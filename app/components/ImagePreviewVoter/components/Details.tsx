@@ -15,12 +15,12 @@ interface DetailsProps {
 const Details: React.FC<DetailsProps> = ({ detailList, footerHeight }) => {
   return (
     <>
-      <DetailsWrapper>
+      <DetailsWrapper $footerHeight={footerHeight}>
         <For each={detailList}>
           {detail => (
             <Detail key={detail.label}>
-              <Flex alignItems="center" justifyContent="flex-start">
-                <Image boxSize="1.44rem" src={detail.img} />
+              <Flex alignItems="center" justifyContent="flex-start" mb={"0.47rem"}>
+                <Image boxSize="1.44rem" src={detail.img} mr={"0.25rem"} />
                 <Text color="#171717" fontWeight="400" fontSize="0.75rem">
                   {detail.label}
                 </Text>
@@ -29,7 +29,13 @@ const Details: React.FC<DetailsProps> = ({ detailList, footerHeight }) => {
                 <Show
                   when={Array.isArray(detail.value) && detail.value.length > 0}
                   fallback={
-                    <Text fontSize="0.75rem" color="#171717" fontWeight="400">
+                    <Text
+                      fontSize="0.75rem"
+                      color="#171717"
+                      fontWeight="400"
+                      lineHeight={"1.13rem"}
+                      textAlign={"justify"}
+                    >
                       {detail.value}
                     </Text>
                   }
@@ -54,22 +60,28 @@ const Details: React.FC<DetailsProps> = ({ detailList, footerHeight }) => {
   )
 }
 
-const DetailsWrapper = styled.section`
+const DetailsWrapper = styled.section<{ $footerHeight: number }>`
   z-index: 1;
-  padding: 0 1.33rem;
+  padding: 0 1.5rem;
+  min-height: ${props => `calc(85vh - ${props.$footerHeight}px)`};
+  flex-shrink: 0;
 `
 
 const Detail = styled.div`
-  margin-bottom: 1.11rem;
+  margin-bottom: 1.25rem;
 `
 
 const DetailItem = styled.div`
   background: #ffffff;
   border-radius: 1.11rem;
   border: 0.03rem solid #ee3939;
-  padding: 0.39rem 0.56rem;
+  padding: 0 0.63rem;
   margin-right: 0.75rem;
-  margin-bottom: 0.44rem;
+  margin-bottom: 0.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 interface PlaceHolderType {
