@@ -156,7 +156,6 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
 
   const handleImageClick = (src: string) => {
     setSelectedImg(src)
-    dispatch(setParams({ loadOriginalImage: src }))
   }
 
   useEffect(() => {

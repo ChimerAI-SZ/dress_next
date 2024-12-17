@@ -18,7 +18,8 @@ import { fetchImageDetails, imageRate, fetchRecommendImages } from "@lib/request
 import { fetchShoppingAdd } from "@lib/request/generate-result"
 import { errorCaptureRes, storage } from "@utils/index"
 import useImageActions from "@hooks/useImageActions"
-
+import { setParams } from "@store/features/workSlice"
+import { useDispatch } from "react-redux"
 const userId = storage.get("user_id")
 
 interface ImageItem {
@@ -46,7 +47,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
   const initIndex = imgList.findIndex(item => item.image_url === initImgUrl)
 
   const router = useRouter()
-
+  const dispatch = useDispatch()
   const [imgUrl, setImgUrl] = useState(initImgUrl)
   const [nextImgUrl, setNextImgUrl] = useState(imgList[initIndex + 1]?.image_url)
   const [allImages, setAllImages] = useState<ImageItem[]>(imgList.slice(initIndex))
@@ -501,8 +502,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
             ref={footerRef}
             footerBtnText={footerBtnText}
             onButtonClick={() => {
-              // router.replace(`/upload`)
-              console.log(allImages[imgIndex].image_url, "allImages")
+              dispatch(setParams({ loadOriginalImage: allImages[imgIndex].image_url }))
+              router.replace(`/upload`)
             }}
           />
 

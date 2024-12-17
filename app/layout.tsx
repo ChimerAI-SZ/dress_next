@@ -15,13 +15,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        {/* {pathname === "/" && (
+        {pathname === "/" && (
           <>
             <link rel="prefetch" href="/login" as="document" />
             <link rel="prefetch" href="/album" as="document" />
             <link rel="prefetch" href="/profile" as="document" />
+            <link rel="prefetch" href="/upload" as="document" />
+            <link rel="prefetch" href="/generate" as="document" />
+            <link rel="prefetch" href="/generate-result" as="document" />
           </>
-        )} */}
+        )}
         <link rel="preload" href={loginBg.src} as="image" />
         <link rel="preload" href="/assets/images/logo-CREAMODA.png" as="image" />
       </head>
