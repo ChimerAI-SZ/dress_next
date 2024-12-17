@@ -81,7 +81,7 @@ function Page() {
             >
               Coming soon
             </Text>
-            <Box bg="rgba(23,23,23,0.4)" position={"absolute"} bottom={"0"} w="100%" height="1.55rem">
+            <Box bg="rgba(23,23,23,0.6)" position={"absolute"} bottom={"0"} w="100%" height="1.55rem">
               <Text fontWeight="400" fontSize="0.75rem" color="#FFFFFF" textAlign={"center"} lineHeight={"1.53rem"}>
                 T-shirt
               </Text>
@@ -121,7 +121,14 @@ function Page() {
             >
               Coming soon
             </Text>
-            <Box bg="#15191c" position={"absolute"} bottom={"0"} borderBottomRadius="0.5rem" w="100%" height="1.55rem">
+            <Box
+              bg="rgba(23,23,23,0.6)"
+              position={"absolute"}
+              bottom={"0"}
+              borderBottomRadius="0.5rem"
+              w="100%"
+              height="1.55rem"
+            >
               <Text fontWeight="400" fontSize="0.75rem" color="#FFFFFF" textAlign={"center"} lineHeight={"1.53rem"}>
                 Hoodie
               </Text>
@@ -153,7 +160,14 @@ function Page() {
             >
               Coming soon
             </Text>
-            <Box bg="#15191c" position={"absolute"} bottom={"0"} borderBottomRadius="0.5rem" w="100%" height="1.55rem">
+            <Box
+              bg="rgba(23,23,23,0.6)"
+              position={"absolute"}
+              bottom={"0"}
+              borderBottomRadius="0.5rem"
+              w="100%"
+              height="1.55rem"
+            >
               <Text fontWeight="400" fontSize="0.75rem" color="#FFFFFF" textAlign={"center"} lineHeight={"1.53rem"}>
                 Swimwear
               </Text>

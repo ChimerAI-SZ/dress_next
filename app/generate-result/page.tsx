@@ -324,7 +324,7 @@ export default function GenerateResult() {
   }, [likeList])
 
   return (
-    <Box h="100vh" position="relative" pt={4} px="1rem">
+    <Box h="100vh" position="relative" pt={4} px="1rem" minH={"46rem"}>
       <Header show noTitle cb={setActive} />
       <Toaster />
 
