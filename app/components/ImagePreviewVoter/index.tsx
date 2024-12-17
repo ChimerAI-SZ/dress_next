@@ -475,13 +475,13 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
                       onClick={() => handleImageAction(false)}
                       boxSize={"3.19rem"}
                       mr={"1.13rem"}
-                      src={"/assets/images/mainPage/dontWant.svg"}
+                      src={"/assets/images/mainPage/dontWant.png"}
                       alt="dontWant-icon"
                     />
                     <Image
                       onClick={() => handleImageAction(true)}
                       boxSize={"3.19rem"}
-                      src={"/assets/images/mainPage/want.svg"}
+                      src={"/assets/images/mainPage/want.png"}
                       alt="watnt-icon"
                     />
                   </Flex>
