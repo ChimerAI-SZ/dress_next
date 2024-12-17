@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation"
 
 import { Portal, Image, Flex, Show, Box } from "@chakra-ui/react"
 import { Toaster, toaster } from "@components/Toaster"
-import { Loading } from "@components/Loading"
 import { Alert } from "@components/Alert"
 import LoginPrompt from "@components/LoginPrompt"
 import ToastTest from "@components/ToastTest"
@@ -54,6 +53,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
 
   const [footerHeight, setFooterHeight] = useState<number>(80) // footer的实际高度
   const [isLoading, setIsLoading] = useState(false)
+  const [currentLoadingImage, setCurrentLoadingImage] = useState(0) // loading轮播图的索引
   const [isRating, setIsRating] = useState(false) // 防止重复点击喜欢/不喜欢按钮，但是不需要进入loading状态，所以设置一个独立的state
   const [active, setActive] = useState(false)
 
@@ -66,7 +66,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
 
   const [detailList, setDetailList] = useState<DetailItem[]>([])
 
-  // 添加 ToastTest 相关的状态
+  // ToastTest 相关的状态
   const [isOpen, setIsOpen] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState("")
 
@@ -145,6 +145,19 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
       if (detailList.length > 0) return
 
       setIsLoading(true) // 开始加载
+      // 添加延时以等待 DOM 更新
+
+      setTimeout(() => {
+        const contentElement = contentRef.current
+
+        if (contentElement) {
+          contentElement.scrollTo({
+            top: contentElement.scrollHeight,
+            behavior: "smooth"
+          })
+        }
+      }, 100)
+
       const [err, res] = await errorCaptureRes(fetchImageDetails, { image_url: imgUrl })
 
       if (err || (res && !res?.success)) {
@@ -179,18 +192,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
 
         setDetailText("More Details")
         setFooterBtnText("Generate")
-
-        // 添加延时以等待 DOM 更新
-        setTimeout(() => {
-          const contentElement = contentRef.current
-
-          if (contentElement) {
-            contentElement.scrollTo({
-              top: contentElement.scrollHeight,
-              behavior: "smooth"
-            })
-          }
-        }, 100)
       }
     } catch (error) {
       console.error("获取图片详情失败:", error)
@@ -395,14 +396,21 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
     }
   }, [imgList.length])
 
+  // 添加轮播计时器
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setInterval(() => {
+        setCurrentLoadingImage(prev => (prev + 1) % 3)
+      }, 500)
+
+      return () => clearInterval(timer)
+    }
+  }, [isLoading])
+
   return (
     <Portal>
       <Container>
         <Wrapper>
-          <Show when={isLoading}>
-            <Loading />
-          </Show>
-
           <Bg />
 
           <Content ref={contentRef}>
@@ -496,6 +504,28 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
             <Show when={detailList.length > 0}>
               <Details detailList={detailList} footerHeight={footerHeight} />
             </Show>
+
+            <Show when={isLoading}>
+              <LoadingContainer>
+                <Carousel>
+                  <Image
+                    src="/assets/images/mainPage/loading_1.png"
+                    alt="loading-1-icon"
+                    className={currentLoadingImage === 0 ? "active" : ""}
+                  />
+                  <Image
+                    src="/assets/images/mainPage/loading_2.png"
+                    alt="loading-2-icon"
+                    className={currentLoadingImage === 1 ? "active" : ""}
+                  />
+                  <Image
+                    src="/assets/images/mainPage/loading_3.png"
+                    alt="loading-3-icon"
+                    className={currentLoadingImage === 2 ? "active" : ""}
+                  />
+                </Carousel>
+              </LoadingContainer>
+            </Show>
           </Content>
 
           <Footer
@@ -515,6 +545,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ close, initImgUrl, imgList, f
             affirmDialog={affirmDialog}
             setPhoneNumber={setPhoneNumber}
           />
+
           <Toaster />
         </Wrapper>
       </Container>
@@ -667,6 +698,31 @@ const ButtonBox = styled.div`
   width: 100%;
   padding: 0 1.63rem;
   left: 0;
+`
+const LoadingContainer = styled.div`
+  height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+`
+const Carousel = styled.div`
+  position: relative;
+  height: 7.25rem;
+  width: 7.25rem;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    &.active {
+      opacity: 1;
+    }
+  }
 `
 
 export default ImageViewer

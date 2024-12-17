@@ -15,7 +15,7 @@ interface DetailsProps {
 const Details: React.FC<DetailsProps> = ({ detailList, footerHeight }) => {
   return (
     <>
-      <DetailsWrapper>
+      <DetailsWrapper $footerHeight={footerHeight}>
         <For each={detailList}>
           {detail => (
             <Detail key={detail.label}>
@@ -60,9 +60,11 @@ const Details: React.FC<DetailsProps> = ({ detailList, footerHeight }) => {
   )
 }
 
-const DetailsWrapper = styled.section`
+const DetailsWrapper = styled.section<{ $footerHeight: number }>`
   z-index: 1;
   padding: 0 1.5rem;
+  min-height: ${props => `calc(85vh - ${props.$footerHeight}px)`};
+  flex-shrink: 0;
 `
 
 const Detail = styled.div`
