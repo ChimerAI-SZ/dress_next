@@ -221,8 +221,8 @@ const Waterfall: React.FC = () => {
   useEffect(() => {
     if (hasCheckedRedirect.current) return
 
-    const newImage = searchParams.get('loadOriginalImage')
-    const imageList = searchParams.get('imageList')
+    const newImage = searchParams?.get("loadOriginalImage")
+    const imageList = searchParams?.get("imageList")
 
     if (newImage && imageList && !open) {
       router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageList}`)
@@ -242,8 +242,8 @@ const Waterfall: React.FC = () => {
 
   const handleClose = useCallback(() => {
     setOpen(false)
-    const newImage = searchParams.get('loadOriginalImage')
-    const imageList = searchParams.get('imageList')
+    const newImage = searchParams?.get("loadOriginalImage")
+    const imageList = searchParams?.get("imageList")
     if (newImage && imageList) {
       router.replace(`/generate-result?loadOriginalImage=${newImage}&imageList=${imageList}`)
     }

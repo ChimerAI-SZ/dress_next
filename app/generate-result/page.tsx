@@ -31,7 +31,7 @@ export default function GenerateResult() {
   const router = useRouter()
   const userId = storage.get("user_id")
   const searchParams = useSearchParams()
-  const params = Object.fromEntries(searchParams.entries())
+  const params = searchParams ? Object.fromEntries(searchParams.entries()) : {}
   const typedParams = {
     imageList: params.imageList || "[]",
     loadOriginalImage: params.loadOriginalImage || ""

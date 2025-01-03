@@ -11,7 +11,7 @@ import { errorCaptureRes } from "@utils/index"
 const Page = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const params = Object.fromEntries(searchParams.entries())
+  const params = searchParams ? Object.fromEntries(searchParams.entries()) : {}
   const [seconds, setSeconds] = useState(60) // 初始倒计时秒数
   const [canResend, setCanResend] = useState(false) // 控制是否可以重新发送验证码
   const [code, setCode] = useState("")

@@ -4,7 +4,7 @@ export async function GET(req: Request) {
   try {
     // 获取查询参数
     const { searchParams } = new URL(req.url) // req.url 为请求的完整 URL
-    const imageUrl = searchParams.get("image_url") // 获取 image_url 参数
+    const imageUrl = searchParams?.get("image_url") // 获取 image_url 参数
     console.log(imageUrl)
 
     // 确保获取到必要的参数

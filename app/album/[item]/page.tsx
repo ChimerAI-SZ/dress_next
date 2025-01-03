@@ -46,7 +46,7 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
   const [description, setDescription] = useState(
     albumList.find((item: AlbumItem) => item.collection_id + "" === params.item)?.description
   )
-  const [title, setTitle] = useState(decodeURIComponent(searchParams.get("name") ?? ""))
+  const [title, setTitle] = useState(decodeURIComponent(searchParams?.get("name") || ""))
 
   const [, forceUpdate] = useReducer(x => x + 1, 0)
 
@@ -220,7 +220,7 @@ const Album: React.FC<AlbumItemProps> = ({ params }) => {
             ? ablumData.is_default
               ? "Default Album"
               : ablumData.title
-            : decodeURIComponent(searchParams.get("name") ?? "")
+            : decodeURIComponent(searchParams?.get("name") || "")
         })()}
       </Heading>
       {/* 收藏夹说明 */}

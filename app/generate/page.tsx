@@ -58,7 +58,7 @@ function Page() {
     }
   })
   const searchParams = useSearchParams()
-  const id = searchParams.get("id")
+  const id = searchParams?.get("id") ?? null
   const [imageList, setImageList] = useState<string[]>(generateImage)
   const [splineComponent, setSplineComponent] = useState<JSX.Element | null>(null)
   const [info, setInfo] = useState({ total_messages: 0, wait_time: 0 })
