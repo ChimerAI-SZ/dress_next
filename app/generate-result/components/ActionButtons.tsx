@@ -89,35 +89,35 @@ export default function ActionButtons({
     router.replace(`/generate?id=${key}`)
   }
   if (!active) {
-    return (
-      <Flex
-        height="3.75rem"
-        position="fixed"
-        bottom="0"
-        zIndex={111}
-        bg="#fff"
-        maxW="100vw"
-        w="full"
-        alignItems="center"
-        justifyContent="flex-end"
-        left="50%"
-        transform="translateX(-50%)"
-        borderRadius="0.75rem 0.75rem 0rem 0rem"
-        boxShadow="0rem -0.06rem 0.31rem 0rem rgba(214,214,214,0.5)"
-      >
-        <Button
-          onClick={handleFurtherGenerate}
-          colorScheme="teal"
-          width="9.5rem"
-          height="2.5rem"
-          background="#EE3939"
-          borderRadius="1.25rem"
-          mr="1rem"
-        >
-          Further Generate
-        </Button>
-      </Flex>
-    )
+    return <></>
+
+    //   <Flex
+    //   height="3.75rem"
+    //   position="fixed"
+    //   bottom="0"
+    //   zIndex={111}
+    //   bg="#fff"
+    //   maxW="100vw"
+    //   w="full"
+    //   alignItems="center"
+    //   justifyContent="flex-end"
+    //   left="50%"
+    //   transform="translateX(-50%)"
+    //   borderRadius="0.75rem 0.75rem 0rem 0rem"
+    //   boxShadow="0rem -0.06rem 0.31rem 0rem rgba(214,214,214,0.5)"
+    // >
+    //   <Button
+    //     onClick={handleFurtherGenerate}
+    //     colorScheme="teal"
+    //     width="9.5rem"
+    //     height="2.5rem"
+    //     background="#EE3939"
+    //     borderRadius="1.25rem"
+    //     mr="1rem"
+    //   >
+    //     Further Generate
+    //   </Button>
+    // </Flex>
   }
 
   return (
