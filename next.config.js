@@ -31,5 +31,13 @@ module.exports = {
   webpack: (config) => {
     config.experiments = { ...config.experiments, topLevelAwait: true }
     return config
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy-image',
+        destination: '/api/proxy-image'
+      }
+    ]
   }
 }

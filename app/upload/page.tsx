@@ -39,7 +39,6 @@ function Page() {
   // 使用 useCallback 优化回调函数
   const handleParamsUpdate = useCallback((newParams: Params) => {
     console.log("newParams", newParams)
-    dispatch(setStoreParams({ ...params, ...newParams }))
     setParams((prev: Params) => ({
       ...prev,
       ...newParams
@@ -75,7 +74,7 @@ function Page() {
         Generate
       </Button>
     )
-  }, [params?.loadOriginalImage, dispatch, router])
+  }, [params, dispatch, router])
 
   return (
     <Container bg="#f5f5f5" h="100%" minH="100vh" position="relative" pt={4}>

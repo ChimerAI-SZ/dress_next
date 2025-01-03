@@ -17,10 +17,24 @@ import { getQuery, fetchAddBatch } from "@lib/request/generate"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 
+// 方案1: 通过后端代理
 async function urlToFile(url: string, filename: string): Promise<File> {
-  const response = await fetch(url)
-  const blob = await response.blob()
-  return new File([blob], filename, { type: blob.type })
+  try {
+    // 如果是同域名下的图片，直接获取
+    if (url.startsWith("/") || url.startsWith(window.location.origin)) {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      return new File([blob], filename, { type: blob.type })
+    }
+
+    // 对于跨域图片，使用代理
+    const response = await fetch("/api/proxy-image?url=" + encodeURIComponent(url))
+    const blob = await response.blob()
+    return new File([blob], filename, { type: blob.type })
+  } catch (error) {
+    console.error("Error fetching image:", error)
+    throw new Error("Failed to fetch image")
+  }
 }
 
 // 更新描述结果的接口定义

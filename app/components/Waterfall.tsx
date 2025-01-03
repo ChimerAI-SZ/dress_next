@@ -177,7 +177,7 @@ const Waterfall = ({ viewDetail, setViewDetail }: { viewDetail: boolean; setView
         Alert.open({
           content: err.message ?? res.message
         })
-      } else if (res.data?.length > 0) {
+      } else if (res?.data?.length > 0) {
         const likedList = res.data.filter((item: LikedItem) => item.liked)
 
         setLikedList(likedList)
