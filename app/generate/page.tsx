@@ -10,7 +10,7 @@ import Spline from "@splinetool/react-spline/next"
 import { Application } from "@splinetool/runtime"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
-  workflow2,
+  workflowId_1,
   workflow3,
   workflow4,
   workflow5,
@@ -114,13 +114,7 @@ function Page() {
       dispatch(setStage("a"))
 
       const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = params
-      console.log(
-        loadPrintingImage,
-        backgroundColor,
-        text?.trim(),
-        loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()
-      )
-      console.log(loadPrintingImage, text?.trim(), !loadFabricImage)
+      console.log("loadPrintingImage", loadPrintingImage, text?.trim())
       if (!loadPrintingImage && text?.trim()) {
         console.log(17)
         dispatch(setWork(17))
@@ -157,64 +151,21 @@ function Page() {
       } else {
         console.log(111666)
         dispatch(setWork(1))
-        workflow1_6(params).then(newTaskIDs => {
+        workflowId_1(params).then(imageUrls => {
           console.log("workflow")
-          if (newTaskIDs) {
-            setTaskIDs(newTaskIDs)
-            dispatch(setTaskId(newTaskIDs))
-            dispatch(setWork(0))
-          }
+          console.log(imageUrls)
+          // 直接设置生成的图片
+          setImageList(imageUrls)
+          dispatch(setGenerateImage(imageUrls))
+          // 设置进度条为100%
+          setBarValue(100)
+          // setCurrentBarValue(100)
+          // 清除任务ID和工作状态
+          dispatch(setTaskId([]))
+          dispatch(setWork(0))
         })
       }
       hasRunRef.current = true
-      // if (loadPrintingImage && backgroundColor === "#FDFCFA" && !text?.trim()) {
-      //   console.log(222)
-      //   dispatch(setWork(2))
-      //   dispatch(setParams(params))
-      //   workflow2(params).then(newTaskIDs => {
-      //     console.log("workflow")
-      //     if (newTaskIDs) {
-      //       setTaskIDs(newTaskIDs)
-      //       dispatch(setTaskId(newTaskIDs))
-      //       dispatch(setWork(0))
-      //     }
-      //   })
-      // } else if (loadPrintingImage && text?.trim() && !loadFabricImage) {
-      //   console.log(4)
-      //   dispatch(setWork(4))
-      //   workflow4(params).then(newTaskIDs => {
-      //     console.log("workflow")
-      //     if (newTaskIDs) {
-      //       setTaskIDs(newTaskIDs)
-      //       dispatch(setTaskId(newTaskIDs))
-
-      //       dispatch(setWork(0))
-      //     }
-      //   })
-      // } else if (loadPrintingImage && text?.trim() && loadFabricImage) {
-      //   console.log(555)
-      //   dispatch(setWork(5))
-      //   workflow5(params).then(newTaskIDs => {
-      //     console.log("workflow")
-      //     if (newTaskIDs) {
-      //       setTaskIDs(newTaskIDs)
-      //       dispatch(setTaskId(newTaskIDs))
-
-      //       dispatch(setWork(0))
-      //     }
-      //   })
-      // } else {
-      //   console.log(111666)
-      //   dispatch(setWork(1))
-      //   workflow1_6(params).then(newTaskIDs => {
-      //     console.log("workflow")
-      //     if (newTaskIDs) {
-      //       setTaskIDs(newTaskIDs)
-      //       dispatch(setTaskId(newTaskIDs))
-      //       dispatch(setWork(0))
-      //     }
-      //   })
-      // }
     } else if (
       !hasRunRef.current &&
       params &&

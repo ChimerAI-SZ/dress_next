@@ -17,97 +17,6 @@ import { getQuery, fetchAddBatch } from "@lib/request/generate"
 import { fetchHomePage } from "@lib/request/page"
 import { errorCaptureRes } from "@utils/index"
 
-async function urlToFile(url: string, filename: string): Promise<File> {
-  const response = await fetch(url)
-  const blob = await response.blob()
-  return new File([blob], filename, { type: blob.type })
-}
-
-// 更新描述结果的接口定义
-interface Description {
-  text: string
-}
-
-// 使用更精确的类型定义
-type ImageDescriptionResult = Array<{
-  data: {
-    descriptions: Array<{
-      text: string
-    }>
-  }
-}>
-
-// 更新返回结果的接口定义
-interface GenerateImageResult {
-  data: {
-    data: Array<{
-      url: string
-      prompt: string
-      resolution: string
-      seed: number
-      style_type: string
-      is_image_safe: boolean
-    }>
-    created: string
-  }
-  message: string
-  success: boolean
-}
-
-export const workflowId_1 = async (p: Params) => {
-  const { loadOriginalImage } = p
-  console.log("loadOriginalImage", loadOriginalImage)
-
-  if (!loadOriginalImage) {
-    throw new Error("Original image URL is required")
-  }
-
-  const file = await urlToFile(loadOriginalImage, "original.jpg")
-  const formData = new FormData()
-  formData.append("image_file", file)
-  const result = (await getImageDescription(formData)) as unknown as ImageDescriptionResult
-  console.log(result)
-
-  const promptText = result?.[0]?.data?.descriptions?.[0]?.text || result?.[1]?.data?.descriptions?.[0]?.text || "-"
-
-  // 创建6个并发请求
-  const requests = Array(6)
-    .fill(null)
-    .map(async () => {
-      const formData = new FormData()
-      formData.append("image_file", file)
-      formData.append("prompt", promptText)
-      formData.append("model", "V_2_TURBO")
-      formData.append("style_type", "AUTO")
-      formData.append("magic_prompt_option", "AUTO")
-      formData.append("aspect_ratio", "ASPECT_3_4")
-      formData.append("image_weight", "70")
-      return generateImageByRemix(formData) as unknown as GenerateImageResult
-    })
-
-  // 等待所有请求完成
-  const results = await Promise.all(requests)
-
-  // 收集所有生成的图片URL到一个数组
-  const generatedImages = results.reduce((acc: string[], result) => {
-    // Handle the [null, {...}] response format
-    const responseData = Array.isArray(result) ? result[1] : result
-
-    if (!responseData?.data?.data?.[0]?.url) {
-      console.error("Invalid response format:", result)
-      return acc
-    }
-    return [...acc, responseData.data.data[0].url]
-  }, [])
-
-  if (generatedImages.length === 0) {
-    throw new Error("No images were successfully generated")
-  }
-
-  console.log("Generated image URLs:", generatedImages)
-  return generatedImages
-}
-
 export const workflow2 = async (p: Params) => {
   const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
   const newFabricImage =
@@ -121,6 +30,29 @@ export const workflow2 = async (p: Params) => {
     library: "show-new"
   })
   console.log(res.data)
+  // const results = await Promise.allSettled([
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage }),
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[0].image_url }),
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[1].image_url }),
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[2].image_url }),
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[3].image_url }),
+  //   dressPrintingTryon({ ...p, loadFabricImage: newFabricImage, loadOriginalImage: res.data[4].image_url })
+  // ])
+
+  // const successfulResults = results.filter(result => result.status === "fulfilled")
+  // const failedResults = results.filter(result => result.status === "rejected")
+
+  // const taskIDs = successfulResults.map(result => result.value.data.taskID)
+  // console.log("Successful task IDs:", taskIDs)
+  // console.log("sueccessful taskid id ,taskid")
+  // failedResults.forEach(result => {
+  //   console.error("Failure:", result.reason)
+  //   if (result.reason.code === "ERR_NETWORK") {
+  //     console.error("Network Error:", result.reason.message)
+  //   }
+  // })
+
+  // return taskIDs
 
   // 存储每次请求的参数
   const requestParams = [
@@ -728,7 +660,104 @@ export const workflow5 = async (p: Params) => {
   })
 }
 
-export const workflow1_6 = async (p: Params) => {}
+export const workflow1_6 = async (p: Params) => {
+  const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
+  const newFabricImage =
+    loadFabricImage === ""
+      ? "http://aimoda-ai.oss-us-east-1.aliyuncs.com/3a982f03073f4c973cbb606541355c50.jpg"
+      : loadFabricImage
+
+  // 尝试调用 searchImage
+  let shouldRunAllApis = false
+  let similarImageUrl = ""
+
+  try {
+    const ImageResult = await errorCaptureRes(searchImage, loadOriginalImage || "")
+    if (ImageResult[1]?.data?.similar_image_url) {
+      similarImageUrl = ImageResult[1].data.similar_image_url
+      shouldRunAllApis = true
+    }
+  } catch (error) {
+    console.error("searchImage failed, will only run first 3 APIs:", error)
+  }
+
+  // 根据 searchImage 的结果决定调用哪些接口
+  const apiCalls = [
+    dressVariation20PCT({ ...p, loadFabricImage: newFabricImage }),
+    dressPatternVariation({ ...p, loadFabricImage: newFabricImage }),
+    dressVariation50PCT({ ...p, loadFabricImage: newFabricImage })
+  ]
+
+  // 如果 searchImage 成功，添加额外的 3 个接口调用
+  if (shouldRunAllApis) {
+    const transferParams = {
+      loadAImage: loadOriginalImage,
+      loadBImage: similarImageUrl,
+      transferWeight: 0.2
+    }
+
+    apiCalls.push(
+      TransferAAndBPlus(transferParams),
+      TransferAAndBVITG(transferParams),
+      TransferAAndBSTANDARD(transferParams)
+    )
+  }
+
+  const results = await Promise.allSettled(apiCalls)
+
+  // 构建对应的请求参数数组
+  const requestParams = [
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage },
+    { ...p, loadFabricImage: newFabricImage }
+  ]
+
+  // 如果执行了全部接口，添加额外的参数
+  if (shouldRunAllApis) {
+    // 转换 transferParams 为符合 Params 类型的对象
+    const transferParamsForRequest = {
+      loadOriginalImage: loadOriginalImage,
+      loadFabricImage: similarImageUrl,
+      backgroundColor,
+      text,
+      loadPrintingImage
+    }
+
+    requestParams.push(transferParamsForRequest, transferParamsForRequest, transferParamsForRequest)
+  }
+
+  // 过滤出成功的结果
+  const successfulResults = results.filter(result => result.status === "fulfilled")
+
+  // 提取每个成功结果中的 taskID 和请求参数
+  const taskDetails = successfulResults.map((result, index) => {
+    const taskID = result.value.data.taskID
+    const params = requestParams[index]
+
+    return {
+      task_id: taskID,
+      task_info: JSON.stringify(params)
+    }
+  })
+
+  const job_id = uuidv4()
+  const newObj = {
+    job_id: job_id,
+    tasks: taskDetails
+  }
+
+  // 调用 fetchAddBatch 请求接口
+  fetchAddBatch(newObj)
+    .then(() => {
+      // 这里可以根据需要处理请求成功后的回调
+    })
+    .catch(err => {
+      console.error("请求失败：", err)
+    })
+
+  const taskIDs = successfulResults.map(result => result.value.data.taskID)
+  return taskIDs
+}
 
 export const workflow11 = async (p: Params) => {
   const { loadOriginalImage, loadPrintingImage, backgroundColor, text, loadFabricImage } = p
@@ -2202,4 +2231,8 @@ export const workflow1_9 = async (p: Params) => {
     })
   const taskIDs = successfulResults.map(result => result.value.data.taskID)
   return taskIDs
+}
+
+export const workflowId_1 = async (p: Params) => {
+  console.log("id1111")
 }

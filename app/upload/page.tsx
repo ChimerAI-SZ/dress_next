@@ -38,6 +38,8 @@ function Page() {
 
   // 使用 useCallback 优化回调函数
   const handleParamsUpdate = useCallback((newParams: Params) => {
+    console.log("newParams", newParams)
+    dispatch(setStoreParams({ ...params, ...newParams }))
     setParams((prev: Params) => ({
       ...prev,
       ...newParams
