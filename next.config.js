@@ -39,5 +39,9 @@ module.exports = {
         destination: '/api/proxy-image'
       }
     ]
-  }
+  },
+  api: {
+    bodyParser: false,
+    responseLimit: '10mb',
+  },
 }

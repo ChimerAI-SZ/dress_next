@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <link rel="prefetch" href="/generate-result" as="document" />
           </>
         )}
-        <link rel="preload" href={loginBg.src} as="image" />
+        <link rel="preload" href="/_next/static/media/bg.f37748e8.png" as="image" type="image/png" />
         <link rel="preload" href="/assets/images/logo-CREAMODA.png" as="image" />
       </head>
       <body

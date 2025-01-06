@@ -1,14 +1,4 @@
 import { useState, useCallback } from "react"
-import OSS from "ali-oss"
-
-// 使用浏览器的 crypto API 进行 SHA-256 哈希
-const hashFileName = async (fileName: string): Promise<string> => {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(fileName)
-  const hashBuffer = await window.crypto.subtle.digest("SHA-256", data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("")
-}
 
 interface UploadState {
   isUploading: boolean
@@ -16,11 +6,15 @@ interface UploadState {
   uploadedUrl: string | undefined
 }
 
+interface UploadResponse {
+  url: string
+}
+
 interface UseAliyunOssUploadReturn {
   isUploading: boolean
   uploadProgress: number
   uploadedUrl: string | undefined
-  uploadToOss: (file: File) => Promise<void>
+  uploadToOss: (file: File) => Promise<UploadResponse>
 }
 
 const useAliyunOssUpload = (): UseAliyunOssUploadReturn => {
@@ -34,39 +28,47 @@ const useAliyunOssUpload = (): UseAliyunOssUploadReturn => {
     setUploadState(prevState => ({ ...prevState, isUploading: true, uploadProgress: 0 }))
 
     try {
-      const client = new OSS({
-        region: process.env.NEXT_PUBLIC_OSS_REGION!,
-        accessKeyId: process.env.NEXT_PUBLIC_OSS_ACCESS_KEY_ID!,
-        accessKeySecret: process.env.NEXT_PUBLIC_OSS_ACCESS_KEY_SECRET!,
-        bucket: process.env.NEXT_PUBLIC_OSS_BUCKET!
-      })
+      const formData = new FormData()
+      formData.append("file", file)
 
-      // 对文件名进行哈希处理
-      const hashedFileName = await hashFileName(file.name)
+      return new Promise<UploadResponse>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
 
-      // 生成一个不包含中文字符的文件名
-      const fileName = `${hashedFileName}.jpg` // 可以根据需要附加扩展名
-
-      const result = await client.multipartUpload(fileName, file, {
-        progress: (p: number) => {
-          setUploadState(prevState => ({
-            ...prevState,
-            uploadProgress: Math.round(p * 100)
-          }))
+        xhr.upload.onprogress = event => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100)
+            setUploadState(prevState => ({
+              ...prevState,
+              uploadProgress: progress
+            }))
+          }
         }
-      })
 
-      // 构建文件的URL并添加阿里云图片处理参数
-      const uploadedUrl = `https://${process.env.NEXT_PUBLIC_OSS_BUCKET}.${process.env.NEXT_PUBLIC_OSS_REGION}.aliyuncs.com/${result.name}?x-oss-process=image/format,jpg`
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText)
+            setUploadState({
+              isUploading: false,
+              uploadProgress: 100,
+              uploadedUrl: data.url
+            })
+            resolve(data)
+          } else {
+            reject(new Error("Upload failed"))
+          }
+        }
 
-      setUploadState({
-        isUploading: false,
-        uploadProgress: 100,
-        uploadedUrl
+        xhr.onerror = () => {
+          reject(new Error("Upload failed"))
+        }
+
+        xhr.open("POST", "/api/upload", true)
+        xhr.send(formData)
       })
     } catch (err) {
-      console.error("Error uploading to OSS:", err)
+      console.error("Error uploading file:", err)
       setUploadState(prevState => ({ ...prevState, isUploading: false }))
+      return Promise.reject(err)
     }
   }, [])
 

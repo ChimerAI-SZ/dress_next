@@ -12,7 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     "aimoda-ai.oss-us-east-1.aliyuncs.com",
     "creamoda.oss-us-west-1.aliyuncs.com",
     "creamoda-gallary.oss-us-west-1.aliyuncs.com",
-    "creamoda-gallary.oss-accelerate.aliyuncs.com"
+    "creamoda-gallary.oss-accelerate.aliyuncs.com",
+    "creamoda-front-end.oss-us-west-1.aliyuncs.com"
   ]
 
   try {
