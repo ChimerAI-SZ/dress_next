@@ -38,7 +38,7 @@ declare global {
 }
 const instance = axios.create({
   baseURL: "https://x.creamoda.ai:3000",
-  timeout: 30000
+  timeout: 100000
 })
 
 // 用于存储 pending 的请求（处理多条相同请求）
