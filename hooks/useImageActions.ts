@@ -4,12 +4,26 @@ const useImageActions = (userId: string) => {
   const handleDownload = async (imgUrl: string) => {
     // 下载逻辑
     try {
-      // 检测是否是移动设备
+      // 检测是否为移动设备
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
       if (isMobile) {
-        // 移动设备直接打开图片链接
-        window.open(imgUrl, "_blank")
+        // 移动设备使用新方法
+        const response = await fetch(imgUrl)
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+
+        // 创建一个隐藏的iframe来加载图片
+        const iframe = document.createElement("iframe")
+        iframe.style.display = "none"
+        document.body.appendChild(iframe)
+        iframe.src = url
+
+        // 清理
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(iframe)
+        }, 1000)
       } else {
         // PC端使用下载方式
         const response = await fetch(imgUrl)
