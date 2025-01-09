@@ -429,7 +429,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
 
   return (
     <Portal>
-      <Container>
+      <Container className="image-preview-voter-container">
         <Wrapper>
           <Bg />
 
@@ -463,6 +463,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
                 </NextImg>
                 <ButtonBox>
                   <Flex>
+                    {/* 下载 */}
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
@@ -478,6 +479,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
                         alt="dontWant-icon"
                       />
                     </Flex>
+                    {/* 加购 */}
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}

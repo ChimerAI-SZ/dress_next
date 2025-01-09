@@ -4,23 +4,28 @@ const useImageActions = (userId: string) => {
   const handleDownload = async (imgUrl: string) => {
     // 下载逻辑
     try {
-      // 先获取图片数据
-      const response = await fetch(imgUrl)
-      const blob = await response.blob()
+      // 检测是否是移动设备
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-      // 创建 URL 对象
-      const url = window.URL.createObjectURL(blob)
+      if (isMobile) {
+        // 移动设备直接打开图片链接
+        window.open(imgUrl, "_blank")
+      } else {
+        // PC端使用下载方式
+        const response = await fetch(imgUrl)
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
 
-      const link = document.createElement("a")
-      link.href = url
-      link.download = "图片.jpg" // 设置下载文件名
+        const link = document.createElement("a")
+        link.href = url
+        link.download = "图片.jpg"
+        document.body.appendChild(link)
+        link.click()
 
-      document.body.appendChild(link)
-      link.click()
-
-      // 清理
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(link)
+        // 清理
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link)
+      }
 
       Alert.open({
         content: "Download Successfully",
@@ -31,7 +36,6 @@ const useImageActions = (userId: string) => {
         }
       })
     } catch (error) {
-      // 下载失败提示
       Alert.open({
         content: "Failed to download the image, \n Please try again."
       })
