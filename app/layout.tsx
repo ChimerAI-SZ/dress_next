@@ -6,6 +6,12 @@ import { headers } from "next/headers"
 import { Loading } from "@components/Loading/index"
 import type { Viewport, Metadata } from "next"
 
+declare global {
+  interface Window {
+    dataLayer: any[]
+  }
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = headers()
   const pathname = headersList.get("x-pathname") || "/"
@@ -13,6 +19,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html suppressHydrationWarning>
       <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-JBLCNYQGR0"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JBLCNYQGR0');
+          `
+          }}
+        />
         <link rel="icon" href="/icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         {pathname === "/" && (
